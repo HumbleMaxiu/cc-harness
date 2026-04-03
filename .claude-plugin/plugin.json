@@ -1,0 +1,8 @@
+{
+  "name": "cc-harness",
+  "description": "Claude Code 开发辅助工具集，包含 feature flow、code review、tdd guide 等 workflows",
+  "version": "1.0.0",
+  "author": {
+    "name": "xiuma"
+  }
+}
