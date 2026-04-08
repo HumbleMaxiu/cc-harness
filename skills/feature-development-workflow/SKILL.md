@@ -1,6 +1,6 @@
 ---
 name: feature-development-workflow
-description: Complete feature development workflow orchestrating spec → tdd → develop → review → fix → pr pipeline. Use when user requests a full feature implementation or /feature-flow command is invoked.
+description: Complete feature development workflow orchestrating spec → tdd → develop → quality-gate → pr pipeline. Use when user requests a full feature implementation or /feature-flow command is invoked.
 origin: ECC
 ---
 
@@ -44,7 +44,6 @@ origin: ECC
 │                    测试用例与覆盖率策略                             │
 │                                                                  │
 │  输出: .claude/spec/<feature>/tests/*.test.ts                 │
-│  Gate: RED phase verified                                        │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -53,37 +52,17 @@ origin: ECC
 │                     增量式代码实现                                │
 │                                                                  │
 │  输出: src/**/*.ts (或其他语言文件)                               │
-│  Gate: GREEN + 80% coverage                                      │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                  REVIEW LOOP (最多循环 3 次)                      │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
-│  │code-reviewer │───▶│ fix-agent    │───▶│ re-review   │       │
-│  │   (问题)      │    │   (修复)      │    │   (验证)     │       │
-│  └──────────────┘    └──────────────┘    └──────┬──────┘       │
-│       │                    │                    │              │
-│       └────────────────────┴────────────────────┘              │
-│                      (如果发现问题)                               │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       TEST AGENT                                 │
-│                     完整测试套件执行                              │
+│                      QUALITY GATE                                │
+│              (由 skill: quality-gate 管理)                        │
 │                                                                  │
-│  运行: npm test && npm run test:coverage                        │
-│  Gate: 所有测试通过 + 80%+ 覆盖率                                 │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       LINT AGENT                                 │
-│                     代码质量与风格检查                            │
-│                                                                  │
-│  运行: npm run lint                                              │
-│  Gate: 无 lint 错误                                               │
+│  类型: review → test → lint                                     │
+│  循环: verify → fix → verify (内部自动处理)                      │
+│  输出: PASS | FAIL | BLOCKED                                    │
+│  状态: .claude/workflow-state.md                                │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -95,30 +74,49 @@ origin: ECC
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+## 质量门说明
+
+质量门统一管理代码质量验证，详见 `skill: quality-gate`。
+
+主工作流只需调用 skill，无需关心循环细节：
+
+```
+skill: quality-gate
+type: review
+
+skill: quality-gate
+type: test
+
+skill: quality-gate
+type: lint
+```
+
+返回 `PASS` 时继续下一阶段，返回 `BLOCKED` 时等待人工介入。
+
 ## 工作流类型
 
 ### Feature Development (标准)
 ```
 输入: "Add user authentication with OAuth"
-流程: spec → planner → tdd → develop → review → test → lint → pr
+流程: spec → planner → tdd → develop → quality-gate → pr
 ```
 
 ### Bug Fix
 ```
 输入: "Fix login button not working on mobile"
-流程: spec (复现) → tdd (测试先行) → develop → review → test → lint → pr
+流程: spec (复现) → tdd (测试先行) → develop → quality-gate → pr
 ```
 
 ### 仅 Code Review
 ```
 输入: "Review the auth module"
-流程: review → fix (可选) → re-review
+流程: skill: quality-gate, type: review
 ```
 
 ### 空项目 / 最小化项目
 ```
 输入: "New project with no test/lint tools"
-流程: spec → planner → develop → review → pr
+流程: spec → planner → develop → quality-gate (仅 review) → pr
 
 跳过: tdd (无 test runner), test (无 test framework), lint (无 linter)
 ```
@@ -147,28 +145,6 @@ npx tsc --version &>/dev/null && echo "TYPESCRIPT_AVAILABLE" || echo "TYPESCRIPT
 | No | Yes | `feature-notest` (跳过 test/tdd) |
 | No | No | `minimal` (develop → review → pr) |
 
-### 流程: `feature-notlint`
-```
-spec → planner → tdd → develop → review → test → pr
-                                                 ↑
-                                           Lint 跳过
-```
-
-### 流程: `feature-notest`
-```
-spec → planner → develop → review → lint → pr
-                                     ↑
-                        TDD/Test 跳过，测试文件仍会生成但不运行
-```
-
-### 流程: `minimal` (空项目)
-```
-spec → planner → develop → review → pr
-
-无 test runner，无 linter，无 TDD
-仅通过 code review 控制质量
-```
-
 ## Agent 交接协议
 
 每个 agent 输出标准化的交接文档：
@@ -181,102 +157,17 @@ spec → planner → develop → review → pr
 **阻塞原因:** [如果有的话]
 ```
 
-## 进度追踪
-
-工作流状态保存在 `.claude/workflow-state.json`：
-
-```json
-{
-  "workflowId": "feat-123",
-  "type": "feature",
-  "status": "in_progress",
-  "currentPhase": "develop",
-  "completedPhases": ["spec", "planner", "tdd"],
-  "artifacts": {
-    "spec": ".claude/spec/feature/SPEC.md",
-    "plan": ".claude/plan/feature.md",
-    "tests": ".claude/spec/feature/tests/"
-  },
-  "iterationCount": {
-    "reviewLoop": 0
-  },
-  "startedAt": "2024-01-01T00:00:00Z"
-}
-```
-
 ## 错误处理
 
 ### Agent 执行失败
-- 记录错误到 `.claude/workflow-state.json`
+- 记录错误到 `.claude/workflow-state.md`
 - 向用户报告错误详情
 - 提供重试或跳过选项
 
-### 测试失败
-- 进入修复循环: `fix-agent → re-review`
-- 最多 3 次迭代后请求人工介入
-
-### 覆盖率失败
-- 报告未覆盖的文件/行
-- 返回 develop agent 添加更多测试
-
-## Feedback Loop 追踪
-
-工作流追踪所有 agent 之间的 feedback loops，确保透明性和质量控制。
-
-### Feedback Loop 类型
-
-| Loop | From | To | 触发条件 |
-|------|------|----|----------|
-| Review Loop | code-reviewer | fix-agent | 代码审查发现问题 |
-| Test Feedback | test-agent | fix-agent | 测试失败或覆盖率低于阈值 |
-| Lint Feedback | lint-agent | fix-agent | Lint 错误被检测到 |
-
-### Feedback Loop 通知
-
-**触发时 (发现问题):**
-```
-🔄 [10:30:15] Review Loop triggered! Returning to fix-agent.
-   Reason: issues_found
-   Iteration: 2/3
-   Issues: 3 HIGH, 1 MEDIUM
-```
-
-**绕过时 (无问题):**
-```
-✓ [10:30:15] Review Loop passed smoothly - no feedback loop needed.
-```
-
-### 状态追踪
-
-Feedback loop 历史保存在工作流状态中:
-```json
-{
-  "iterationCount": {
-    "reviewLoop": 2,
-    "fixLoop": 2
-  },
-  "feedbackLoopHistory": [
-    {
-      "type": "review",
-      "name": "Review Loop",
-      "timestamp": "2026-04-03T10:30:15Z",
-      "reason": "issues_found",
-      "iteration": 1,
-      "issuesFound": ["Security: hardcoded API key", "Error: missing try-catch"]
-    }
-  ]
-}
-```
-
-### 最大迭代次数
-- 每个 feedback loop 最多 3 次迭代
-- 如果达到最大值，工作流阻塞并请求人工介入
-- 使用 `isMaxIterationsReached(state, 'review')` 检查
-
-### 带 Feedback 的显示
-使用 `getStatusDisplayWithFeedback(state)` 而不是 `getStatusDisplay(state)` 可以看到:
-- 当前 feedback loop 迭代次数
-- 所有 loops 触发/绕过的摘要
+### 质量门失败
+- 详见 `skill: quality-gate`
+- 达到最大迭代次数后返回 `BLOCKED`
+- 等待人工介入或显式 override
 
 ## 命令语法
 
@@ -323,23 +214,23 @@ Feedback loop 历史保存在工作流状态中:
 │                                                             │
 │ ✓ spec        [  COMPLETE  ]  需求已编写                     │
 │ ✓ planner     [  COMPLETE  ]  计划已批准                     │
-│ ✓ tdd         [  COMPLETE  ]  12 tests RED                 │
+│ ✓ tdd         [  COMPLETE  ]  12 tests                     │
 │ ● develop     [ IN PROGRESS]  正在实现...                   │
-│ ○ review      [  PENDING   ]  等待 develop                  │
-│ ○ test        [  PENDING   ]  等待 review                   │
-│ ○ lint        [  PENDING   ]  等待 test                     │
-│ ○ pr          [  PENDING   ]  等待 lint                     │
+│ ○ quality-gate[  PENDING   ]  等待 develop                  │
+│ ○ pr          [  PENDING   ]  等待 quality-gate              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## 相关
 
+- `skill: quality-gate` - 质量门定义（review/test/lint 循环管理）
+- `skills/quality-gate/loop-state.md` - 循环状态格式
 - `agents/spec.md` - 需求分析
 - `agents/planner.md` - 实施计划
 - `agents/tdd-guide.md` - 测试驱动开发
 - `agents/develop.md` - 代码实现
-- `agents/code-reviewer.md` - 代码审查
-- `agents/fix-agent.md` - 修复 review/test/lint 反馈的问题
-- `agents/test-agent.md` - 测试执行 (带 feedback loop 追踪)
-- `agents/lint-agent.md` - Lint 检查 (带 feedback loop 追踪)
+- `agents/code-reviewer.md` - 代码审查（quality-gate 调用）
+- `agents/fix-agent.md` - 修复 agent（quality-gate 循环调用）
+- `agents/test-agent.md` - 测试执行（quality-gate 调用）
+- `agents/lint-agent.md` - Lint 检查（quality-gate 调用）
 - `commands/prp-pr.md` - PR 创建
