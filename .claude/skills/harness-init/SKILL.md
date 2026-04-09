@@ -161,7 +161,7 @@ git add -A && git commit -m "harness: initial project setup"
 
 | 文件 | 用途 |
 |------|------|
-| `../agents-md/references/01-agents-template.md` | AGENTS.md 模板 |
-| `../agents-md/references/02-generation-workflow.md` | 生成流程 |
-| `../agents-md/references/03-subdir-management.md` | 子目录管理 |
-| `../agents-md/references/04-progressive-improvement.md` | 改进指南 |
+| `../agents-md-guide/references/01-agents-template.md` | AGENTS.md 模板 |
+| `../agents-md-guide/references/02-generation-workflow.md` | 生成流程 |
+| `../agents-md-guide/references/03-subdir-management.md` | 子目录管理 |
+| `../agents-md-guide/references/04-progressive-improvement.md` | 改进指南 |
