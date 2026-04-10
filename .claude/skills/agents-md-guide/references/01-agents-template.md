@@ -1,140 +1,141 @@
-# AGENTS.md 标准模板
+# AGENTS.md Standard Template
 
-基于 Harness Engineering 框架的标准 AGENTS.md 模板。
+Based on the Harness Engineering framework and AGENTS.md industry best practices.
 
-**原则**：AGENTS.md 是**目录索引**，不是百科全书。只编码模型无法自行推断的信息。
+**Core Principles**:
+- AGENTS.md is a **directory index**, not an encyclopedia. Only encode what the model cannot infer on its own.
+- Content can be in English or mixed English/Chinese. File paths, code snippets, and technical terms stay in their original language (usually English).
+- Documentation Map descriptions use English primarily (consistent with the AGENTS.md industry standard).
 
 ---
 
-## 标准结构
+## Standard Structure
 
 ```markdown
-# 项目名称
+# Project Name
 
-> 一句话项目描述
+> One-line project description
 
-## 快速开始
+## Quick Start
 
 ```bash
-# 安装依赖
+# Install dependencies
 npm install
 
-# 启动开发服务器
+# Start dev server
 npm run dev
 ```
 
-## 项目概述
+## Project Overview
 
-[2-3 句话描述项目是什么、解决什么问题]
+[2-3 sentences: what the project is, what problem it solves]
 
-## 技术栈
+## Tech Stack
 
-- **语言/框架**: [核心框架]
-- **构建工具**: [构建工具]
-- **主要依赖**: [3-5 个核心依赖]
+- **Language/Framework**: [core framework]
+- **Build Tool**: [build tool]
+- **Key Dependencies**: [3-5 core dependencies]
 
-## 目录结构
+## Directory Structure
 
 ```
 project/
-├── src/                    # 源代码
-│   ├── components/        # UI 组件
-│   ├── pages/             # 页面/路由
-│   └── utils/             # 工具函数
-├── tests/                 # 测试
-├── docs/                  # 文档（见下方）
-└── scripts/               # 构建脚本
+├── src/                    # Source code
+│   ├── components/        # Reusable UI components
+│   ├── pages/             # Page/route components
+│   └── utils/             # Utility functions
+├── tests/                 # Tests
+├── docs/                  # Documentation (see below)
+└── scripts/               # Build scripts
 ```
 
-## 关键约定
+## Key Conventions
 
-> ⚠️ **重要**：以下规则是模型无法自行推断的硬性约束，违反将导致错误结果。
+> ⚠️ **Important**: The following rules are hard constraints that the model cannot infer on its own.
+> 💡 **Convention sourcing**: Conventions must come from user input whenever possible. If the user has not specified conventions, infer from existing code patterns — do NOT fabricate rules for patterns that don't exist in the codebase.
 
-1. [约定 1 — 具体描述，避免模糊]
-2. [约定 2]
-3. [约定 3]
+1. [Convention 1 — be specific, avoid vagueness]
+2. [Convention 2]
+3. [Convention 3]
 
-## 代码风格
+## Code Style
 
-- [风格规则 1]
-- [风格规则 2]
+- [Style rule 1]
+- [Style rule 2]
 
-## 文档地图
+## Documentation Map
 
-| 主题 | 文件 |
-|------|------|
-| 架构设计 | `docs/architecture.md` |
-| API 约定 | `docs/api.md` |
-| 编码规范 | `docs/conventions.md` |
-| 测试策略 | `docs/testing.md` |
+| Topic | File |
+|-------|------|
+| Architecture | `docs/architecture.md` |
+| API Reference | `docs/api.md` |
+| Code Conventions | `docs/conventions.md` |
+| Testing Strategy | `docs/testing.md` |
 
-## 常见任务
+> ⚠️ **Document map rules**: Only include user-facing docs (`docs/*.md`, `README.md`). Do NOT include internal development resources like `.claude/`, `skill-creator/references/`, or plugin-internal paths.
 
-| 任务 | 命令/操作 |
-|------|-----------|
-| 运行测试 | `npm test` |
-| 构建生产版本 | `npm run build` |
-| 代码检查 | `npm run lint` |
+## Common Tasks
 
-## 语言约束
+| Task | Command |
+|------|---------|
+| Run tests | `npm test` |
+| Build for production | `npm run build` |
+| Lint | `npm run lint` |
 
-**必须使用中文输出**。所有回复、注释、提交信息均使用中文。
-```
+## Language Constraint (Optional)
 
----
-
-## 根目录 AGENTS.md 强制条款
-
-每个根目录 AGENTS.md **必须**在 "关键约定" 或 "语言约束" 章节包含以下条款：
+To constrain agent reply language to Chinese, add this section. This is optional and only needed if the project explicitly requires it:
 
 ```markdown
-## 语言约束
+## Language Constraint
 
-**必须使用中文输出**。所有回复、注释、提交信息均使用中文。
+**You must respond in Chinese.** All replies, comments, and commit messages use Chinese.
 ```
+
+> ⚠️ This clause only constrains the agent's communication language. It does NOT require the AGENTS.md content itself to be entirely in Chinese. File paths and code snippets stay in English.
 
 ---
 
-## 子目录 AGENTS.md 模板
+## Subdirectory AGENTS.md Template
 
-子目录 AGENTS.md **不需要**语言约束条款（继承自根目录），专注于模块特定内容：
+Subdirectory AGENTS.md files **do NOT need** the language constraint clause (inherited from root). Focus on module-specific content:
 
 ```markdown
-# [模块名称]
+# [Module Name]
 
-> 本模块在项目中的职责
+> Module's responsibility in the project
 
-## 与根目录 AGENTS.md 的关系
+## Relationship with Root AGENTS.md
 
-本模块是 [父项目名] 的一部分，根目录 `AGENTS.md` 中的通用约定仍然适用。
+This module is part of [project name]. General conventions from the root `AGENTS.md` still apply.
 
-## 模块特定约定
+## Module-Specific Conventions
 
-[本模块特有的规则，3-8 条]
+[Rules unique to this module, 3-8 items]
 
-## 关键文件
+## Key Files
 
-| 文件 | 用途 |
-|------|------|
-| `file1.ts` | [描述] |
-| `file2.ts` | [描述] |
+| File | Purpose |
+|------|---------|
+| `file1.ts` | [description] |
+| `file2.ts` | [description] |
 
-## 依赖关系
+## Dependencies
 
-- 上游：`../module-x/AGENTS.md`
-- 下游：`../module-y/AGENTS.md`（如有）
+- Upstream: `../module-x/AGENTS.md`
+- Downstream: `../module-y/AGENTS.md` (if applicable)
 ```
 
 ---
 
-## 质量检查清单
+## Quality Checklist
 
-生成 AGENTS.md 后，自查：
+After generating AGENTS.md, self-check:
 
-- [ ] 行数在 50–200 之间
-- [ ] 包含"快速开始"（1-3 条命令）
-- [ ] 包含"关键约定"（3-8 条具体规则）
-- [ ] 包含"文档地图"（指向 docs/ 文件）
-- [ ] 根目录包含中文输出约束
-- [ ] 没有复制粘贴整段代码或文档
-- [ ] 没有过时信息（使用 `[最后更新: YYYY-MM-DD]`）
+- [ ] Line count is 50–200
+- [ ] Contains "Quick Start" (1-3 commands)
+- [ ] Contains "Key Conventions" (3-8 specific rules, sourced from user or existing code — not fabricated)
+- [ ] Contains "Documentation Map" (pointing to `docs/` files, NOT internal `.claude/` paths)
+- [ ] No large code blocks or documentation pasted verbatim
+- [ ] No stale information (include `[Last verified: YYYY-MM-DD]`)
+- [ ] Language constraint section added only if explicitly requested by user
