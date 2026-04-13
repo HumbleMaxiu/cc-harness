@@ -1,97 +1,34 @@
 {
   "id": "cc-harness",
   "name": "cc-harness",
-  "description": "Claude Code 开发辅助工具集，包含 feature flow、code review、tdd guide 等 workflows",
+  "description": "Claude Code 开发辅助工具集，包含 exa-search、my-harness、skill-creator 等 skills",
   "version": "1.0.0",
   "author": {
     "name": "xiuma"
   },
   "tags": [
     "workflow",
-    "feature-development",
-    "code-review",
-    "tdd",
-    "quality-gate"
-  ],
-  "commands": [
-    {
-      "name": "feature-flow",
-      "description": "启动完整的功能开发流程，支持 spec → planner → tdd → develop → review → test → lint → pr",
-      "path": "commands/feature-flow.md"
-    },
-    {
-      "name": "prp-pr",
-      "description": "Pull Request 自动化创建，包含审查报告和上下文",
-      "path": "commands/prp-pr.md"
-    },
-    {
-      "name": "orchestrate",
-      "description": "多 Agent 协调工作流编排",
-      "path": "commands/orchestrate.md"
-    }
+    "skill",
+    "agent",
+    "exa-search",
+    "harness",
+    "skill-creator"
   ],
   "skills": [
     {
-      "name": "feature-development-workflow",
-      "description": "完整功能开发工作流，协调多个 agents",
-      "path": "skills/feature-development-workflow/SKILL.md"
+      "name": "exa-search",
+      "description": "通过 Exa MCP 进行神经搜索，适用于网络、代码和公司研究",
+      "path": "skills/exa-search/SKILL.md"
     },
     {
-      "name": "quality-gate",
-      "description": "统一质量门，支持 review/test/lint 的 verify → fix → verify 循环",
-      "path": "skills/quality-gate/SKILL.md"
+      "name": "my-harness",
+      "description": "为软件项目搭建或更新 OpenAI 规范的 agent harness",
+      "path": "skills/my-harness/SKILL.md"
     },
     {
-      "name": "continuous-learning-v2",
-      "description": "基于本能的持续学习系统",
-      "path": "skills/continuous-learning-v2/SKILL.md"
-    }
-  ],
-  "agents": [
-    {
-      "name": "spec",
-      "description": "需求分析与 User Stories 生成",
-      "path": "agents/spec.md"
-    },
-    {
-      "name": "planner",
-      "description": "实施计划与风险评估",
-      "path": "agents/planner.md"
-    },
-    {
-      "name": "tdd-guide",
-      "description": "测试驱动开发指南",
-      "path": "agents/tdd-guide.md"
-    },
-    {
-      "name": "develop",
-      "description": "增量式代码实现",
-      "path": "agents/develop.md"
-    },
-    {
-      "name": "code-reviewer",
-      "description": "专业代码审查专家",
-      "path": "agents/code-reviewer.md"
-    },
-    {
-      "name": "test-agent",
-      "description": "测试执行专家",
-      "path": "agents/test-agent.md"
-    },
-    {
-      "name": "lint-agent",
-      "description": "代码质量与风格检查",
-      "path": "agents/lint-agent.md"
-    },
-    {
-      "name": "fix-agent",
-      "description": "智能 bug 修复器",
-      "path": "agents/fix-agent.md"
-    },
-    {
-      "name": "architect",
-      "description": "架构设计与决策",
-      "path": "agents/architect.md"
+      "name": "skill-creator",
+      "description": "创建、编辑和改进 AgentSkills",
+      "path": "skills/skill-creator/SKILL.md"
     }
   ],
   "screenshots": [],
@@ -100,9 +37,9 @@
   "license": "MIT",
   "keywords": [
     "claude-code",
-    "feature-flow",
-    "tdd",
-    "code-review",
-    "workflow-automation"
+    "skill",
+    "exa-search",
+    "harness",
+    "skill-creator"
   ]
 }
