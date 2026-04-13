@@ -8,7 +8,7 @@
 
 - **Purpose：** Operator + agent 契约；**地图**进入 `docs/`。
 - **Length：** 目标约 100 行；**硬上限 120 行**。超过 120 行是质量缺陷。
-- **Include：** 项目一句话描述；优先级顺序（user > harness docs > defaults）；技术栈表；仓库布局表；secrets/logging 规则；测试门槛；链接到 `ARCHITECTURE.md` 和关键 `docs/` 文件。当 Evals add-on 存在时，添加一个短 subsection 链接到 `docs/evals/index.md`。
+- **Include：** 项目一句话描述；优先级顺序（user > harness docs > defaults）；技术栈表；仓库布局表；secrets/logging 规则；测试门槛；链接到 `ARCHITECTURE.md` 和关键 `docs/` 文件。
 - **Include — How to use this harness：** 一个短的 `## How to use this harness` section，最多**3 行**，并链接到 `docs/PLANS.md` 获取扩展工作流：
 
 | Scenario | Start here | Then |
@@ -39,7 +39,7 @@
 ### `docs/PLANS.md`
 
 - **Purpose：** **路线图**阶段（产品），区别于 task 级 exec plans。也是**扩展工作流指导**的归宿，这些内容不适合放在 `AGENTS.md` 的 3 行使用表中（tech debt 分类、文档新鲜度维护等）。
-- **Include：** Phase 1 = harness/scaffold 完成；后续阶段为要点；链接到 `exec-plans/` 和（如果存在）`superpowers/plans/` 和（如果存在）`docs/evals/index.md`，了解 eval suite 扩展 / "graduate to regression"。包含一个 **Workflows** section 用于 tech debt、文档新鲜度和任何项目特定例程。
+- **Include：** Phase 1 = harness/scaffold 完成；后续阶段为要点；链接到 `exec-plans/`。包含一个 **Workflows** section 用于 tech debt、文档新鲜度和任何项目特定例程。
 
 ### `docs/PRODUCT_SENSE.md`
 
@@ -49,7 +49,7 @@
 ### `docs/QUALITY_SCORE.md`
 
 - **Purpose：** 质量维度的**记分卡**。
-- **Include：** 表格 — criterion | target | notes（typecheck、tests、docs 新鲜度、覆盖率 if used）。当 Evals add-on 存在时，为 eval 覆盖率、regression pass rate 或 baseline 新鲜度添加行（见 `docs/evals/index.md`）。
+- **Include：** 表格 — criterion | target | notes（typecheck、tests、docs 新鲜度、覆盖率 if used）。
 - **Refresh rules（harness update）：** 每个条目必须引用**具体仓库信号**（例如 `jest.config.ts` 存在、`pyproject.toml` 中有 `pytest`、CI workflow 名称）。如果某个标准没有找到信号，写 **TBD** — 不要编造数字或百分比。
 
 ### `docs/RELIABILITY.md`
@@ -125,37 +125,6 @@
 - **Purpose：** agents 的**原始** context（vendor docs 的粘贴区、长节选）。
 - **Format：** 纯文本；简短标题；建议的填充 sections。
 - **Examples：** `design-system-reference-llms.txt`、`nixpacks-llms.txt`、`uv-llms.txt` — 按**工具/domain** 命名，而不是神秘名称。
-
-## `docs/evals/`（可选 — 当 Evals add-on 启用时）
-
-见 [evals-addon.md](evals-addon.md) 了解术语、grader 类型、capability vs regression 和工具说明。
-
-### `docs/evals/index.md`
-
-- **Purpose：** **Eval suite** 概览 — 策略、链接到 tasks 和 graders、baselines、如何执行运行（CI script vs external framework）。
-- **Include：** suites 列表或表格（capability vs regression）；grader 策略（优先 deterministic，必要时 LLM/human）；链接到 `docs/QUALITY_SCORE.md` 和 `docs/exec-plans/` 用于 eval 相关债务；如果 `.specify/` 存在则包含 Spec Kit 说明（evals 测试 agent 行为；`specs/` 是 feature specs）。
-- **Avoid：** 粘贴完整的 task YAML — **链接**到 `tasks/`。
-
-### `docs/evals/tasks/<name>.yaml`（或 `.md`）
-
-- **Purpose：** 一个**task**（测试用例）：inputs、success criteria、grader references、可选的 `tracked_metrics`。
-- **Include：** 明确的 `id` 和 `desc`；如果使用则标记 `suite`（`capability` | `regression`）；与 `docs/evals/graders/` 对齐的 grader blocks；grader 检查的所有内容必须能从描述中推断出来。
-- **Avoid：** 模糊的 success criteria；假设隐藏约束的测试（例如 prompt 中未说明的 filepath）。
-
-### `docs/evals/graders/rubrics.md`
-
-- **Purpose：** **LLM-as-judge** rubrics：dimensions、scoring、校准说明、"unknown" escape hatch for judges。
-- **Include：** 每个 rubric 的 section；从 task YAML 链接；如果主观则说明人工校准频率。
-
-### `docs/evals/graders/deterministic.md`
-
-- **Purpose：** **基于代码的**检查：单元测试、lint/type 命令、state/outcome 检查、可选的 tool-call 提示（避免过度脆弱的顺序）。
-- **Include：** 命名约定；CI 在哪里调用这些；优选 grading **outcomes** over rigid step sequences。
-
-### `docs/evals/results/baselines/`
-
-- **Purpose：** **Baseline** snapshots 或指针（JSON/MD summaries，或链接到 CI artifacts）。
-- **Include：** 如果为空则 `.gitkeep`；在 `index.md` 中解释 baselines 是存在于 git 中还是外部。
 
 ---
 
