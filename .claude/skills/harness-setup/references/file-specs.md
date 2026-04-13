@@ -188,7 +188,7 @@ Before substantive edits: read `AGENTS.md`, `ARCHITECTURE.md`, `docs/exec-plans/
 - **Refresh quality score** — 每个标准必须引用具体仓库信号；没有信号时写 **TBD**。
 
 ---
-
+    
 ## Anti-patterns（所有文件）
 
 - **Blob duplication** — `AGENTS.md` 和 spec 文件中的相同内容。
