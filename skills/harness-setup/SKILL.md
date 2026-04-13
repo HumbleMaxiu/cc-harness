@@ -152,6 +152,13 @@ digraph harness {
 
 目录存在后，按照 [references/file-specs.md](references/file-specs.md) 的顺序填充。`AGENTS.md` **必须**包含 **How to use this harness**（3 行使用表 + 链接到 `docs/PLANS.md`）。`AGENTS.md` 必须保持在 **120 行硬性上限**以内。
 
+**AGENTS.md 生成约束：** 使用 [templates/AGENTS-index.md](templates/AGENTS-index.md) 模板生成 `AGENTS.md`。内容应只包括：
+- 一句话项目描述
+- `docs/` 导航目录（带超链接）
+- 常用命令快速参考（构建 / 测试 / lint / 运行）
+- 已安装 Skills 快速参考（带使用场景）
+- **行为规则**（从 [references/behavior-rules.md](references/behavior-rules.md) 提取，作为 hooks 未生效时的后备）
+
 **单一检查点（第 15 步）：** 步骤 8–14 的所有文件存在后，列出路径并请求调整；然后进入阶段 4。
 
 ## Phase 4 — 验证 & 审查
