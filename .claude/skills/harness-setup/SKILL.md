@@ -1,5 +1,5 @@
 ---
-name: my-harness
+name: harness-setup
 description: 为任何软件项目搭建或更新 OpenAI 规范的 agent harness（AGENTS.md、ARCHITECTURE.md、结构化 docs/）。用于：新仓库起步、添加 agent 优先的文档、更新现有 harness（harness update）、或用户要求 harness 脚手架、文档布局、harness 工程设置。
 ---
 
@@ -9,7 +9,7 @@ description: 为任何软件项目搭建或更新 OpenAI 规范的 agent harness
 
 **Scaffold（脚手架）** 是为项目创建一套初始的 agent 文档结构。就像建筑施工中的脚手架一样——它是一个临时框架，用来支撑主要结构。
 
-在 `my-harness` 的语境中，**scaffold** 指的是：
+在 `harness-setup` 的语境中，**scaffold** 指的是：
 - 生成 `AGENTS.md` — agent 的操作入口和索引
 - 生成 `ARCHITECTURE.md` — 项目技术架构图
 - 创建 `docs/` 目录树及模板文件
