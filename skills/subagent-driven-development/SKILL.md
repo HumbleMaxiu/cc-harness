@@ -15,23 +15,23 @@ description: 通过 Claude Code subagent 执行实现计划，支持 A/E/T/C 四
 
 | 角色 | Subagent | 职责 |
 |------|----------|------|
-| 架构师 (A) | `@architect` | 规划、设计、文档维护 |
-| 工程师 (E) | `@engineer` | TDD 实现 |
-| 测试工程师 (T) | `@tester` | 独立测试，补充边界情况 |
-| 挑战者 (C) | `@challenger` | 对抗性审查，质量门禁 |
+| 架构师 (A) | `architect` | 规划、设计、文档维护 |
+| 工程师 (E) | `engineer` | TDD 实现 |
+| 测试工程师 (T) | `tester` | 独立测试，补充边界情况 |
+| 挑战者 (C) | `challenger` | 对抗性审查，质量门禁 |
 
 ## 流程
 
 ### Plan 阶段
 
 ```
-A (@architect) 写 Plan → C (@challenger) 审查 → [A-C 循环] → C 确认通过 → 进入实现阶段
+A (architect) 写 Plan → C (challenger) 审查 → [A-C 循环] → C 确认通过 → 进入实现阶段
 ```
 
 ### 实现阶段
 
 ```
-E (@engineer) 实现 → T (@tester) 测试 → [E-T 小循环] → 测试通过 → C (@challenger) 审查 → [E/T-C 小循环] → 审查通过 → 下一任务
+E (engineer) 实现 → T (tester) 测试 → [E-T 小循环] → 测试通过 → C (challenger) 审查 → [E/T-C 小循环] → 审查通过 → 下一任务
 ```
 
 ### 状态机
@@ -44,14 +44,20 @@ E (@engineer) 实现 → T (@tester) 测试 → [E-T 小循环] → 测试通过
 
 ## Subagent 调用方式
 
-使用 `@<subagent-name>` 或 Agent tool 派发：
+使用 `Agent` tool 派发 subagent：
 
 ```
-@architect 审查 docs/exec-plans/active/2026-04-14-feature.md
-@engineer 实现任务 3 - 用户认证模块
-@tester 补充边界情况测试
-@challenger 审查实现是否符合计划
+Agent({
+  description: "架构师审查计划",
+  prompt: "读取 docs/exec-plans/active/YYYY-MM-DD-feature.md，审查计划是否符合架构要求..."
+})
 ```
+
+Subagent 名称：
+- `architect` - 架构师
+- `engineer` - 工程师
+- `tester` - 测试工程师
+- `challenger` - 挑战者
 
 ## 工作流配置
 
@@ -93,9 +99,9 @@ skills/
 ## 如何使用
 
 1. **启动流程**：读取 Plan 文件，分解任务
-2. **派发 Architect**：使用 `@architect` 生成计划文档
-3. **派发 Challenger**：使用 `@challenger` 审查计划
-4. **派发 Engineer**：使用 `@engineer` 实现任务
-5. **派发 Tester**：使用 `@tester` 补充测试
-6. **派发 Challenger**：使用 `@challenger` 审查实现
+2. **派发 Architect**：使用 `Agent({subagent_type: "architect", ...})` 生成计划文档
+3. **派发 Challenger**：使用 `Agent({subagent_type: "challenger", ...})` 审查计划
+4. **派发 Engineer**：使用 `Agent({subagent_type: "engineer", ...})` 实现任务
+5. **派发 Tester**：使用 `Agent({subagent_type: "tester", ...})` 补充测试
+6. **派发 Challenger**：使用 `Agent({subagent_type: "challenger", ...})` 审查实现
 7. **循环直到所有任务完成**
