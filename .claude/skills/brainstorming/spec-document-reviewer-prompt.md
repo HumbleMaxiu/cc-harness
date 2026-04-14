@@ -1,49 +1,47 @@
-# Spec Document Reviewer Prompt Template
+# 规格文档审查员提示模板
 
-Use this template when dispatching a spec document reviewer subagent.
+在派遣规格文档审查员子代理时使用此模板。
 
-**Purpose:** Verify the spec is complete, consistent, and ready for implementation planning.
+**目的：** 验证规格是否完整、一致并准备好进行实施规划。
 
-**Dispatch after:** Spec document is written to docs/superpowers/specs/
+**派遣时机：** 规格文档写入 `docs/design-docs/` 后
 
 ```
-Task tool (general-purpose):
-  description: "Review spec document"
+任务工具（通用型）：
+  description: "审查规格文档"
   prompt: |
-    You are a spec document reviewer. Verify this spec is complete and ready for planning.
+    你是一个规格文档审查员。验证此规格是否完整并准备好进行规划。
 
-    **Spec to review:** [SPEC_FILE_PATH]
+    **待审查的规格：** [规格文件路径]
 
-    ## What to Check
+    ## 检查项
 
-    | Category | What to Look For |
-    |----------|------------------|
-    | Completeness | TODOs, placeholders, "TBD", incomplete sections |
-    | Consistency | Internal contradictions, conflicting requirements |
-    | Clarity | Requirements ambiguous enough to cause someone to build the wrong thing |
-    | Scope | Focused enough for a single plan — not covering multiple independent subsystems |
-    | YAGNI | Unrequested features, over-engineering |
+    | 类别 | 检查内容 |
+    |------|----------|
+    | 完整性 | TODOs占位符、"TBD"、不完整的部分 |
+    | 一致性 | 内部矛盾、冲突的需求 |
+    | 清晰度 | 需求足够模糊以至于可能让人构建错误的东西 |
+    | 范围 | 是否足够专注于单个计划——而非涵盖多个独立子系统 |
+    | YAGNI | 未请求的功能、过度工程化 |
 
-    ## Calibration
+    ## 校准
 
-    **Only flag issues that would cause real problems during implementation planning.**
-    A missing section, a contradiction, or a requirement so ambiguous it could be
-    interpreted two different ways — those are issues. Minor wording improvements,
-    stylistic preferences, and "sections less detailed than others" are not.
+    **只标记在实施规划期间会导致实际问题的问题。**
+    缺失的部分、矛盾、或足够模糊以至于可以被两种不同方式解释的需求——这些都是问题。轻微的措辞改进、风格偏好和"比其他部分不那么详细的章节"不是。
 
-    Approve unless there are serious gaps that would lead to a flawed plan.
+    除非有严重缺陷会导致计划有缺陷，否则予以批准。
 
-    ## Output Format
+    ## 输出格式
 
-    ## Spec Review
+    ## 规格审查
 
-    **Status:** Approved | Issues Found
+    **状态：** 已批准 | 发现问题
 
-    **Issues (if any):**
-    - [Section X]: [specific issue] - [why it matters for planning]
+    **问题（如果有）：**
+    - [章节X]：[具体问题] - [为什么这对规划很重要]
 
-    **Recommendations (advisory, do not block approval):**
-    - [suggestions for improvement]
-```
+    **建议（ advisory，不阻止批准）：**
+    - [改进建议]
+  ```
 
-**Reviewer returns:** Status, Issues (if any), Recommendations
+**审查员返回：** 状态、问题（如果有）、建议
