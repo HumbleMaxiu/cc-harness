@@ -19,6 +19,7 @@
 | 质量评分 | [docs/QUALITY_SCORE.md](docs/QUALITY_SCORE.md) | 质量维度的记分卡 |
 | 可靠性 | [docs/RELIABILITY.md](docs/RELIABILITY.md) | 超时、重试、幂等性、observability |
 | 安全 | [docs/SECURITY.md](docs/SECURITY.md) | Secrets、auth、audit 预期 |
+| Memory | [docs/memory/index.md](docs/memory/index.md) | 项目记忆与反馈索引 |
 | 前端 | [docs/FRONTEND.md](docs/FRONTEND.md) | UI 约定、a11y、routing/state（可选） |
 | 设计文档 | [docs/design-docs/](docs/design-docs/index.md) | 核心设计决策和信念 |
 | 执行计划 | [docs/exec-plans/](docs/exec-plans/index.md) | 主动执行中的计划 |
@@ -84,6 +85,11 @@
 - MUST NOT 留死代码 / 调试输出
 - MUST NOT 未经验证就声称完成
 - 声称"完成"前 → 运行标准质量门禁（文档同步 + 代码规范 + 进度验证）
+
+### 反馈规则
+- 用户反馈 → 记录到 `docs/memory/feedback/user-feedback.md` 并立即应用
+- Agent 反馈 → 记录到 `docs/memory/feedback/agent-feedback.md`，执行前先询问用户
+- 同类问题出现 2 次或以上 → 同步到 `docs/memory/feedback/prevents-recurrence.md` 并升级为规范
 
 ### 文档同步（编辑源码后自检）
 - 编辑源码后检查：对应的 docs/ 模块文档是否存在？

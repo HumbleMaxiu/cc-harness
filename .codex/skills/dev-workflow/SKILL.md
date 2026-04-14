@@ -34,6 +34,7 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 2. 用自然语言传递上下文给 subagent
 3. Subagent 完成后主 agent 读取结果，决定下一步
 4. 每个角色完成后写交接文档
+5. 如交接文档包含 `Feedback Record`，主 agent 负责同步到 `docs/memory/feedback/agent-feedback.md`
 
 ### Team 模式
 
@@ -102,6 +103,7 @@ Reviewer 审查
 
 每个角色完成后必须写交接文档，格式见下方统一格式。
 交接文档用于主 agent 读取结果、决定下一步操作。
+开始执行前，主 agent 应先读取 `docs/memory/index.md` 和 `docs/memory/feedback/prevents-recurrence.md`。
 
 ## 统一交接文档格式
 
@@ -124,9 +126,18 @@ Reviewer 审查
 ### 待解决问题
 - [ ] ...
 
+### Feedback Record
+source: reviewer | tester | self-check | none
+type: correction | improvement | issue | none
+content: ...
+suggestion: ...
+prevents_recurrence: true | false
+
 ### 状态
 APPROVED / REJECTED / BLOCKED
 ```
+
+当没有新增反馈时，`Feedback Record` 填写 `source: none`。
 
 **单独调用时的行为**：
 

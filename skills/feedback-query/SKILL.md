@@ -56,7 +56,8 @@ description: 查询反馈历史、记录新反馈、查看防止再犯条目
 
 ## 文件位置
 
-- 用户反馈：`memory/feedback/user-feedback.md`
-- Agent 反馈：`memory/feedback/agent-feedback.md`
-- 防止再犯：`memory/feedback/prevents-recurrence.md`
+- 记忆入口：`docs/memory/index.md`
+- 用户反馈：`docs/memory/feedback/user-feedback.md`
+- Agent 反馈：`docs/memory/feedback/agent-feedback.md`
+- 防止再犯：`docs/memory/feedback/prevents-recurrence.md`
 - 处理规范：`docs/feedback/feedback-collection.md`

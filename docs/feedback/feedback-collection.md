@@ -11,18 +11,25 @@
 ## 用户反馈处理流程
 
 1. **识别**：用户给出纠正、偏好、请求或投诉
-2. **记录**：写入 `memory/feedback/user-feedback.md`
+2. **记录**：写入 `docs/memory/feedback/user-feedback.md`
 3. **应用**：立即执行用户要求，无需确认
 4. **预防**：检查是否需要防止再犯，必要时更新规范
 
 ## Agent 反馈处理流程
 
 1. **识别**：Agent 自检发现问题或 Reviewer/Tester 返回 REJECTED
-2. **记录**：写入 `memory/feedback/agent-feedback.md`，状态 `pending`
+2. **记录**：写入 `docs/memory/feedback/agent-feedback.md`，状态 `pending`
 3. **询问**：向用户说明反馈内容，请求确认是否执行
 4. **执行/拒绝**：根据用户决定行动
 5. **归档**：更新状态为 `approved` 或 `rejected`
 6. **预防**：检查是否需要防止再犯
+
+## 运行时集成
+
+- `docs/memory/index.md` 是反馈记忆入口，也是会话恢复时的默认读取点
+- SessionStart hook 会在新会话中注入 `docs/memory/index.md` 以及 `docs/memory/feedback/` 下的核心记录
+- Reviewer / Tester 若发现问题，必须在交接文档中输出结构化的 `Feedback Record`，以便主 agent 追加到 `docs/memory/feedback/agent-feedback.md`
+- 当同类问题累计 2 次或以上时，主 agent 必须同步更新 `docs/memory/feedback/prevents-recurrence.md` 和相应规范文件
 
 ## 询问用户的话术模板
 

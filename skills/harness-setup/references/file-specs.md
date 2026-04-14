@@ -9,6 +9,7 @@
 - **Purpose：** Operator + agent 契约；**地图**进入 `docs/`。
 - **Length：** 目标约 100 行；**硬上限 120 行**。超过 120 行是质量缺陷。
 - **Include：** 项目一句话描述；优先级顺序（user > harness docs > defaults）；技术栈表；仓库布局表；secrets/logging 规则；测试门槛；链接到 `ARCHITECTURE.md` 和关键 `docs/` 文件。
+- **Include：** 如果仓库启用了记忆机制，在 docs 导航中加入 `docs/memory/index.md`。
 - **Include — How to use this harness：** 一个短的 `## How to use this harness` section，最多**3 行**，并链接到 `docs/PLANS.md` 获取扩展工作流：
 
 | Scenario | Start here | Then |
@@ -61,6 +62,11 @@
 
 - **Purpose：** **Secrets、auth、audit** 预期。
 - **Include：** token 放在哪里；永不 log secrets；威胁相关约定；链接到 product specs 中的 auth flows。
+
+### `docs/memory/index.md`
+
+- **Purpose：** 工作记忆和反馈的入口索引。
+- **Include：** 读取顺序；`docs/memory/feedback/` 的三类文档链接；“`docs/memory/` 是事实来源”的说明。
 
 ### `docs/FRONTEND.md`（可选）
 
@@ -196,3 +202,19 @@ Before substantive edits: read `AGENTS.md`, `ARCHITECTURE.md`, `docs/exec-plans/
 - **Stale generated** — 记录重新生成路径或明确标记为过时。
 - **Wiping bridge files** — 用 only harness text 替换整个 `.cursor/rules/*` 或 `.windsurfrules`。
 - **Fabricated quality data** — 在没有可验证仓库信号的情况下编造覆盖率%、测试数量或分数。
+## `docs/memory/feedback/`
+
+### `docs/memory/feedback/user-feedback.md`
+
+- **Purpose：** 记录用户直接给出的纠正、偏好、请求或投诉。
+- **Include：** 字段说明、追加约定、是否需要防止再犯。
+
+### `docs/memory/feedback/agent-feedback.md`
+
+- **Purpose：** 记录来自 Reviewer、Tester 或自检的问题。
+- **Include：** 字段说明、`pending / approved / rejected` 状态、建议处理方式。
+
+### `docs/memory/feedback/prevents-recurrence.md`
+
+- **Purpose：** 记录重复问题及其预防措施。
+- **Include：** 计数规则、同步到规范的位置、升级条件。

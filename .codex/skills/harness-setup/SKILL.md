@@ -44,28 +44,29 @@ Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**
 
 ### Phase 2 — 创建目录结构
 
-7. **创建核心目录** — `docs/`、子目录包括 `design-docs/`、`exec-plans/active/`、`exec-plans/completed/`、`generated/`、`product-specs/`、`references/`
+7. **创建核心目录** — `docs/`、子目录包括 `design-docs/`、`exec-plans/active/`、`exec-plans/completed/`、`generated/`、`memory/feedback/`、`product-specs/`、`references/`
 
 ### Phase 3 — 填充文件
 
 8. **填充根目录** — `AGENTS.md`、`ARCHITECTURE.md`（每个文件按 file-specs 包含 **How to use this harness**）
-9. **填充顶层 docs** — DESIGN、PLANS、PRODUCT_SENSE、QUALITY_SCORE、RELIABILITY、SECURITY、FRONTEND（如适用）
+9. **填充顶层 docs** — DESIGN、PLANS、PRODUCT_SENSE、QUALITY_SCORE、RELIABILITY、SECURITY、FRONTEND（如适用）、`memory/index.md`
 10. **填充 design docs** — `design-docs/index.md`、`core-beliefs.md`
 11. **填充 exec plans** — tech-debt-tracker、`active/`、`completed/`
 12. **填充 generated** — schema 占位符
-13. **填充 product specs** — index + per-domain 文件
-14. **填充 references** — LLM context stubs
-15. **⛔ 检查点** — 列出阶段 3 创建/更新的所有文件；用户可在阶段 4 前请求修复
+13. **填充 memory** — `docs/memory/feedback/user-feedback.md`、`agent-feedback.md`、`prevents-recurrence.md`
+14. **填充 product specs** — index + per-domain 文件
+15. **填充 references** — LLM context stubs
+16. **⛔ 检查点** — 列出阶段 3 创建/更新的所有文件；用户可在阶段 4 前请求修复
 
 ### Phase 4 — 验证 & 审查
 
-16. **验证交叉链接** — 路径和 Markdown 链接可解析
-17. **最终报告** — 汇总表、下一步、如果选择了 Claude Code / Codex 则提供原生 AGENTS.md 支持
-18. **用户审查** — 需要时修改（最多 3 轮）
+17. **验证交叉链接** — 路径和 Markdown 链接可解析
+18. **最终报告** — 汇总表、下一步、如果选择了 Claude Code / Codex 则提供原生 AGENTS.md 支持
+19. **用户审查** — 需要时修改（最多 3 轮）
 
 ### Phase 5 — 生成后（无需额外提问）
 
-19. **Agent platform bridges** — 根据 [references/file-specs.md](references/file-specs.md) "Agent platform bridge files" 为阶段 5 中选择的每个平台生成文件
+20. **Agent platform bridges** — 根据 [references/file-specs.md](references/file-specs.md) "Agent platform bridge files" 为阶段 5 中选择的每个平台生成文件
 
 ## Process flow（scaffold）
 
@@ -78,11 +79,11 @@ digraph harness {
     p1 [label="2-6. Context\n(batched)" shape=box];
     gate1 [label="6. ⛔ GATE\nConfirm summary" shape=diamond style=filled fillcolor="#ffcccc"];
     create_dirs [label="7. Create dirs" shape=box];
-    populate [label="8-14. Populate files" shape=box];
-    cp [label="15. ⛔ CHECKPOINT\nReview outputs" shape=diamond style=filled fillcolor="#fff3cc"];
-    verify [label="16-17. Verify & report" shape=box];
-    review [label="18. User review" shape=diamond style=filled fillcolor="#ffcccc"];
-    phase5 [label="19. Platform\nbridges" shape=box];
+    populate [label="8-15. Populate files" shape=box];
+    cp [label="16. ⛔ CHECKPOINT\nReview outputs" shape=diamond style=filled fillcolor="#fff3cc"];
+    verify [label="17-18. Verify & report" shape=box];
+    review [label="19. User review" shape=diamond style=filled fillcolor="#ffcccc"];
+    phase5 [label="20. Platform\nbridges" shape=box];
     done [label="Done" shape=doublecircle];
 
     detect -> p1;
@@ -144,7 +145,7 @@ digraph harness {
 
 ## Phase 2 — 创建目录结构
 
-只创建缺失的目录（不删除用户文件）。树结构：`docs/design-docs/`、`exec-plans/active|`completed/`、`generated/`、`product-specs/`、`references/`。
+只创建缺失的目录（不删除用户文件）。树结构：`docs/design-docs/`、`exec-plans/active|`completed/`、`generated/`、`memory/feedback/`、`product-specs/`、`references/`。
 
 **无目录树检查点** — 继续阶段 3。
 
@@ -159,7 +160,9 @@ digraph harness {
 - 已安装 Skills 快速参考（带使用场景）
 - **行为规则**（从 [references/behavior-rules.md](references/behavior-rules.md) 提取，作为 hooks 未生效时的后备）
 
-**单一检查点（第 15 步）：** 步骤 8–14 的所有文件存在后，列出路径并请求调整；然后进入阶段 4。
+`docs/memory/index.md` 必须声明 `docs/memory/` 是工作记忆的事实来源，`docs/memory/feedback/` 必须包含用户反馈、Agent 反馈和防止再犯三份文档。
+
+**单一检查点（第 16 步）：** 步骤 8–15 的所有文件存在后，列出路径并请求调整；然后进入阶段 4。
 
 ## Phase 4 — 验证 & 审查
 
