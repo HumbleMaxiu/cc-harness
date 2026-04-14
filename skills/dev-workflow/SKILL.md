@@ -1,11 +1,12 @@
 ---
 name: dev-workflow
-description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 Skill/Subagent/Team 三种模式。
+description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 Skill/Subagent/Team 三种模式。接在 writing-plans 之后。
 ---
 
 # Dev Workflow Agent System
 
 开发流程 agent 系统，遵循 harness engineering 原则。
+接在 `writing-plans` 技能之后使用。
 
 ## 角色
 
@@ -31,8 +32,8 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 **执行方式**：
 1. 主 agent 读取 `.claude/agents/` 中的 agent 定义
 2. 用自然语言传递上下文给 subagent
-3. Subagent 完成后写交接文档
-4. 主 agent 读取交接文档，决定下一步
+3. Subagent 完成后主 agent 读取结果，决定下一步
+4. 每个角色完成后写交接文档
 
 ### Team 模式
 
@@ -43,46 +44,64 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 2. 多个 Reviewer 并行审查同一份代码
 3. 结果汇总给主 agent
 
-## 完整流程
+## Subagent 模式调用流程
+
+### 单任务循环
 
 ```
-用户需求
+主 agent
     ↓
-Planner 写计划（writing-plans）
+Architect 检查计划文档
     ↓
-用户选择模式
+Dev 实现
     ↓
-┌──────────────────────────────────────┐
-│  Skill 模式：主 agent 直接执行         │
-│  Subagent 模式：主 agent 编排调用      │
-│  Team 模式：创建 team，并行审查        │
-└──────────────────────────────────────┘
+Reviewer 审查
+    ↓ [不通过]
+    ↑____________↓
     ↓
-每个任务开始前 → Architect 检查计划文档
+[通过] → Tester 测试
+    ↓ [不通过]
+    ↑____________↓
     ↓
-Dev → Reviewer → [循环] → Tester → [循环]
-    ↓
-全部完成 → Architect 维护文档
+[通过] → Architect 维护文档
     ↓
 交付
 ```
 
-## Workflow 层约束
+### 循环定义
 
-- **每个角色完成后必须写交接文档**
-- 单独调用时，交接文档作为报告格式输出给用户/主 agent
-- 主 agent 读取交接文档后决定下一步操作
+| 循环 | 条件 | 动作 |
+|------|------|------|
+| Dev → Reviewer | REJECTED | 打回 Dev 重新修改 |
+| Dev → Reviewer | APPROVED | 进入 Tester |
+| Tester | REJECTED | 打回 Dev 修复 → Reviewer 重新审查 |
+| Tester | APPROVED | 进入 Architect 维护 |
 
-## 循环规则
+**终止条件**：Reviewer APPROVED + Tester APPROVED
 
-- **Reviewer 审查不通过** → 打回 Developer 重新修改 → 重新审查
-- **Tester 测试不通过** → 打回 Developer 重新修复 → 重新审查变更 → 重新测试
-- **循环终止条件**：Reviewer 和 Tester 都 APPROVED
+### 并行审查
 
-## 并行规则
+- 可临时起意开启多个 Reviewer 并行审查同一份代码
+- 结果汇总给主 agent
 
-- **Subagent 模式**：顺序调用，可临时起意开启多个 Reviewer 并行审查
-- **Team 模式**：多个 Reviewer 默认并行审查
+## Team 模式调用流程
+
+```
+主 agent
+    ↓
+创建 Agent Team
+    ↓
+多个 Reviewer 并行审查
+    ↓
+结果汇总
+    ↓
+后续流程同 Subagent 模式
+```
+
+## 交接文档
+
+每个角色完成后必须写交接文档，格式见下方统一格式。
+交接文档用于主 agent 读取结果、决定下一步操作。
 
 ## 统一交接文档格式
 
@@ -111,10 +130,7 @@ APPROVED / REJECTED / BLOCKED
 
 **单独调用时的行为**：
 
-当 agent 不通过 workflow 调用时（独立使用场景），交接文档作为报告格式输出：
-- `to` 填写"用户"或"主 agent"
-- 内容聚焦于：该次调用完成的工作、发现的问题、建议
-- 仍然必须写，维持 harness engineering 的"所有工作有记录"原则
+当 agent 独立使用时（不通过 workflow），交接文档作为报告格式输出给用户。
 
 ## 调用方式
 
@@ -125,12 +141,20 @@ APPROVED / REJECTED / BLOCKED
 
 主 agent 读取对应 agent 定义，用自然语言传递上下文。
 
+## 计划完成处理
+
+实施计划完成后：
+- 将计划从 `docs/exec-plans/active/` 移动到 `docs/exec-plans/completed/`
+- 在 git 中提交状态变更
+
 ## 与现有流程的衔接
 
 ```
 用户需求
     ↓
-brainstorming（如需）→ writing-plans → dev-workflow
+brainstorming（如需）
+    ↓
+writing-plans → 实施计划 → dev-workflow
     ↓
 交付
 ```
