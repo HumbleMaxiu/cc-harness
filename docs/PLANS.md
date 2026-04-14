@@ -41,9 +41,9 @@
 2. 更新 `docs/exec-plans/index.md`
 
 ### Tech Debt 维护
-见 [tech-debt-tracker.md](../exec-plans/tech-debt-tracker.md)
+见 [tech-debt-tracker.md](./exec-plans/tech-debt-tracker.md)
 
 ## 链接
 
-- 执行计划索引：[exec-plans/index.md](../exec-plans/index.md)
-- 设计文档索引：[design-docs/index.md](../design-docs/index.md)
+- 执行计划索引：[exec-plans/index.md](./exec-plans/index.md)
+- 设计文档索引：[design-docs/index.md](./design-docs/index.md)
