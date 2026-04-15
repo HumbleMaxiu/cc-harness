@@ -25,6 +25,11 @@
 | **Subagent 模式** | 需要循环审查、有状态追踪 | 主 agent 编排调用 subagent |
 | **Team 模式** | 多角度并行审查 | 多个 Reviewer 并行审查 |
 
+### 反馈决策
+
+- `REJECTED` 属于阻塞型反馈：主 agent 先记录，再立即询问用户是否修复后继续
+- `APPROVED` 下的建议属于非阻塞反馈：主 agent 先记录，允许主流程继续，并在任务交付前统一询问用户
+
 ### 完整流程
 
 ```
@@ -34,7 +39,7 @@ brainstorming（如需）→ writing-plans
     ↓
 Architect 检查计划文档
     ↓
-Dev → Reviewer → [循环] → Tester → [循环]
+Dev → Reviewer → [如 REJECTED 则进入用户决策点] → Tester → [如 REJECTED 则进入用户决策点]
     ↓
 Architect 维护文档
     ↓

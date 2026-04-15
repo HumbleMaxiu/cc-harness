@@ -35,6 +35,7 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 3. Subagent 完成后主 agent 读取结果，决定下一步
 4. 每个角色完成后写交接文档
 5. 如交接文档包含 `Feedback Record`，主 agent 负责同步到 `docs/memory/feedback/agent-feedback.md`
+6. 阻塞型反馈立即进入用户决策点，非阻塞建议可在任务收尾时统一询问用户
 
 ### Team 模式
 
@@ -73,9 +74,9 @@ Reviewer 审查
 
 | 循环 | 条件 | 动作 |
 |------|------|------|
-| Dev → Reviewer | REJECTED | 打回 Dev 重新修改 |
+| Dev → Reviewer | REJECTED | 主 agent 记录阻塞反馈并立即询问用户是否修复后继续 |
 | Dev → Reviewer | APPROVED | 进入 Tester |
-| Tester | REJECTED | 打回 Dev 修复 → Reviewer 重新审查 |
+| Tester | REJECTED | 主 agent 记录阻塞反馈并立即询问用户是否修复后继续 |
 | Tester | APPROVED | 进入 Architect 维护 |
 
 **终止条件**：Reviewer APPROVED + Tester APPROVED
@@ -104,6 +105,13 @@ Reviewer 审查
 每个角色完成后必须写交接文档，格式见下方统一格式。
 交接文档用于主 agent 读取结果、决定下一步操作。
 开始执行前，主 agent 应先读取 `docs/memory/index.md` 和 `docs/memory/feedback/prevents-recurrence.md`。
+
+## 反馈决策规则
+
+- **阻塞型反馈**：Reviewer 或 Tester 给出 `REJECTED` 时，主 agent 必须先记录到 `docs/memory/feedback/agent-feedback.md`，状态为 `pending`，然后立即向用户汇总阻塞项，请用户决定是“修复后继续”还是“接受当前状态并停止/调整流程”。
+- **非阻塞反馈**：Reviewer 或 Tester 在 `APPROVED` 状态下给出的改进建议，主 agent 也必须先记录；主流程可以继续，但在当前任务交付前统一向用户汇总并询问是否执行。
+- **未经用户确认，不得因为 Agent 反馈自动触发新的实现改动。**
+- **同类问题累计 2 次或以上**：除记录反馈外，还应同步更新 `docs/memory/feedback/prevents-recurrence.md` 或相关规范。
 
 ## 统一交接文档格式
 

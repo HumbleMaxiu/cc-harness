@@ -12,7 +12,7 @@ tools: ["Read", "Write", "Bash", "Glob", "Grep"]
 
 - 运行测试验证功能
 - 运行 lint 检查代码质量
-- 测试不通过则打回 Developer
+- 测试不通过时输出 `REJECTED`，由主 agent 记录并进入用户决策点
 
 ## 测试流程
 
