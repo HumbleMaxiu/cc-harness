@@ -84,9 +84,9 @@
 
 ### Skill 模式
 
-**适用场景**：单一任务、步骤明确、不需要循环审查
+**适用场景**：单一任务、边界清楚、不需要独立 reviewer 角色或并行审查
 
-**执行方式**：主 agent 直接执行各阶段 skill
+**执行方式**：主 agent 按固定状态机执行单 agent workflow，而不是调用 subagent。该模式的详细协议已在 `2026-04-15-dev-workflow-skill-mode-design.md` 中补充。
 
 ### Subagent 模式
 
@@ -119,7 +119,7 @@ Planner 写计划（writing-plans）
 用户选择模式
     ↓
 ┌──────────────────────────────────────┐
-│  Skill 模式：主 agent 直接执行         │
+│  Skill 模式：单 agent workflow         │
 │  Subagent 模式：主 agent 编排调用       │
 │  Team 模式：创建 team，并行审查         │
 └──────────────────────────────────────┘
@@ -134,13 +134,20 @@ Dev → Reviewer → [循环] → Tester → [循环]
 ```
 
 **Workflow 层约束**：
-- 每个角色完成后**必须写交接文档**
-- 单独调用时，交接文档作为报告格式输出给用户/主 agent
+- `Subagent` / `Team` 模式：每个角色完成后**必须写交接文档**
+- `Skill` 模式：必须产出结构化 `Skill Workflow Record`
+- 单独调用时，交接文档或 Skill 记录都作为报告格式输出给用户/主 agent
+
+### Skill 模式最小协议
+
+- 状态机：`Input Ready -> Plan Check -> Execute -> Self Review -> Verify -> Doc Sync -> Final Summary`
+- 最小产物：`Skill Workflow Record`
+- 发生循环审查、独立 reviewer 需求、高风险工具操作或强状态追踪需求时，升级到 `Subagent` 或 `Team`
 
 ### 循环规则
 
-- **Reviewer 审查不通过** → 主 agent 记录阻塞反馈并立即询问用户是否修复后继续
-- **Tester 测试不通过** → 主 agent 记录阻塞反馈并立即询问用户是否修复后继续
+- **Reviewer 审查不通过** → 主 agent 记录阻塞反馈并根据风险决定自动修复回流或保留到最终确认
+- **Tester 测试不通过** → 主 agent 记录阻塞反馈并根据风险决定自动修复回流或保留到最终确认
 - **循环终止条件**：Reviewer 和 Tester 都通过
 
 ### 并行规则
@@ -184,9 +191,9 @@ APPROVED / REJECTED / BLOCKED
 
 ## 反馈决策规则
 
-- **阻塞型反馈**：`REJECTED` 必须先写入 `docs/memory/feedback/agent-feedback.md`，再由主 agent 立即询问用户是否修复后继续。
-- **非阻塞反馈**：`APPROVED` 下的建议也必须先记录，但可以在当前任务完成前统一汇总后询问用户。
-- **关键约束**：未经用户确认，不得因 Agent 反馈自动触发新的实现修改。
+- **阻塞型反馈**：`REJECTED` 或 Skill 模式下的严重自检/验证失败都必须先结构化记录，再按风险决定自动修复回流或进入最终确认。
+- **非阻塞反馈**：`APPROVED` 下的建议也必须先记录，但可以在最终交付前统一向用户汇总。
+- **关键约束**：只有低风险且处于自动执行白名单内的改动才允许自动触发新的实现修改。
 
 ## 目录结构
 

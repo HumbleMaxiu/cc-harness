@@ -28,9 +28,131 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 
 ### Skill 模式
 
-**适用场景**：单一任务、步骤明确、不需要循环审查
+**适用场景**：单一任务、边界清楚、工具数量有限、不需要独立 reviewer 角色或并行审查
 
-**执行方式**：主 agent 直接执行各阶段，并在阻塞反馈出现时自动回流修复；用户只在最终交付时统一确认
+**执行方式**：主 agent 以单 agent workflow 的方式串行执行固定阶段，而不是调用 subagent。Skill 模式必须显式产出结构化阶段记录，并在必要时升级到 `Subagent` 或 `Team` 模式；用户只在最终交付时统一确认。
+
+#### Skill 模式状态机
+
+```text
+Input Ready
+  ↓
+Plan Check
+  ↓
+Execute
+  ↓
+Self Review
+  ↓
+Verify
+  ↓
+Doc Sync
+  ↓
+Final Summary
+  ↓
+Done
+```
+
+#### Skill 模式阶段说明
+
+| 阶段 | 目标 | 最小输出 |
+|------|------|---------|
+| Input Ready | 确认需求、计划、memory 输入完整 | 输入是否齐备；是否可继续 |
+| Plan Check | 进行最小 Architect 检查，判断是否适合继续停留在 Skill 模式 | `Mode Decision` |
+| Execute | 实现代码或文档变更 | `Execution` |
+| Self Review | 用显式 checklist 进行单 agent 自检 | `Self Review` + `Feedback Record` |
+| Verify | 探测并执行最合适的验证入口 | `Verification` |
+| Doc Sync | 检查并更新受影响文档 | `Doc Sync` |
+| Final Summary | 汇总结果、风险、未执行建议、模式升级建议 | `Final Summary` |
+
+#### Skill 模式最小产物
+
+Skill 模式不要求生成多角色 handoff 文档，但必须至少在交付前整理一份 `Skill Workflow Record`：
+
+```markdown
+## Skill Workflow Record
+
+### Context
+- plan_path:
+- task_scope:
+- mode: skill
+
+### Mode Decision
+- fit_for_skill_mode:
+- escalation_reason:
+
+### Execution
+- files_touched:
+- commands_run:
+- artifacts:
+
+### Self Review
+- checklist:
+- issues_found:
+- feedback_record:
+
+### Verification
+- detected_entrypoints:
+- executed_checks:
+- assumptions:
+- uncovered_risks:
+
+### Doc Sync
+- docs_checked:
+- docs_updated:
+
+### Final Summary
+- outcome:
+- remaining_risks:
+- followups:
+```
+
+这个记录用于：
+
+- 支撑 `/compact` 或新会话后的恢复
+- 为 memory / feedback 提供事实来源
+- 让 Skill 模式也具备审计性，而不是只依赖隐式上下文
+
+#### Skill 模式中的反馈处理
+
+- **阻塞反馈来源**：自检发现严重问题、验证失败、文档同步发现规范冲突
+- **记录要求**：阻塞与非阻塞反馈都必须先进入 `Feedback Record`
+- **自动修复条件**：仅当 `risk_level=low` 且 `action_type` 属于自动执行白名单时，允许在 Skill 模式内自动修复并继续
+- **升级条件**：一旦反馈表明任务已需要独立 reviewer、重复循环或更强状态追踪，立即升级到 `Subagent 模式`
+
+#### 模式升级规则
+
+- **Skill → Subagent**
+  - 出现循环审查需求
+  - 出现 2 轮以上反馈回流
+  - 需要独立 reviewer / tester 视角
+  - 任务跨度或风险已超出单 agent 串行 workflow 的可控范围
+- **Subagent → Team**
+  - 需要多视角并行审查
+  - 需要并行验证不同风险面
+- **禁止继续停留在 Skill 模式**
+  - 高风险不可逆操作
+  - 复杂 tool orchestration
+  - 强状态追踪需求
+  - 需要明确 gatekeeper 角色
+
+#### Skill 模式内部子 Skill
+
+Skill 模式后续建议引入少量阶段型专用 Skill，用于稳定单 agent workflow 的关键阶段，而不是按角色镜像拆分更多 Skill。
+
+当前建议的第一批是：
+
+- `plan-check-skill`
+- `self-review-skill`
+- `verification-skill`
+
+详细契约见：
+
+- [references/skill-mode-specialized-skills.md](references/skill-mode-specialized-skills.md)
+- [internal-skills/plan-check-skill/SKILL.md](internal-skills/plan-check-skill/SKILL.md)
+- [internal-skills/self-review-skill/SKILL.md](internal-skills/self-review-skill/SKILL.md)
+- [internal-skills/verification-skill/SKILL.md](internal-skills/verification-skill/SKILL.md)
+
+这些子 Skill 初期应作为 `dev-workflow` 的内部子 skill 使用，不急于暴露成用户直接调用的顶层入口。
 
 ### Subagent 模式
 
@@ -115,11 +237,21 @@ Dev 实现
 后续流程同 Subagent 模式
 ```
 
+## 模式选择建议
+
+| 模式 | 核心特征 | 何时使用 |
+|------|---------|---------|
+| Skill | 单 agent 显式 workflow | 任务短、边界清楚、无需独立 reviewer |
+| Subagent | 多角色串行 handoff | 需要 reviewer / tester 门禁和状态追踪 |
+| Team | 并行多视角审查 | 需要多个 reviewer 并行给结论 |
+
 ## 交接文档
 
 每个角色完成后必须写交接文档，格式见下方统一格式。
 交接文档用于主 agent 读取结果、决定下一步操作。
 开始执行前，主 agent 应先读取 `docs/memory/index.md` 和 `docs/memory/feedback/prevents-recurrence.md`。
+
+Skill 模式不要求多角色 handoff，但仍必须产出上文的 `Skill Workflow Record`。`Subagent` / `Team` 模式则继续使用本节交接文档格式。
 
 ## 反馈决策规则
 
@@ -201,11 +333,12 @@ APPROVED / REJECTED / BLOCKED
 ## 调用方式
 
 用户通过自然语言描述需求：
+- "用 Skill 模式完成这次小范围文档更新"
 - "帮我用 developer 实现这个功能"
 - "启动完整流程：dev → reviewer → tester"
 - "开 3 个 reviewer 并行审查这段代码"
 
-主 agent 读取对应 agent 定义，用自然语言传递上下文。
+主 agent 根据复杂度决定使用 Skill / Subagent / Team 中的哪一种模式；如果选择后发现复杂度超出当前模式边界，应显式升级。
 
 ## 计划完成处理
 
@@ -229,4 +362,4 @@ writing-plans → 实施计划 → dev-workflow
 
 1. **领域 Skill**：后续可加入 react-dev、vue-dev 等，Developer agent 调用
 2. **Team 模式完善**：多角色并行协作
-3. **状态追踪**：交接文档持久化到 git
+3. **状态追踪**：交接文档与 `Skill Workflow Record` 持久化到 git

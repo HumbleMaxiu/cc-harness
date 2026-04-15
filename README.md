@@ -128,6 +128,20 @@
 
 如果你是在一个新项目里引入这套体系，通常从 `/harness-setup` 开始。
 
+`/dev-workflow` 当前支持三种模式：
+
+- `Skill`：单 agent 串行 workflow，适合小而清楚的任务
+- `Subagent`：多角色串行 handoff，适合需要 reviewer / tester 门禁的任务
+- `Team`：多 reviewer 并行，适合复杂或多视角审查
+
+如果任务开始时看起来适合 `Skill`，但执行中出现循环审查、高风险工具操作或强状态追踪需求，应升级到 `Subagent` 或 `Team`。
+
+最小示例：
+
+- `Skill`："用 Skill 模式完成这次小范围文档更新，并给出结构化总结"
+- `Subagent`："启动完整流程：developer -> reviewer -> tester"
+- `Team`："开 3 个 reviewer 并行审查这段改动，然后汇总结论"
+
 ## 内置 Skills
 
 | Skill | 用途 |

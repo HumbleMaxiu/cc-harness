@@ -27,12 +27,19 @@
 | `recorded_by` | 记录者（通常为 `feedback-curator` 或主 agent） |
 | `evidence` | 交接文档位置、命令结果摘要或 findings 引用；原始 lint / test 输出保留在交接文档中，不直接堆进 memory |
 
+其中：
+
+- `source = self-check` 主要用于 `Skill 模式` 下由主 agent 在 `Self Review` 或 `Verification` 阶段发现的问题
+- `trace_id` 可以指向 `Skill Workflow Record` 或多角色 handoff 链路
+- `evidence` 应优先引用结构化记录位置，而不是复制整段终端输出
+
 ## 记录原则
 
 1. `agent-feedback.md` 记录的是可复用的经验、模式和规则，不是一次性噪音日志。
 2. 某次具体 lint / test / review 失败的原始文本，应保留在角色交接文档的 `Findings` / `evidence` 中。
 3. 只有当问题能被归纳成通用模式、修复策略或预防措施时，才进入这里。
 4. 如果某条反馈无法抽象成通用规则，应标记为一次性执行证据，而不是写入长期 memory。
+5. Skill 模式与 Subagent 模式写入这里的标准相同；区别只在事实来源是 `Skill Workflow Record` 还是多角色交接文档。
 
 ## 待在最终交付中汇总的反馈
 

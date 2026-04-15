@@ -4,7 +4,7 @@
 
 | 计划 | 描述 | 状态 |
 |------|------|------|
-| 暂无 | — | — |
+| [active/2026-04-15-harness-capability-gap-closure.md](active/2026-04-15-harness-capability-gap-closure.md) | 基于方法论与外部最佳实践补齐 harness 能力缺口 | 草案 |
 
 ## 已完成
 

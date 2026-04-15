@@ -29,6 +29,13 @@
 6. **预防**：检查是否需要防止再犯
 7. **滚动归档**：当 `agent-feedback.md` 开始积累过多已完成记录时，将历史项 roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`
 
+### Skill 模式补充
+
+- `dev-workflow` 的 `Skill 模式` 也会产生 Agent 反馈，即便没有独立 Reviewer / Tester handoff
+- Skill 模式中的反馈事实来源是 `Skill Workflow Record` 里的 `Self Review`、`Verification` 和 `Final Summary`
+- 只要这些区块中出现结构化 `feedback_record`，主 agent 或 `feedback-curator` 就应按与 Subagent 模式相同的规则写入 `docs/memory/feedback/agent-feedback.md`
+- 这意味着 Skill 模式不是“没有反馈记录的轻量模式”，而是“单 agent 产出结构化反馈的 workflow 模式”
+
 ## Feedback Rollup / Archive
 
 ### 目标
@@ -62,7 +69,9 @@
 
 - `docs/memory/index.md` 是反馈记忆入口，也是会话恢复时的默认读取点
 - SessionStart hook 当前只负责注入 `using-brainstorming` skill，memory 读取仍由 workflow 和各角色在运行时显式完成
+- Skill 模式执行时，主 agent 必须在最终交付前整理 `Skill Workflow Record`，作为恢复、memory 写入和最终汇总的事实来源
 - Reviewer / Tester 若发现问题，必须在交接文档中输出结构化的 `Feedback Record`，以便主 agent 追加到 `docs/memory/feedback/agent-feedback.md`
+- Skill 模式若在 `Self Review` / `Verification` 中发现问题，也必须输出结构化的 `feedback_record`，再决定自动修复、升级模式或进入最终汇总
 - `feedback-curator` 负责消费 `Feedback Record`，维护 `agent-feedback.md`，并在需要时更新 `prevents-recurrence.md` 中的提名或统计
 - `feedback-curator` 在执行前应先读取 `docs/feedback/feedback-collection.md` 和 `docs/memory/index.md`，否则视为未完整加载约束
 - `REJECTED` 反馈属于阻塞项，但是否自动修复要看 `risk_level` 和 `action_type`；`APPROVED` 下的建议项可以在最终交付前统一汇总

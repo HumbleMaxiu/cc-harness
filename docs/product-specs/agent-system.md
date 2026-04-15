@@ -22,9 +22,15 @@
 
 | 模式 | 适用场景 | 执行方式 |
 |------|---------|---------|
-| **Skill 模式** | 单一任务、步骤明确 | 主 agent 直接执行各阶段 |
+| **Skill 模式** | 单一任务、边界清楚、无需独立 reviewer | 主 agent 按固定状态机执行单 agent workflow，并产出结构化 `Skill Workflow Record` |
 | **Subagent 模式** | 需要循环审查、有状态追踪 | 主 agent 编排调用 subagent |
 | **Team 模式** | 多角度并行审查 | 多个 Reviewer 并行审查 |
+
+Skill 模式的默认状态机为：
+
+`Input Ready -> Plan Check -> Execute -> Self Review -> Verify -> Doc Sync -> Final Summary`
+
+当任务出现循环审查、强状态追踪、高风险工具操作或需要独立 reviewer / tester 视角时，应从 Skill 模式升级到 Subagent 或 Team 模式。
 
 ### 反馈决策
 
@@ -38,23 +44,17 @@
 ```
 用户需求
     ↓
-brainstorming（如需）→ writing-plans
+brainstorming（如需）→ writing-plans → 选择模式
     ↓
-Architect 检查计划文档
+Skill：单 agent workflow
+或
+Subagent：Dev → Reviewer → Tester
+或
+Team：并行 Reviewer / Tester 视角
     ↓
-Dev → Reviewer
+Feedback Curator（如产生 `Feedback Record`）
     ↓
-Feedback Curator 记录审查反馈并输出决策摘要
-    ↓
-主 agent 在阻塞项时自动修复回流；通过后进入 Tester
-    ↓
-Tester
-    ↓
-Feedback Curator 记录测试反馈并输出决策摘要
-    ↓
-主 agent 在阻塞项时自动修复回流，在非阻塞项上于最终交付前统一向用户汇总
-    ↓
-Architect 维护文档
+文档维护 / 最终汇总
     ↓
 交付
 ```
@@ -78,6 +78,8 @@ Architect 维护文档
 - Developer 输出 completed / remaining steps 与结构化自检结果
 - Reviewer 输出 severity / confidence / violates / recurrence candidate
 - Tester 输出验证入口探测、测试矩阵、环境假设和未覆盖风险
+
+Skill 模式下不要求多角色 handoff，但必须至少输出一份包含 `Context`、`Mode Decision`、`Execution`、`Self Review`、`Verification`、`Doc Sync`、`Final Summary` 的 `Skill Workflow Record`。
 
 ## 相关文档
 

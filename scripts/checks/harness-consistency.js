@@ -25,7 +25,7 @@ function listFilesRecursive(relDir) {
 
   function walk(currentDir, currentRel = '') {
     for (const entry of fs.readdirSync(currentDir, { withFileTypes: true })) {
-      if (entry.name === '__pycache__') continue;
+      if (entry.name === '__pycache__' || entry.name === '.DS_Store') continue;
       const nextRel = currentRel ? path.join(currentRel, entry.name) : entry.name;
       const nextAbs = path.join(currentDir, entry.name);
       if (entry.isDirectory()) {
