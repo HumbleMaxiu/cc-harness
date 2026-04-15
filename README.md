@@ -87,10 +87,16 @@
 添加 marketplace：
 
 ```bash
-/plugin marketplace add <giturl>
+/plugin marketplace add https://github.com/HumbleMaxiu/cc-harness.git
 ```
 
-添加后即可在 Claude Code 中按插件方式安装 `cc-harness`。
+安装 `cc-harness`：
+
+```bash
+/plugin install cc-harness@cc-harness
+```
+
+如果你更喜欢先浏览插件列表，也可以先运行 `/plugin`，再在 Discover 里选择 `cc-harness` 安装。
 
 ## 启用方式
 
