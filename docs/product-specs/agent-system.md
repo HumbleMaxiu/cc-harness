@@ -15,7 +15,7 @@
 | Architect | `.claude/agents/architect.md` | 计划检查、文档维护 | 任务开始前 / 完成后 |
 | Developer | `.claude/agents/developer.md` | TDD 实现 | 收到 Architect 交接后 |
 | Reviewer | `.claude/agents/reviewer.md` | 代码质量和安全审查 | 收到 Developer 交接后 |
-| Tester | `.claude/agents/tester.md` | 测试验证 | 收到 Reviewer 交接后 |
+| Tester | `.claude/agents/tester.md` | 探测验证入口并执行测试验证 | 收到 Reviewer 交接后 |
 | Feedback Curator | `.claude/agents/feedback-curator.md` | 整理反馈、维护 memory、输出决策摘要 | 收到带 `Feedback Record` 的交接后 / 任务交付前 |
 
 ### 三种开发模式
@@ -31,6 +31,7 @@
 - `REJECTED` 属于阻塞型反馈：主 agent 先记录，再立即询问用户是否修复后继续
 - `APPROVED` 下的建议属于非阻塞反馈：主 agent 先记录，允许主流程继续，并在任务交付前统一询问用户
 - 反馈记录和汇总由 `feedback-curator` 承担；是否执行仍由主 agent 向用户确认
+- Tester 先探测项目当前可用的 test / lint / typecheck / build 入口；无法可靠判断时向用户确认，而不是假定固定脚本
 
 ### 完整流程
 
@@ -76,7 +77,7 @@ Architect 维护文档
 - Architect 输出计划校验清单、范围确认和文档影响矩阵
 - Developer 输出 completed / remaining steps 与结构化自检结果
 - Reviewer 输出 severity / confidence / violates / recurrence candidate
-- Tester 输出测试矩阵、环境假设和未覆盖风险
+- Tester 输出验证入口探测、测试矩阵、环境假设和未覆盖风险
 
 ## 相关文档
 

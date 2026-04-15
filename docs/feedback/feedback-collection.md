@@ -29,10 +29,12 @@
 ## 运行时集成
 
 - `docs/memory/index.md` 是反馈记忆入口，也是会话恢复时的默认读取点
-- SessionStart hook 会在新会话中注入 `docs/memory/index.md` 以及 `docs/memory/feedback/` 下的核心记录
+- SessionStart hook 当前只负责注入 `using-brainstorming` skill，memory 读取仍由 workflow 和各角色在运行时显式完成
 - Reviewer / Tester 若发现问题，必须在交接文档中输出结构化的 `Feedback Record`，以便主 agent 追加到 `docs/memory/feedback/agent-feedback.md`
 - `feedback-curator` 负责消费 `Feedback Record`，维护 `agent-feedback.md`，并在需要时更新 `prevents-recurrence.md` 中的提名或统计
 - `REJECTED` 反馈属于阻塞项，主 agent 在记录后必须立即进入用户决策点；`APPROVED` 下的建议项可以在任务交付前统一汇总
+- 主流程的阻塞点由 `dev-workflow` 控制，而不是由 hook 或 shell 层面拦截控制
+- Tester 的验证入口探测属于运行时职责：先探测项目事实，再运行可执行验证，必要时询问用户
 - 当同类问题累计 2 次或以上时，主 agent 必须同步更新 `docs/memory/feedback/prevents-recurrence.md` 和相应规范文件
 
 ## 询问用户的话术模板

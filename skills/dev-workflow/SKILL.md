@@ -8,6 +8,12 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 开发流程 agent 系统，遵循 harness engineering 原则。
 接在 `writing-plans` 技能之后使用。
 
+## 入口规则
+
+- 创造性任务先经过 `brainstorming` / `writing-plans`，再进入实现
+- 主 agent 开始执行前先读取 `docs/memory/index.md` 和 `docs/memory/feedback/prevents-recurrence.md`
+- 没有可接受的设计输入时，不直接进入 Developer 实现
+
 ## 角色
 
 | 角色 | Agent | 职责 |
@@ -24,7 +30,7 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 
 **适用场景**：单一任务、步骤明确、不需要循环审查
 
-**执行方式**：主 agent 直接执行各阶段
+**执行方式**：主 agent 直接执行各阶段，但仍必须遵守 Reviewer / Tester 的阻塞规则与用户决策点
 
 ### Subagent 模式
 
@@ -83,9 +89,9 @@ Dev 实现
 
 | 循环 | 条件 | 动作 |
 |------|------|------|
-| Dev → Reviewer | REJECTED | `feedback-curator` 记录阻塞反馈，主 agent 立即询问用户是否修复后继续 |
+| Dev → Reviewer | REJECTED | `feedback-curator` 记录阻塞反馈，主 agent 立即询问用户是否修复后继续；未经用户确认不得自动回到实现 |
 | Dev → Reviewer | APPROVED | 进入 Tester |
-| Tester | REJECTED | `feedback-curator` 记录阻塞反馈，主 agent 立即询问用户是否修复后继续 |
+| Tester | REJECTED | `feedback-curator` 记录阻塞反馈，主 agent 立即询问用户是否修复后继续；未经用户确认不得自动回到实现 |
 | Tester | APPROVED | 进入 Architect 维护 |
 
 **终止条件**：Reviewer APPROVED + Tester APPROVED
@@ -121,6 +127,14 @@ Dev 实现
 - **非阻塞反馈**：Reviewer 或 Tester 在 `APPROVED` 状态下给出的改进建议，也应先由 `feedback-curator` 记录；主流程可以继续，但在当前任务交付前统一向用户汇总并询问是否执行。
 - **未经用户确认，不得因为 Agent 反馈自动触发新的实现改动。**
 - **同类问题累计 2 次或以上**：除记录反馈外，`feedback-curator` 还应更新 `docs/memory/feedback/prevents-recurrence.md` 中的提名或统计，并由主 agent 在用户确认后推动规范升级。
+
+## Tester 运行时验证规则
+
+- Tester 必须先探测项目技术栈和可用验证入口，再建立测试矩阵
+- Tester 不得把“项目缺少统一脚本”当作跳过验证的理由
+- 当存在多个候选命令时，Tester 选择最项目原生、最贴近本轮变更范围的命令，并在交接文档中说明
+- 当无法可靠判断可执行命令时，Tester 必须把已探测到的事实汇总给用户，请用户确认
+- Tester 输出必须同时覆盖：已执行验证、环境假设、未覆盖风险
 
 ## Feedback Curator 接入点
 

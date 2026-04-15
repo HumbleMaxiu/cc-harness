@@ -4,7 +4,7 @@
 
 | 计划 | 描述 | 状态 |
 |------|------|------|
-| 暂无 | — | — |
+| [active/2026-04-15-automation-enforcement.md](active/2026-04-15-automation-enforcement.md) | 文档约束到自动化约束实施计划 | 进行中 |
 
 ## 已完成
 
