@@ -74,6 +74,10 @@ fixtures/
 - tester 入口探测与验证降级
 - memory / feedback 恢复
 - bridge 文件生成与合并
+- Skill 模式单 agent workflow 闭环
+- Skill 模式 `plan-check-skill` 升级到 `Subagent`
+- Skill 模式 `self-review-skill` 产出结构化 `feedback_record`
+- Skill 模式 `verification-skill` 记录验证不确定性与未覆盖风险
 
 每个场景必须包含：
 
@@ -247,7 +251,7 @@ fixtures/
 - Skill 模式与 Subagent 模式的核心区别
 - 何时需要升级模式
 
-- [ ] **步骤 6：将 Skill 模式纳入后续 eval 计划**
+- [x] **步骤 6：将 Skill 模式纳入后续 eval 计划**
 
 在任务 1 的 eval 场景设计中显式纳入：
 
@@ -256,6 +260,13 @@ fixtures/
 - Skill 模式下的结构化产物完整性
 
 要求后续 eval 不只覆盖 agent/subagent 回流，也覆盖单 agent workflow 本身。
+
+当前已纳入 `docs/references/eval-scenarios.md` / `scripts/checks/harness-evals.js` 的 Skill 模式重点场景：
+
+- 单 agent Skill 模式成功闭环
+- `plan-check-skill` 判定需升级到 `Subagent`
+- `self-review-skill` 产出结构化 `feedback_record`
+- `verification-skill` 发现验证不确定性并记录未覆盖风险
 
 - [x] **步骤 7：定义 Skill 模式的第一批阶段型专用 Skill**
 

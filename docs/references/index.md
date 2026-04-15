@@ -4,7 +4,9 @@
 
 ## 已有的 Reference 文件
 
-暂无。填充方式：
+- [Harness Eval Scenarios](eval-scenarios.md) — harness 回归场景矩阵，包含 Skill 模式专项 eval
+
+其他填充方式：
 
 1. 创建 `docs/references/<tool-name>-llms.txt`
 2. 粘贴相关的 vendor docs 长节选或 API 文档

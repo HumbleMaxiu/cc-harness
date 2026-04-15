@@ -193,3 +193,24 @@
    - `plan-check-skill` 的模式判断
    - `self-review-skill` 的反馈记录质量
    - `verification-skill` 的验证入口探测质量
+
+## 最小调用模式
+
+`dev-workflow` 在 Skill 模式下可按以下顺序使用这 3 个内部子 skill：
+
+1. `Plan Check` 阶段加载 `plan-check-skill`，把输出直接写入 `Mode Decision`
+2. `Execute` 完成后加载 `self-review-skill`，把输出直接写入 `Self Review`
+3. `Verify` 阶段加载 `verification-skill`，把输出直接写入 `Verification`
+4. 三者都不单独生成平行报告，而是回填到同一份 `Skill Workflow Record`
+
+简化示意：
+
+```text
+dev-workflow (Skill mode)
+  -> plan-check-skill
+  -> execute task
+  -> self-review-skill
+  -> verification-skill
+  -> doc sync
+  -> final summary
+```

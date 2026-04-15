@@ -154,6 +154,40 @@ Skill 模式后续建议引入少量阶段型专用 Skill，用于稳定单 agen
 
 这些子 Skill 初期应作为 `dev-workflow` 的内部子 skill 使用，不急于暴露成用户直接调用的顶层入口。
 
+#### Skill 模式内部子 Skill 调用模式
+
+`dev-workflow` 在 Skill 模式下应按阶段需要显式读取并套用对应内部子 skill，而不是把它们当成独立角色：
+
+1. 进入 `Plan Check` 时，读取 `internal-skills/plan-check-skill/SKILL.md`，输出可并入 `Mode Decision` 的判断。
+2. 完成 `Execute` 后，读取 `internal-skills/self-review-skill/SKILL.md`，输出可并入 `Self Review` 的 checklist 与 `feedback_record`。
+3. 进入 `Verify` 时，读取 `internal-skills/verification-skill/SKILL.md`，输出可并入 `Verification` 的验证记录、假设与未覆盖风险。
+4. 将上述输出拼装回同一份 `Skill Workflow Record`，再继续 `Doc Sync` 与 `Final Summary`。
+
+最小示例：
+
+```markdown
+## Skill Workflow Record
+
+### Mode Decision
+- fit_for_skill_mode: true
+- escalation_reason:
+
+### Self Review
+- checklist:
+  - task goal matched
+- feedback_record:
+  - source: self-check
+    pattern: missing-doc-sync
+
+### Verification
+- executed_checks:
+  - npm test
+- assumptions:
+  - consistency and eval checks represent repo-native validation for this doc-focused change
+- uncovered_risks:
+  - no fixture-based runtime regression yet
+```
+
 ### Subagent 模式
 
 **适用场景**：需要循环审查、有状态追踪需求

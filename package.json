@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "check:harness": "node scripts/checks/harness-consistency.js",
-    "test": "node scripts/checks/harness-consistency.js"
+    "check:evals": "node scripts/checks/harness-evals.js",
+    "test": "node scripts/checks/harness-consistency.js && node scripts/checks/harness-evals.js"
   }
 }
