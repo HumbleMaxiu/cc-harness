@@ -31,7 +31,9 @@ cc-harness/
 │   ├── product-specs/      # 各领域产品规格
 │   └── generated/          # 生成产物占位符
 │
-├── marketplace.json        # NPM 包元数据
+├── .claude-plugin/         # Claude Code 插件清单与 marketplace 元数据
+│   ├── plugin.json
+│   └── marketplace.json
 └── orchestrate.md          # 编排命令（Legacy shim）
 ```
 
@@ -42,6 +44,7 @@ cc-harness/
     ├── Skills — 工作流编排（Markdown 文档）
     ├── Agents — 角色定义（Markdown + YAML front matter）
     ├── Hooks — Session 生命周期（Node.js）
+    ├── Plugin Manifest — git marketplace 安装入口
     └── docs/ — 文档系统（Markdown + Git 版本化）
               ├── design-docs/   — 设计决策
               ├── exec-plans/    — 执行计划

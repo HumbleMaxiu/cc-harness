@@ -1,9 +1,30 @@
 {
   "name": "cc-harness",
-  "description": "Claude Code 开发辅助工具集，包含 feature flow、code review、tdd guide 等 workflows",
+  "description": "Claude Code harness engineering plugin，提供 skills、agents、hooks 与 MCP 配置模板",
   "version": "1.0.0",
+  "homepage": "",
+  "repository": "",
+  "license": "MIT",
   "author": {
     "name": "xiuma"
   },
-  "marketplace": "./marketplace.json"
+  "keywords": [
+    "claude-code",
+    "harness",
+    "workflow",
+    "skills",
+    "agents",
+    "hooks"
+  ],
+  "agents": [
+    "./.claude/agents/architect.md",
+    "./.claude/agents/developer.md",
+    "./.claude/agents/feedback-curator.md",
+    "./.claude/agents/reviewer.md",
+    "./.claude/agents/tester.md"
+  ],
+  "skills": [
+    "./skills/"
+  ],
+  "commands": []
 }

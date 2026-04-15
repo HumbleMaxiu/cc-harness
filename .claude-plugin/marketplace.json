@@ -1,0 +1,39 @@
+{
+  "name": "cc-harness",
+  "owner": {
+    "name": "xiuma"
+  },
+  "metadata": {
+    "description": "Harness engineering plugin for Claude Code projects"
+  },
+  "plugins": [
+    {
+      "name": "cc-harness",
+      "source": "./",
+      "description": "Claude Code harness engineering plugin with reusable skills, agents, hooks, and project conventions",
+      "version": "1.0.0",
+      "author": {
+        "name": "xiuma"
+      },
+      "homepage": "",
+      "repository": "",
+      "license": "MIT",
+      "keywords": [
+        "claude-code",
+        "harness",
+        "skills",
+        "agents",
+        "hooks"
+      ],
+      "category": "workflow",
+      "tags": [
+        "claude-code",
+        "harness",
+        "skills",
+        "agents",
+        "hooks"
+      ],
+      "strict": false
+    }
+  ]
+}

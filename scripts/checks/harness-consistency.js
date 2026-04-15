@@ -15,6 +15,10 @@ function exists(relPath) {
   return fs.existsSync(path.join(repoRoot, relPath));
 }
 
+function readJson(relPath) {
+  return JSON.parse(read(relPath));
+}
+
 function fail(message) {
   failures.push(message);
 }
@@ -102,12 +106,56 @@ function assertHookDocsMatchImplementation() {
   }
 }
 
+function assertClaudeMarketplaceManifest() {
+  const plugin = readJson('.claude-plugin/plugin.json');
+  const marketplace = readJson('.claude-plugin/marketplace.json');
+
+  if (!Array.isArray(plugin.agents) || plugin.agents.length === 0) {
+    fail('.claude-plugin/plugin.json: agents must be a non-empty array');
+  }
+
+  if (!Array.isArray(plugin.skills) || !plugin.skills.includes('./skills/')) {
+    fail('.claude-plugin/plugin.json: skills must include ./skills/');
+  }
+
+  if (!Array.isArray(plugin.commands)) {
+    fail('.claude-plugin/plugin.json: commands must be an array');
+  }
+
+  for (const relPath of plugin.agents) {
+    const normalized = relPath.replace(/^\.\//, '');
+    if (!exists(normalized)) {
+      fail(`.claude-plugin/plugin.json: missing agent path ${relPath}`);
+    }
+  }
+
+  if (!Array.isArray(marketplace.plugins) || marketplace.plugins.length === 0) {
+    fail('.claude-plugin/marketplace.json: plugins must be a non-empty array');
+    return;
+  }
+
+  const primaryPlugin = marketplace.plugins[0];
+  if (primaryPlugin.name !== plugin.name) {
+    fail('.claude-plugin/marketplace.json: first plugin entry name must match .claude-plugin/plugin.json');
+  }
+
+  if (primaryPlugin.source !== './') {
+    fail('.claude-plugin/marketplace.json: first plugin entry source must be ./');
+  }
+}
+
 function main() {
   const requiredPaths = [
     'AGENTS.md',
+    'README.md',
     'docs/design-docs/index.md',
     'docs/exec-plans/index.md',
+    'docs/exec-plans/completed/2026-04-15-claude-marketplace-install.md',
     '.claude/agents/tester.md',
+    '.claude-plugin/plugin.json',
+    '.claude-plugin/marketplace.json',
+    'examples/claude-code/project-settings.json',
+    'examples/claude-code/global-settings.json',
     'skills/dev-workflow/SKILL.md',
     '.claude/skills/dev-workflow/SKILL.md',
     'scripts/hooks/session-start.js',
@@ -120,6 +168,8 @@ function main() {
   }
 
   assertRelativeLinksExist('AGENTS.md');
+  assertRelativeLinksExist('README.md');
+  assertRelativeLinksExist('ARCHITECTURE.md');
   assertRelativeLinksExist('docs/design-docs/index.md');
   assertRelativeLinksExist('docs/exec-plans/index.md');
   assertRelativeLinksExist('docs/product-specs/index.md');
@@ -128,6 +178,7 @@ function main() {
   assertIndexCoversDirectory('docs/product-specs/index.md', 'docs/product-specs');
   assertExecPlanIndexMatches();
   assertHookDocsMatchImplementation();
+  assertClaudeMarketplaceManifest();
 
   if (failures.length > 0) {
     console.error('Harness consistency check failed:\n');

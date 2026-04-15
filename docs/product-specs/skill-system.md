@@ -15,7 +15,7 @@
 1. 定义 Skill 名称和描述
 2. 编写 SKILL.md 主文件
 3. 可选：添加 references/ 和 scripts/
-4. 发布到 marketplace.json
+4. 发布到 `.claude-plugin/marketplace.json`
 
 ### Skill 结构规范
 
@@ -55,4 +55,4 @@ description: <一句话描述>
 ## 相关文档
 
 - [docs/design-docs/core-beliefs.md](../design-docs/core-beliefs.md)
-- marketplace.json（root）
+- `.claude-plugin/marketplace.json`

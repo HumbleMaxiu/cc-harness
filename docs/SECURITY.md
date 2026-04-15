@@ -20,7 +20,7 @@
 ### Audit
 
 - 所有 npm 发布通过 GitHub Actions CI 执行（需手动 trigger approval）
-- marketplace.json 中的 skills 路径需与实际文件对应
+- `.claude-plugin/plugin.json` 与 `.claude-plugin/marketplace.json` 中声明的路径需与实际文件对应
 
 ### 相关文档
 

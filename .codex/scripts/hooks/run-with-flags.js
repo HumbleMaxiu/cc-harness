@@ -83,17 +83,19 @@ function parseArgs() {
  * Resolve the plugin root directory
  */
 function resolvePluginRoot() {
-  const CURRENT_PLUGIN_SLUG = 'ecc';
-  const LEGACY_PLUGIN_SLUG = 'everything-claude-code';
+  const CURRENT_PLUGIN_SLUG = 'cc-harness';
+  const LEGACY_PLUGIN_SLUGS = ['ecc', 'everything-claude-code'];
   const KNOWN_PLUGIN_PATHS = [
     [CURRENT_PLUGIN_SLUG],
     [`${CURRENT_PLUGIN_SLUG}@${CURRENT_PLUGIN_SLUG}`],
     ['marketplace', CURRENT_PLUGIN_SLUG],
-    [LEGACY_PLUGIN_SLUG],
-    [`${LEGACY_PLUGIN_SLUG}@${LEGACY_PLUGIN_SLUG}`],
-    ['marketplace', LEGACY_PLUGIN_SLUG],
+    ...LEGACY_PLUGIN_SLUGS.flatMap((slug) => [
+      [slug],
+      [`${slug}@${slug}`],
+      ['marketplace', slug],
+    ]),
   ];
-  const CACHE_PLUGIN_SLUGS = [CURRENT_PLUGIN_SLUG, LEGACY_PLUGIN_SLUG];
+  const CACHE_PLUGIN_SLUGS = [CURRENT_PLUGIN_SLUG, ...LEGACY_PLUGIN_SLUGS];
 
   const rel = path.join('scripts', 'hooks', 'run-with-flags.js');
 
