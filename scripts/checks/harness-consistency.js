@@ -193,6 +193,70 @@ function assertClaudeMarketplaceManifest() {
   assertHttpsUrl(primaryPlugin.repository, '.claude-plugin/marketplace.json: first plugin entry repository');
 }
 
+function assertAutonomousWorkflowDocs() {
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
+  const feedbackDoc = read('docs/feedback/feedback-collection.md');
+  const memoryDoc = read('docs/memory/feedback/agent-feedback.md');
+
+  const forbiddenSnippets = [
+    '立即询问用户是否修复后继续',
+    '未经用户确认不得自动回到实现',
+    '未经用户确认，不得因为 Agent 反馈自动触发新的实现改动。',
+  ];
+
+  for (const snippet of forbiddenSnippets) {
+    if (workflow.includes(snippet)) {
+      fail(`skills/dev-workflow/SKILL.md: stale pre-autonomous rule -> ${snippet}`);
+    }
+  }
+
+  if (!workflow.includes('最终交付前统一向用户汇总')) {
+    fail('skills/dev-workflow/SKILL.md: expected final-gate summary behavior');
+  }
+
+  if (!agentSpec.includes('最终交付前统一向用户汇总')) {
+    fail('docs/product-specs/agent-system.md: expected final-gate summary behavior');
+  }
+
+  if (!feedbackDoc.includes('自动修复')) {
+    fail('docs/feedback/feedback-collection.md: expected auto-remediation guidance');
+  }
+
+  if (!memoryDoc.includes('自动执行')) {
+    fail('docs/memory/feedback/agent-feedback.md: expected autonomous feedback record fields');
+  }
+}
+
+function assertDangerousModeSettingsDocs() {
+  const requiredSetting = '"skipDangerousModePermissionPrompt": true';
+  const readme = read('README.md');
+  const agentsDoc = read('AGENTS.md');
+  const projectSettings = read('examples/claude-code/project-settings.json');
+  const globalSettings = read('examples/claude-code/global-settings.json');
+  const claudeSettings = read('.claude/settings.json');
+  const codexSettings = read('.codex/settings.json');
+
+  if (!readme.includes('skipDangerousModePermissionPrompt')) {
+    fail('README.md: expected dangerous mode setting guidance');
+  }
+
+  if (!agentsDoc.includes('skipDangerousModePermissionPrompt')) {
+    fail('AGENTS.md: expected dangerous mode setting guidance');
+  }
+
+  for (const [relPath, content] of [
+    ['examples/claude-code/project-settings.json', projectSettings],
+    ['examples/claude-code/global-settings.json', globalSettings],
+    ['.claude/settings.json', claudeSettings],
+    ['.codex/settings.json', codexSettings],
+  ]) {
+    if (!content.includes(requiredSetting)) {
+      fail(`${relPath}: missing ${requiredSetting}`);
+    }
+  }
+}
+
 function assertMirrorDirectory(sourceDir, mirrorDir) {
   const sourceFiles = listFilesRecursive(sourceDir);
   const mirrorFiles = listFilesRecursive(mirrorDir);
@@ -259,6 +323,8 @@ function main() {
   assertExecPlanIndexMatches();
   assertHookDocsMatchImplementation();
   assertClaudeMarketplaceManifest();
+  assertAutonomousWorkflowDocs();
+  assertDangerousModeSettingsDocs();
   assertMirrorDirectory('.claude/skills', 'skills');
   assertMirrorDirectory('.claude/skills', '.codex/skills');
   assertMirrorDirectory('.claude/agents', 'agents');

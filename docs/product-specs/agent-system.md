@@ -28,9 +28,9 @@
 
 ### 反馈决策
 
-- `REJECTED` 属于阻塞型反馈：主 agent 先记录，再立即询问用户是否修复后继续
-- `APPROVED` 下的建议属于非阻塞反馈：主 agent 先记录，允许主流程继续，并在任务交付前统一询问用户
-- 反馈记录和汇总由 `feedback-curator` 承担；是否执行仍由主 agent 向用户确认
+- `REJECTED` 属于阻塞型反馈：主 agent 先记录，再自动回到实现修复并继续主流程
+- `APPROVED` 下的建议属于非阻塞反馈：主 agent 先记录，允许主流程继续，并在最终交付前统一向用户汇总
+- 反馈记录和汇总由 `feedback-curator` 承担；用户只在最终交付时统一确认产物、风险和待执行建议
 - Tester 先探测项目当前可用的 test / lint / typecheck / build 入口；无法可靠判断时向用户确认，而不是假定固定脚本
 
 ### 完整流程
@@ -46,13 +46,13 @@ Dev → Reviewer
     ↓
 Feedback Curator 记录审查反馈并输出决策摘要
     ↓
-主 agent 在阻塞项时立即询问用户；通过后进入 Tester
+主 agent 在阻塞项时自动修复回流；通过后进入 Tester
     ↓
 Tester
     ↓
 Feedback Curator 记录测试反馈并输出决策摘要
     ↓
-主 agent 在阻塞项时立即询问用户，在非阻塞项上于交付前统一询问
+主 agent 在阻塞项时自动修复回流，在非阻塞项上于最终交付前统一向用户汇总
     ↓
 Architect 维护文档
     ↓

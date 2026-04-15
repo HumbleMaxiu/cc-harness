@@ -14,4 +14,5 @@
 | [completed/2026-04-15-feedback-curator-agent.md](completed/2026-04-15-feedback-curator-agent.md) | Feedback Curator Agent 实施计划 | 2026-04-15 |
 | [completed/2026-04-15-agent-contract-upgrade.md](completed/2026-04-15-agent-contract-upgrade.md) | Agent Contract Upgrade 实施计划 | 2026-04-15 |
 | [completed/2026-04-15-automation-enforcement.md](completed/2026-04-15-automation-enforcement.md) | 文档约束到自动化约束实施计划 | 2026-04-15 |
+| [completed/2026-04-15-autonomous-until-final-gate.md](completed/2026-04-15-autonomous-until-final-gate.md) | 持续运行到最终确认实施计划 | 2026-04-15 |
 | [completed/2026-04-15-claude-marketplace-install.md](completed/2026-04-15-claude-marketplace-install.md) | Claude Code marketplace git 安装形态改造 | 2026-04-15 |

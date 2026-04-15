@@ -56,7 +56,7 @@ ls .claude/agents/
 | Developer | [docs/design-docs/developer.md](docs/design-docs/developer.md) | TDD 实现功能 |
 | Reviewer | [docs/design-docs/reviewer.md](docs/design-docs/reviewer.md) | 代码质量和安全审查 |
 | Tester | [docs/design-docs/tester.md](docs/design-docs/tester.md) | 探测验证入口并执行测试验证 |
-| Feedback Curator | [docs/design-docs/feedback-curator.md](docs/design-docs/feedback-curator.md) | 整理 Agent 反馈、维护 feedback memory、输出用户决策摘要 |
+| Feedback Curator | [docs/design-docs/feedback-curator.md](docs/design-docs/feedback-curator.md) | 整理 Agent 反馈、维护 feedback memory、输出自动处理轨迹与最终汇总摘要 |
 
 ## 行为规则
 
@@ -73,9 +73,14 @@ ls .claude/agents/
 ### 反馈规则
 
 - **用户反馈**：优先级最高。记录到 `docs/memory/feedback/user-feedback.md`，立即执行，无需询问
-- **Agent 反馈**：来自 Reviewer/Tester 或自检的问题。先记录到 `docs/memory/feedback/agent-feedback.md`；阻塞型反馈（`REJECTED`）立即询问用户，非阻塞建议在任务收尾统一询问用户，**未经确认不得执行**
+- **Agent 反馈**：来自 Reviewer/Tester 或自检的问题。先记录到 `docs/memory/feedback/agent-feedback.md`；阻塞型反馈优先自动修复并继续主流程，非阻塞建议在最终交付前统一汇总给用户确认
 - **防止再犯**：同一问题出现 2 次或以上 → 将预防措施写入 `AGENTS.md` 或相关规范
 - 新会话或 `/compact` 后恢复上下文时，先读 `docs/memory/index.md`，再按需查看 `docs/memory/feedback/`
+
+### Claude Code 运行模式
+
+- 想要尽量减少 Claude Code 运行时的危险模式确认，项目或全局设置中加入 `"skipDangerousModePermissionPrompt": true`
+- 这个设置只影响 Claude Code 自身的危险模式确认；真正的“中途不停下来问用户”还需要 `dev-workflow` 和 agent 契约采用最终统一确认模式
 
 ### 文档同步（编辑源码后自检）
 

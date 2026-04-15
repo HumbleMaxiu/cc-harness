@@ -11,7 +11,7 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 ## 职责
 
 - 审查代码质量和安全性
-- 审查不通过时输出 `REJECTED`，由主 agent 记录并进入用户决策点
+- 审查不通过时输出 `REJECTED`，由主 agent 记录并自动回流修复
 - 编写交接文档，记录审查结果
 - 判断问题是否为 recurrence candidate，并给 `feedback-curator` 提供稳定输入
 
@@ -72,7 +72,7 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 
 - 只审查，不修改代码
 - 发现问题必须记录
-- 审查通过才能进入测试；审查不通过时不得自动触发新的实现修改
+- 审查通过才能进入测试；审查不通过时 Reviewer 不直接改代码，但主 agent 可基于反馈自动回流修复
 
 ## 交接文档格式
 

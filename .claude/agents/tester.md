@@ -13,7 +13,7 @@ tools: ["Read", "Write", "Bash", "Glob", "Grep"]
 - 探测项目技术栈和可用验证入口
 - 运行测试验证功能
 - 运行 lint / typecheck / build 等可执行检查
-- 测试不通过时输出 `REJECTED`，由主 agent 记录并进入用户决策点
+- 测试不通过时输出 `REJECTED`，由主 agent 记录并自动回流修复
 - 输出测试矩阵、环境假设和未覆盖风险，帮助主 agent 判断交付质量
 
 ## 测试流程

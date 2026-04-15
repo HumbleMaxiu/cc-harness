@@ -1,13 +1,13 @@
 # Feedback Curator Agent
 
-> Feedback Curator 负责消费交接文档中的 `Feedback Record`，维护 feedback memory，并给主 agent 输出用户决策摘要。
+> Feedback Curator 负责消费交接文档中的 `Feedback Record`，维护 feedback memory，并给主 agent 输出自动处理轨迹与最终汇总摘要。
 
 ## 触发时机
 
 | 时机 | 操作 |
 |------|------|
 | **交接后** | 读取 Reviewer / Tester 的交接文档，提取并记录新增反馈 |
-| **交付前** | 汇总当前任务中尚未统一询问用户的非阻塞建议 |
+| **交付前** | 汇总当前任务中尚未在最终交付中汇总的建议与剩余风险 |
 
 ## 职责
 
@@ -15,14 +15,14 @@
 2. 提取并校验 `Feedback Record`
 3. 更新 `docs/memory/feedback/agent-feedback.md`
 4. 在满足条件时更新 `docs/memory/feedback/prevents-recurrence.md` 中的提名或统计
-5. 输出给主 agent 的决策摘要
+5. 输出给主 agent 的自动处理摘要与最终汇总摘要
 
 ## 边界
 
 - 可以写 memory 文件
 - 不直接修改业务代码
 - 不直接修改 `AGENTS.md`、Skills 或 Agent 定义
-- 不替代主 agent 向用户发起确认
+- 不替代主 agent 做最终交付
 
 ## 工具
 
@@ -39,9 +39,9 @@ Read、Write、Grep、Glob、Bash
 ### 新增记录
 - af-YYYYMMDD-NNN：...
 
-### 用户决策建议
-- 阻塞项：...
-- 可收尾统一询问项：...
+### 自动处理摘要
+- 已自动执行项：...
+- 待最终汇总项：...
 
 ### Recurrence 提名
 - [新增 / 更新 / 无]

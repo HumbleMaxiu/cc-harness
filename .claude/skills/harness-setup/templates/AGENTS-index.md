@@ -88,7 +88,7 @@
 
 ### 反馈规则
 - 用户反馈 → 记录到 `docs/memory/feedback/user-feedback.md` 并立即应用
-- Agent 反馈 → 记录到 `docs/memory/feedback/agent-feedback.md`，执行前先询问用户
+- Agent 反馈 → 记录到 `docs/memory/feedback/agent-feedback.md`，阻塞项优先自动修复回流，非阻塞建议在最终交付统一汇总
 - 同类问题出现 2 次或以上 → 同步到 `docs/memory/feedback/prevents-recurrence.md` 并升级为规范
 
 ### 文档同步（编辑源码后自检）

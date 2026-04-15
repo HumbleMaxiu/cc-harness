@@ -147,7 +147,7 @@
 | Developer | [docs/design-docs/developer.md](docs/design-docs/developer.md) | TDD 实现功能 |
 | Reviewer | [docs/design-docs/reviewer.md](docs/design-docs/reviewer.md) | 代码质量和安全审查 |
 | Tester | [docs/design-docs/tester.md](docs/design-docs/tester.md) | 探测验证入口并执行测试验证 |
-| Feedback Curator | [docs/design-docs/feedback-curator.md](docs/design-docs/feedback-curator.md) | 整理 Agent 反馈、维护 memory、输出用户决策摘要 |
+| Feedback Curator | [docs/design-docs/feedback-curator.md](docs/design-docs/feedback-curator.md) | 整理 Agent 反馈、维护 memory、输出自动处理轨迹与最终汇总摘要 |
 
 ## 行为规则
 
@@ -169,8 +169,23 @@
 ### 反馈处理
 
 - 用户反馈优先级最高，直接执行并记录
-- Agent 反馈先进入 memory，再由用户决定是否执行非阻塞建议
+- Agent 反馈先进入 memory；阻塞反馈默认自动修复回流，非阻塞建议在最终交付时统一汇总
 - 同一问题重复出现时，要升级成规则，而不是只记日志
+
+## 持续运行模式
+
+如果你希望 Claude Code 尽量持续运行、减少中途确认，需要同时满足两层条件：
+
+1. **Harness workflow 层**：使用本仓库的 autonomous-until-final-gate 语义，让 Reviewer / Tester 的 `REJECTED` 自动回流修复，而不是中途询问用户。
+2. **Claude Code 运行层**：在项目级或全局设置里启用：
+
+```json
+{
+  "skipDangerousModePermissionPrompt": true
+}
+```
+
+这项设置只影响 Claude Code 自身的危险模式确认。hook 无法替代产品本身的权限系统，因此如果没有这项设置，workflow 虽然会继续推进，但运行时仍可能因为 Claude Code 默认确认策略而暂停。
 
 ## 仓库结构
 

@@ -5,7 +5,7 @@
 ## 职责
 
 - 审查代码质量和安全性
-- 审查不通过时输出 `REJECTED`，由主 agent 记录并进入用户决策点
+- 审查不通过时输出 `REJECTED`，由主 agent 记录并自动回流修复
 - 编写交接文档，记录审查结果
 - 判断问题是否为 recurrence candidate，并为 `feedback-curator` 提供结构化输入
 
@@ -20,7 +20,7 @@
 
 ## 循环规则
 
-- **不通过** → 输出 `REJECTED` + 问题列表 → 由主 agent 记录并询问用户是否继续修复
+- **不通过** → 输出 `REJECTED` + 问题列表 → 由主 agent 记录并自动回流修复
 - **通过** → 输出 APPROVED → 进入测试阶段
 
 ## 工具
