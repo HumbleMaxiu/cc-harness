@@ -42,7 +42,7 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 3. Subagent 完成后主 agent 读取结果，决定下一步
 4. 每个角色完成后写交接文档
 5. 如交接文档包含 `Feedback Record`，主 agent 应触发 `feedback-curator` 维护 `docs/memory/feedback/agent-feedback.md`
-6. 阻塞型反馈立即进入自动修复回流，非阻塞建议可在最终交付前统一向用户汇总
+6. 阻塞型反馈先按风险分级，再决定自动修复回流还是保留到最终确认；非阻塞建议可在最终交付前统一向用户汇总
 
 ### Team 模式
 
@@ -87,9 +87,11 @@ Dev 实现
 
 | 循环 | 条件 | 动作 |
 |------|------|------|
-| Dev → Reviewer | REJECTED | `feedback-curator` 记录阻塞反馈，主 agent 自动回到实现修复并继续循环 |
+| Dev → Reviewer | REJECTED + low risk | `feedback-curator` 记录阻塞反馈，主 agent 自动回到实现修复并继续循环 |
+| Dev → Reviewer | REJECTED + medium/high risk | `feedback-curator` 记录阻塞反馈，主 agent 停止自动修改，把风险保留到最终确认或显式 gate |
 | Dev → Reviewer | APPROVED | 进入 Tester |
-| Tester | REJECTED | `feedback-curator` 记录阻塞反馈，主 agent 自动回到实现修复并继续循环 |
+| Tester | REJECTED + low risk | `feedback-curator` 记录阻塞反馈，主 agent 自动回到实现修复并继续循环 |
+| Tester | REJECTED + medium/high risk | `feedback-curator` 记录阻塞反馈，主 agent 停止自动修改，把风险保留到最终确认或显式 gate |
 | Tester | APPROVED | 进入 Architect 维护 |
 
 **终止条件**：Reviewer APPROVED + Tester APPROVED
@@ -121,10 +123,13 @@ Dev 实现
 
 ## 反馈决策规则
 
-- **阻塞型反馈**：Reviewer 或 Tester 给出 `REJECTED` 时，主 agent 必须先触发 `feedback-curator` 记录到 `docs/memory/feedback/agent-feedback.md`，然后自动回到实现修复后继续主流程。
+- **阻塞型反馈**：Reviewer 或 Tester 给出 `REJECTED` 时，主 agent 必须先触发 `feedback-curator` 记录到 `docs/memory/feedback/agent-feedback.md`。只有 `risk_level=low` 且 `action_type` 属于自动执行白名单时，才自动回到实现修复后继续主流程。
+- **自动执行白名单**：`code_fix`、`test_fix`、`doc_sync` 且 `scope=local_file` 或 `scope=cross_module` 但无外部副作用。
+- **自动执行黑名单**：`workflow_rule`、`repo_rule`、`external`、删除文件、迁移脚本、发布/部署、权限或网络相关变更。
 - **非阻塞反馈**：Reviewer 或 Tester 在 `APPROVED` 状态下给出的改进建议，也应先由 `feedback-curator` 记录；主流程可以继续，但在最终交付前统一向用户汇总。
 - **最终确认**：用户只在最终交付时统一确认产物、验证结果、剩余风险和未自动执行建议。
 - **同类问题累计 2 次或以上**：除记录反馈外，`feedback-curator` 还应更新 `docs/memory/feedback/prevents-recurrence.md` 中的提名或统计，并在最终交付摘要中提示主 agent 评估是否升级规范。
+- **抽象要求**：`Feedback Record` 记录的是抽象后的问题模式和规则；原始 lint / test / review 输出留在角色专项输出和 `evidence` 中，不直接进入长期 memory。
 
 ## Tester 运行时验证规则
 
@@ -173,6 +178,11 @@ Dev 实现
 ### Feedback Record
 source: reviewer | tester | self-check | none
 type: correction | improvement | issue | none
+pattern: ...
+rule: ...
+action_type: code_fix | test_fix | doc_sync | workflow_rule | risk_note | none
+risk_level: low | medium | high | none
+scope: local_file | cross_module | repo_rule | external | none
 content: ...
 suggestion: ...
 prevents_recurrence: true | false

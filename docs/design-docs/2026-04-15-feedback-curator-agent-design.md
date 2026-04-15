@@ -5,7 +5,7 @@
 
 ## 目标
 
-新增一个 `feedback-curator` agent，用于消费各角色交接文档中的 `Feedback Record`，维护反馈记忆文件，并生成面向用户的决策摘要。
+新增一个 `feedback-curator` agent，用于消费各角色交接文档中的 `Feedback Record`，把原始问题提炼成通用规则与问题模式，维护反馈记忆文件，并生成面向用户的决策摘要。
 
 ## 背景
 
@@ -21,9 +21,10 @@
 ## 设计原则
 
 1. **记录与执行分离**：`feedback-curator` 可以整理和写入 memory，但不能直接推动代码修改
-2. **主流程不断裂**：阻塞反馈和非阻塞建议都要被记录，但用户决策仍由主 agent 发起
-3. **最小增量接入**：优先接入现有 `dev-workflow`，不重写整个流程
-4. **规范升级可审计**：`prevents-recurrence` 仅由 curator 提名，真正改规范仍由主 agent 在用户批准后协调 Architect 执行
+2. **memory 存规则，不存噪音**：长期 memory 里应保留通用模式和预防措施，而不是具体 lint 文本
+3. **主流程不断裂**：阻塞反馈和非阻塞建议都要被记录，但高风险项不应自动执行
+4. **最小增量接入**：优先接入现有 `dev-workflow`，不重写整个流程
+5. **规范升级可审计**：`prevents-recurrence` 仅由 curator 提名，真正改规范仍由主 agent 在用户批准后协调 Architect 执行
 
 ## 角色定义
 
@@ -35,6 +36,7 @@
 - 维护 `docs/memory/feedback/agent-feedback.md`
 - 判断是否需要提名到 `docs/memory/feedback/prevents-recurrence.md`
 - 生成给用户的反馈决策摘要
+- 将原始问题抽象为模式、规则和风险分级
 
 **明确不负责**：
 
@@ -50,19 +52,19 @@
 `feedback-curator` 在以下场景运行：
 
 1. **交接后触发**：当 Reviewer 或 Tester 的交接文档包含 `Feedback Record` 时立即触发
-2. **交付前触发**：当前任务准备交付前再运行一次，用于汇总尚未向用户统一询问的非阻塞建议
+2. **交付前触发**：当前任务准备交付前再运行一次，用于汇总尚未向用户统一汇总的中高风险项和剩余建议
 
 ### 输出要求
 
 每次运行都需要完成以下工作：
 
 1. 判断本次是否存在有效 `Feedback Record`
-2. 如果存在，则按规范写入或更新 `agent-feedback.md`
+2. 如果存在，则先抽象成模式 / 规则 / 风险分级，再按规范写入或更新 `agent-feedback.md`
 3. 如果 `prevents_recurrence: true` 或疑似重复问题，则检查是否应提名到 `prevents-recurrence.md`
 4. 输出一份交接摘要给主 agent，说明：
    - 新增了哪些反馈记录
-   - 哪些属于阻塞项
-   - 哪些适合在任务收尾统一询问
+   - 哪些属于低风险自动执行项
+   - 哪些属于中高风险、适合最终统一确认
    - 是否建议升级为 recurrence 条目
 
 ## 与现有流程的衔接
@@ -81,8 +83,8 @@ feedback-curator 读取 Feedback Record
 写入 agent-feedback.md / 提名 recurrence
   ↓
 主 agent 根据 curator 摘要决定：
-  - 阻塞项：立即询问用户
-  - 非阻塞项：继续流程，收尾统一询问
+  - 低风险项：自动执行
+  - 中高风险项：继续流程，但保留到最终统一确认
 ```
 
 ### 与 Architect 的关系
@@ -97,9 +99,10 @@ feedback-curator 读取 Feedback Record
 `feedback-curator` 负责：
 
 - 分配新的 `af-YYYYMMDD-NNN` 编号
-- 填写 `source`、`type`、`content`、`suggestion`、`ask_user`、`prevents_recurrence`
-- 将待确认项写入“待询问用户的反馈”
+- 填写 `pattern`、`rule`、`action_type`、`risk_level`、`scope`、`execution`、`final_report`
+- 将待确认项写入最终汇总区
 - 将已确认或已拒绝项保留在“已处理反馈”
+- 原始命令输出或 lint 文本保留在交接文档证据中
 
 ### `docs/memory/feedback/prevents-recurrence.md`
 
@@ -124,9 +127,9 @@ feedback-curator 读取 Feedback Record
 ### 新增记录
 - af-YYYYMMDD-NNN：...
 
-### 用户决策建议
-- 阻塞项：...
-- 可收尾统一询问项：...
+### 自动处理 / 最终确认建议
+- 自动执行项：...
+- 最终确认项：...
 
 ### Recurrence 提名
 - [新增/更新/无]

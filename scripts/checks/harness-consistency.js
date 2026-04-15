@@ -226,6 +226,18 @@ function assertAutonomousWorkflowDocs() {
   if (!memoryDoc.includes('自动执行')) {
     fail('docs/memory/feedback/agent-feedback.md: expected autonomous feedback record fields');
   }
+
+  if (!workflow.includes('自动执行白名单')) {
+    fail('skills/dev-workflow/SKILL.md: expected risk-based auto-apply policy');
+  }
+
+  if (!memoryDoc.includes('pattern') || !memoryDoc.includes('rule')) {
+    fail('docs/memory/feedback/agent-feedback.md: expected generalized rule-oriented feedback fields');
+  }
+
+  if (!feedbackDoc.includes('不要直接把 lint / test 原始文本写进长期 memory')) {
+    fail('docs/feedback/feedback-collection.md: expected generalized-memory guidance');
+  }
 }
 
 function assertDangerousModeSettingsDocs() {
