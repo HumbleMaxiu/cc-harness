@@ -2,8 +2,8 @@
   "name": "cc-harness",
   "description": "Claude Code harness engineering plugin，提供 skills、agents、hooks 与 MCP 配置模板",
   "version": "1.0.0",
-  "homepage": "",
-  "repository": "",
+  "homepage": "https://github.com/HumbleMaxiu/cc-harness",
+  "repository": "https://github.com/HumbleMaxiu/cc-harness.git",
   "license": "MIT",
   "author": {
     "name": "xiuma"

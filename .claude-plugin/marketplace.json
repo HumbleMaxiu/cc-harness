@@ -15,8 +15,8 @@
       "author": {
         "name": "xiuma"
       },
-      "homepage": "",
-      "repository": "",
+      "homepage": "https://github.com/HumbleMaxiu/cc-harness",
+      "repository": "https://github.com/HumbleMaxiu/cc-harness.git",
       "license": "MIT",
       "keywords": [
         "claude-code",

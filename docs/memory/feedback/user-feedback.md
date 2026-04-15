@@ -20,3 +20,7 @@
 ## 已记录的反馈
 
 <!-- 新反馈追加在此处，按日期倒序 -->
+
+| id | date | session | type | content | action | applied | prevents_recurrence |
+|------|------|------|------|------|------|------|------|
+| `uf-20260415-001` | `2026-04-15` | `claude marketplace install` | `complaint` | `/plugin marketplace add https://github.com/HumbleMaxiu/cc-harness.git` 时报错，`marketplace.json` 的 `plugins.0.homepage` 为非法 URL。 | 将 `.claude-plugin/plugin.json` 与 `.claude-plugin/marketplace.json` 中空字符串 URL 改为真实 GitHub 地址，并在 `scripts/checks/harness-consistency.js` 中新增 homepage/repository URL 校验。 | `true` | `true` |

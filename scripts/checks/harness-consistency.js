@@ -134,6 +134,24 @@ function assertHookDocsMatchImplementation() {
 function assertClaudeMarketplaceManifest() {
   const plugin = readJson('.claude-plugin/plugin.json');
   const marketplace = readJson('.claude-plugin/marketplace.json');
+  const assertHttpsUrl = (value, label) => {
+    if (typeof value !== 'string' || value.trim().length === 0) {
+      fail(`${label} must be a non-empty URL string`);
+      return;
+    }
+
+    let parsed;
+    try {
+      parsed = new URL(value);
+    } catch {
+      fail(`${label} must be a valid URL`);
+      return;
+    }
+
+    if (parsed.protocol !== 'https:') {
+      fail(`${label} must use https`);
+    }
+  };
 
   if (!Array.isArray(plugin.agents) || plugin.agents.length === 0) {
     fail('.claude-plugin/plugin.json: agents must be a non-empty array');
@@ -146,6 +164,9 @@ function assertClaudeMarketplaceManifest() {
   if (!Array.isArray(plugin.commands)) {
     fail('.claude-plugin/plugin.json: commands must be an array');
   }
+
+  assertHttpsUrl(plugin.homepage, '.claude-plugin/plugin.json: homepage');
+  assertHttpsUrl(plugin.repository, '.claude-plugin/plugin.json: repository');
 
   for (const relPath of plugin.agents) {
     const normalized = relPath.replace(/^\.\//, '');
@@ -167,6 +188,9 @@ function assertClaudeMarketplaceManifest() {
   if (primaryPlugin.source !== './') {
     fail('.claude-plugin/marketplace.json: first plugin entry source must be ./');
   }
+
+  assertHttpsUrl(primaryPlugin.homepage, '.claude-plugin/marketplace.json: first plugin entry homepage');
+  assertHttpsUrl(primaryPlugin.repository, '.claude-plugin/marketplace.json: first plugin entry repository');
 }
 
 function assertMirrorDirectory(sourceDir, mirrorDir) {
