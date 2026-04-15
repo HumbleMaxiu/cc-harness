@@ -19,6 +19,31 @@ function readJson(relPath) {
   return JSON.parse(read(relPath));
 }
 
+function listFilesRecursive(relDir) {
+  const base = path.join(repoRoot, relDir);
+  const files = [];
+
+  function walk(currentDir, currentRel = '') {
+    for (const entry of fs.readdirSync(currentDir, { withFileTypes: true })) {
+      if (entry.name === '__pycache__') continue;
+      const nextRel = currentRel ? path.join(currentRel, entry.name) : entry.name;
+      const nextAbs = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        walk(nextAbs, nextRel);
+      } else if (entry.isFile()) {
+        files.push(nextRel);
+      }
+    }
+  }
+
+  if (!fs.existsSync(base)) {
+    return files;
+  }
+
+  walk(base);
+  return files.sort();
+}
+
 function fail(message) {
   failures.push(message);
 }
@@ -144,16 +169,47 @@ function assertClaudeMarketplaceManifest() {
   }
 }
 
+function assertMirrorDirectory(sourceDir, mirrorDir) {
+  const sourceFiles = listFilesRecursive(sourceDir);
+  const mirrorFiles = listFilesRecursive(mirrorDir);
+  const sourceSet = new Set(sourceFiles);
+  const mirrorSet = new Set(mirrorFiles);
+
+  for (const relPath of sourceFiles) {
+    if (!mirrorSet.has(relPath)) {
+      fail(`${mirrorDir}: missing mirrored file ${relPath} from ${sourceDir}`);
+      continue;
+    }
+
+    const sourceContent = read(path.join(sourceDir, relPath));
+    const mirrorContent = read(path.join(mirrorDir, relPath));
+    if (sourceContent !== mirrorContent) {
+      fail(`${mirrorDir}: content drift for ${relPath} (expected to match ${sourceDir})`);
+    }
+  }
+
+  for (const relPath of mirrorFiles) {
+    if (!sourceSet.has(relPath)) {
+      fail(`${mirrorDir}: unexpected extra file ${relPath} not present in ${sourceDir}`);
+    }
+  }
+}
+
 function main() {
   const requiredPaths = [
     'AGENTS.md',
     'README.md',
+    'agents/architect.md',
+    'agents/feedback-curator.md',
     'docs/design-docs/index.md',
     'docs/exec-plans/index.md',
     'docs/exec-plans/completed/2026-04-15-claude-marketplace-install.md',
     '.claude/agents/tester.md',
     '.claude-plugin/plugin.json',
     '.claude-plugin/marketplace.json',
+    '.claude/hooks/hooks.json',
+    '.codex/hooks/hooks.json',
+    '.codex/agents/feedback-curator.md',
     'examples/claude-code/project-settings.json',
     'examples/claude-code/global-settings.json',
     'skills/dev-workflow/SKILL.md',
@@ -179,6 +235,14 @@ function main() {
   assertExecPlanIndexMatches();
   assertHookDocsMatchImplementation();
   assertClaudeMarketplaceManifest();
+  assertMirrorDirectory('.claude/skills', 'skills');
+  assertMirrorDirectory('.claude/skills', '.codex/skills');
+  assertMirrorDirectory('.claude/agents', 'agents');
+  assertMirrorDirectory('.claude/agents', '.codex/agents');
+  assertMirrorDirectory('.claude/scripts/hooks', 'scripts/hooks');
+  assertMirrorDirectory('.claude/scripts/hooks', '.codex/scripts/hooks');
+  assertMirrorDirectory('hooks', '.claude/hooks');
+  assertMirrorDirectory('hooks', '.codex/hooks');
 
   if (failures.length > 0) {
     console.error('Harness consistency check failed:\n');

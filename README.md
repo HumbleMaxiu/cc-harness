@@ -2,6 +2,8 @@
 
 `cc-harness` 是一个面向 Claude Code 的 harness engineering 插件仓库，提供可复用的 skills、agents、hooks 和 MCP 配置模板。
 
+仓库内以 `.claude/` 为事实来源；根目录镜像与 `.codex/` 镜像保持同步，便于不同运行时消费同一套内容。
+
 ## 作为 Marketplace 仓库安装
 
 仓库现在包含 Claude Code marketplace 所需的清单文件：
@@ -39,7 +41,9 @@
 ## 目录
 
 - `skills/`：Claude Code skills
-- `.claude/agents/`：Claude Code agents
+- `agents/`：根目录 agents 镜像
+- `.claude/agents/`：事实来源
+- `.codex/agents/`：Codex 镜像
 - `hooks/hooks.json`：插件安装后自动发现的 hook 声明
 - `scripts/hooks/`：hook 实现
 - `docs/`：设计、规格、执行计划与 memory

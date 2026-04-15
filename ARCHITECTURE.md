@@ -6,6 +6,7 @@
 
 ```
 cc-harness/
+├── agents/               # Agent 镜像（与 .claude/agents/ 同步）
 ├── skills/               # Skill 定义 — Claude Code 技能入口
 │   ├── brainstorming/     # 创造性需求探索
 │   ├── dev-workflow/      # A/Dev/R/T 角色开发流程
@@ -19,11 +20,22 @@ cc-harness/
 │   ├── agents/            # Agent 定义（完整能力描述）
 │   │   ├── architect.md
 │   │   ├── developer.md
+│   │   ├── feedback-curator.md
 │   │   ├── reviewer.md
 │   │   └── tester.md
-│   ├── hooks/             # Session 钩子（Node.js）
-│   │   └── session-start-bootstrap.js
+│   ├── hooks/             # Hook 声明镜像
+│   │   └── hooks.json
+│   ├── scripts/hooks/     # Session 钩子实现
+│   │   ├── run-with-flags.js
+│   │   ├── session-start-bootstrap.js
+│   │   └── session-start.js
 │   └── settings.json      # Claude Code 配置
+│
+├── .codex/                # Codex 兼容镜像（与 .claude/ 同步）
+│   ├── agents/
+│   ├── hooks/
+│   ├── scripts/hooks/
+│   └── skills/
 │
 ├── docs/                  # Harness 文档（见 AGENTS.md 导航）
 │   ├── design-docs/        # 架构设计文档
@@ -51,6 +63,13 @@ cc-harness/
               ├── product-specs/ — 产品规格
               └── references/    — LLM context stubs
 ```
+
+## 同步原则
+
+- `.claude/` 是事实来源
+- 根目录 `agents/`、`skills/`、`scripts/hooks/` 必须与 `.claude/` 对应目录保持一致
+- `.codex/` 中对应的 `agents/`、`skills/`、`hooks/`、`scripts/hooks/` 必须与 `.claude/` 保持一致
+- `hooks/hooks.json` 需同时镜像到 `.claude/hooks/hooks.json` 与 `.codex/hooks/hooks.json`
 
 ## 无传统服务端
 
