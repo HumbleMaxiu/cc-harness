@@ -8,7 +8,7 @@
 | [2026-04-14-dev-workflow-agent-system-design.md](2026-04-14-dev-workflow-agent-system-design.md) | Dev Workflow Agent System 设计 | 已批准 |
 | [2026-04-15-feedback-curator-agent-design.md](2026-04-15-feedback-curator-agent-design.md) | Feedback Curator Agent 设计 | 已实现 |
 | [2026-04-15-agent-contract-upgrade-design.md](2026-04-15-agent-contract-upgrade-design.md) | Agent Contract Upgrade 设计 | 已实现 |
-| [2026-04-15-automation-enforcement-design.md](2026-04-15-automation-enforcement-design.md) | 文档约束到自动化约束设计 | 草稿 |
+| [2026-04-15-automation-enforcement-design.md](2026-04-15-automation-enforcement-design.md) | 文档约束到自动化约束设计 | 已实现 |
 | [architect.md](architect.md) | Architect Agent 定义 | 草稿 |
 | [developer.md](developer.md) | Developer Agent 定义 | 草稿 |
 | [reviewer.md](reviewer.md) | Reviewer Agent 定义 | 草稿 |

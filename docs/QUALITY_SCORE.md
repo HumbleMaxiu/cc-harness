@@ -4,11 +4,11 @@
 
 | 标准 | 目标 | 现状 | 信号来源 |
 |------|------|------|---------|
-| **测试覆盖** | 仓库自检可运行 | 部分 | 将通过 `package.json` 中的 `test` 脚本运行 harness consistency check |
+| **测试覆盖** | 仓库自检可运行 | 部分 | `package.json` 中的 `test` 脚本已运行 harness consistency check |
 | **Linting** | 代码规范检查 | 部分 | 当前以 repo-local consistency check 替代传统 lint，覆盖文档与索引一致性 |
 | **TypeScript 类型** | 类型安全 | TBD | 无 `tsconfig.json` |
 | **CI/CD** | 自动化构建 | TBD | 无 `.github/workflows/` |
-| **Harness 文档新鲜度** | 无过时交叉链接 | 部分 | 将通过 harness consistency check 验证关键索引与引用 |
+| **Harness 文档新鲜度** | 无过时交叉链接 | 部分 | harness consistency check 已验证关键索引与引用 |
 | **Exec plan 完整性** | active 计划有进度追踪 | 部分 | `docs/exec-plans/active/` 已有计划，仍需脚本化核对 index 一致性 |
 
 ## 说明

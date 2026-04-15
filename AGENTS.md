@@ -55,7 +55,7 @@ ls .claude/agents/
 | Architect | [docs/design-docs/architect.md](docs/design-docs/architect.md) | 任务开始前检查计划，开发完成后维护文档 |
 | Developer | [docs/design-docs/developer.md](docs/design-docs/developer.md) | TDD 实现功能 |
 | Reviewer | [docs/design-docs/reviewer.md](docs/design-docs/reviewer.md) | 代码质量和安全审查 |
-| Tester | [docs/design-docs/tester.md](docs/design-docs/tester.md) | 测试验证和 lint 检查 |
+| Tester | [docs/design-docs/tester.md](docs/design-docs/tester.md) | 探测验证入口并执行测试验证 |
 | Feedback Curator | [docs/design-docs/feedback-curator.md](docs/design-docs/feedback-curator.md) | 整理 Agent 反馈、维护 feedback memory、输出用户决策摘要 |
 
 ## 行为规则

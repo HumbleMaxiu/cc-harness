@@ -16,14 +16,14 @@
 
 ### Phase 3 — Quality & Reliability
 - [ ] 完善 QUALITY_SCORE.md（基于实际仓库信号）
-- [ ] 添加 repo-local harness consistency check
+- [x] 添加 repo-local harness consistency check
 - [ ] 补充 SECURITY.md 具体约定
 
 ### Phase 4 — 工具链完善
 - [ ] skill-creator SKILL 完善
 - [ ] harness-setup SKILL 完善（支持增量 update）
 - [ ] 补充 exa-search SKILL
-- [ ] 强化 Tester 的验证入口探测协议
+- [x] 强化 Tester 的验证入口探测协议
 
 ## Workflows
 
