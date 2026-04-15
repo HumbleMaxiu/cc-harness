@@ -240,6 +240,29 @@ function assertAutonomousWorkflowDocs() {
   }
 }
 
+function assertFeedbackArchiveDocs() {
+  const memoryIndex = read('docs/memory/index.md');
+  const feedbackDoc = read('docs/feedback/feedback-collection.md');
+  const agentMemory = read('docs/memory/feedback/agent-feedback.md');
+  const archiveIndex = read('docs/memory/feedback/archive/index.md');
+
+  if (!memoryIndex.includes('feedback/archive/')) {
+    fail('docs/memory/index.md: expected feedback archive reference');
+  }
+
+  if (!feedbackDoc.includes('docs/memory/feedback/archive/YYYY-MM.md')) {
+    fail('docs/feedback/feedback-collection.md: expected feedback rollup/archive guidance');
+  }
+
+  if (!agentMemory.includes('roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`')) {
+    fail('docs/memory/feedback/agent-feedback.md: expected active-memory rollup guidance');
+  }
+
+  if (!archiveIndex.includes('月度归档')) {
+    fail('docs/memory/feedback/archive/index.md: expected monthly archive guidance');
+  }
+}
+
 function assertDangerousModeSettingsDocs() {
   const requiredSetting = '"skipDangerousModePermissionPrompt": true';
   const readme = read('README.md');
@@ -336,6 +359,7 @@ function main() {
   assertHookDocsMatchImplementation();
   assertClaudeMarketplaceManifest();
   assertAutonomousWorkflowDocs();
+  assertFeedbackArchiveDocs();
   assertDangerousModeSettingsDocs();
   assertMirrorDirectory('.claude/skills', 'skills');
   assertMirrorDirectory('.claude/skills', '.codex/skills');

@@ -27,6 +27,35 @@
 4. **执行/拒绝**：只有 `risk_level=low` 且 `action_type` 在自动执行白名单内的项默认自动修复；其余项进入最终总结
 5. **归档**：更新自动执行状态和最终用户决定
 6. **预防**：检查是否需要防止再犯
+7. **滚动归档**：当 `agent-feedback.md` 开始积累过多已完成记录时，将历史项 roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`
+
+## Feedback Rollup / Archive
+
+### 目标
+
+- 让活跃 memory 保持短、小、可恢复
+- 让 archive 保留历史趋势、代表性模式和规则升级轨迹
+- 避免把长期记忆变成逐条错误日志
+
+### Rollup 规则
+
+1. `agent-feedback.md` 主要保留：
+   - `final_report = pending` 的待汇总项
+   - 最近一段时间刚完成处理的记录
+   - 仍影响当前规范判断的少量代表性样本
+2. 已完成处理且不再影响当前决策的旧记录，应按月 roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`
+3. 月度归档只保留：
+   - 高频问题模式
+   - 代表性修复类型
+   - 已升级为 `prevents-recurrence` 的规则
+   - 未关闭的跨任务风险
+4. 原始证据不进入 archive；保留在交接文档和 `evidence` 引用中
+
+### 触发时机
+
+- 交付前发现 `agent-feedback.md` 已明显变长
+- 月末或 `/compact` 前整理长期记忆
+- `feedback-curator` 在处理一批已完成反馈时顺手进行
 
 ## 运行时集成
 
@@ -38,6 +67,7 @@
 - 主流程的阻塞点由 `dev-workflow` 控制，而不是由 hook 或 shell 层面拦截控制
 - Tester 的验证入口探测属于运行时职责：先探测项目事实，再运行可执行验证，必要时询问用户
 - 当同类问题累计 2 次或以上时，主 agent 必须同步更新 `docs/memory/feedback/prevents-recurrence.md` 和相应规范文件
+- 当活跃 feedback 文件开始变长时，主 agent 或 `feedback-curator` 必须将已完成项归档到 `docs/memory/feedback/archive/`
 
 ## 反馈优先级
 

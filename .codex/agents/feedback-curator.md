@@ -35,7 +35,8 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 3. 为新增反馈分配 `af-YYYYMMDD-NNN` 编号
 4. 将原始问题归纳为“问题模式 + 通用规则 + 风险分级”，再写入或更新 `docs/memory/feedback/agent-feedback.md`
 5. 如 `prevents_recurrence: true` 或同类问题重复出现，更新 `docs/memory/feedback/prevents-recurrence.md` 中的提名/统计信息
-6. 输出给主 agent 的自动处理摘要与最终汇总摘要
+6. 当活跃 feedback 记录过长时，将已完成项 roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`
+7. 输出给主 agent 的自动处理摘要与最终汇总摘要
 
 ## 写入规则
 
@@ -43,6 +44,7 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 - 非阻塞建议写入后标记为 `final_report: pending`，在最终交付时统一汇总
 - 若未发现有效反馈，允许输出“无新增反馈”的交接文档，但不要改动业务代码
 - `agent-feedback.md` 记录的是通用规则和模式；原始 lint / test 输出应保留在交接文档中
+- 已完成且不再影响当前决策的旧记录，应汇总迁移到 `docs/memory/feedback/archive/`
 
 ## 行为约束
 
