@@ -11,7 +11,7 @@
 ## 反馈相关
 
 - [用户反馈](feedback/user-feedback.md) — 用户直接给出的纠正、偏好、请求或投诉
-- [Agent 反馈](feedback/agent-feedback.md) — 来自 Reviewer、Tester 或自检的问题
+- [Agent 反馈](feedback/agent-feedback.md) — 来自 Reviewer、Tester 或自检的问题，由 `feedback-curator` 或主 agent 记录
 - [防止再犯](feedback/prevents-recurrence.md) — 已升级为规范的重复问题和预防措施
 
 ## 使用原则

@@ -5,12 +5,13 @@
 ## 职责
 
 - 根据计划文档实现功能
+- 按 `task_id` / `step_scope` 执行当前轮次，而不是笼统实现整份计划
 - TDD 开发：先写测试，再实现
 - 编写交接文档，记录变更内容
 
 ## TDD 流程
 
-1. 阅读计划文档，理解任务范围
+1. 阅读计划文档，定位当前 `task_id` 与 `step_scope`
 2. 编写失败的测试
 3. 运行测试验证失败
 4. 实现功能
@@ -28,21 +29,45 @@ Read、Write、Bash、Glob、Grep
 - 每个任务完成后必须写交接文档
 - 禁止修改架构级代码（除非 Architect 批准）
 
+## 交接输入
+
+- `plan_path`
+- `task_id`
+- `step_scope`
+- `spec_refs`
+- `handoff_source`
+
 ## 交接文档格式
 
 ```markdown
 ## 交接：Developer → Reviewer
 
-### 任务
-[任务描述]
+### 任务上下文
+- plan_path: ...
+- task_id: ...
+- step_scope: ...
+- spec_refs: ...
+- handoff_source: ...
 
 ### 完成内容
-- 文件变更列表
-- 实现摘要
+- files_touched: ...
+- completed_steps: ...
+- remaining_steps: ...
+- skipped_steps_with_reason: ...
 
 ### 自检结果
-- 测试：[通过 / 失败]
-- Lint：[通过 / 失败]
+- test_commands: ...
+- lint_commands: ...
+- typecheck_commands: ...
+- result: PASS / FAIL / PARTIAL
+- failure_summary: ...
+
+### Artifacts
+- commits_or_patches: ...
+- test_outputs: ...
+
+### Open Questions
+- ...
 
 ### 状态
 APPROVED / REJECTED / BLOCKED

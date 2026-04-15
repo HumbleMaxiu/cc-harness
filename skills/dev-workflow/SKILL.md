@@ -16,6 +16,7 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 | 开发者 | developer | TDD 实现功能 |
 | 审查者 | reviewer | 代码审查，质量把关 |
 | 测试工程师 | tester | 测试验证 |
+| 反馈整理员 | feedback-curator | 整理 `Feedback Record`，维护 feedback memory，输出用户决策摘要 |
 
 ## 三种开发模式
 
@@ -34,7 +35,7 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 2. 用自然语言传递上下文给 subagent
 3. Subagent 完成后主 agent 读取结果，决定下一步
 4. 每个角色完成后写交接文档
-5. 如交接文档包含 `Feedback Record`，主 agent 负责同步到 `docs/memory/feedback/agent-feedback.md`
+5. 如交接文档包含 `Feedback Record`，主 agent 应触发 `feedback-curator` 维护 `docs/memory/feedback/agent-feedback.md`
 6. 阻塞型反馈立即进入用户决策点，非阻塞建议可在任务收尾时统一询问用户
 
 ### Team 模式
@@ -58,12 +59,20 @@ Architect 检查计划文档
 Dev 实现
     ↓
 Reviewer 审查
-    ↓ [不通过]
-    ↑____________↓
     ↓
-[通过] → Tester 测试
-    ↓ [不通过]
-    ↑____________↓
+Feedback Curator 记录反馈并输出摘要
+    ↓ [REJECTED]
+用户决策点
+    ↓ [继续修复]
+Dev 实现
+    ↓ [APPROVED]
+Tester 测试
+    ↓
+Feedback Curator 记录反馈并输出摘要
+    ↓ [REJECTED]
+用户决策点
+    ↓ [继续修复]
+Dev 实现
     ↓
 [通过] → Architect 维护文档
     ↓
@@ -74,9 +83,9 @@ Reviewer 审查
 
 | 循环 | 条件 | 动作 |
 |------|------|------|
-| Dev → Reviewer | REJECTED | 主 agent 记录阻塞反馈并立即询问用户是否修复后继续 |
+| Dev → Reviewer | REJECTED | `feedback-curator` 记录阻塞反馈，主 agent 立即询问用户是否修复后继续 |
 | Dev → Reviewer | APPROVED | 进入 Tester |
-| Tester | REJECTED | 主 agent 记录阻塞反馈并立即询问用户是否修复后继续 |
+| Tester | REJECTED | `feedback-curator` 记录阻塞反馈，主 agent 立即询问用户是否修复后继续 |
 | Tester | APPROVED | 进入 Architect 维护 |
 
 **终止条件**：Reviewer APPROVED + Tester APPROVED
@@ -108,31 +117,46 @@ Reviewer 审查
 
 ## 反馈决策规则
 
-- **阻塞型反馈**：Reviewer 或 Tester 给出 `REJECTED` 时，主 agent 必须先记录到 `docs/memory/feedback/agent-feedback.md`，状态为 `pending`，然后立即向用户汇总阻塞项，请用户决定是“修复后继续”还是“接受当前状态并停止/调整流程”。
-- **非阻塞反馈**：Reviewer 或 Tester 在 `APPROVED` 状态下给出的改进建议，主 agent 也必须先记录；主流程可以继续，但在当前任务交付前统一向用户汇总并询问是否执行。
+- **阻塞型反馈**：Reviewer 或 Tester 给出 `REJECTED` 时，主 agent 必须先触发 `feedback-curator` 记录到 `docs/memory/feedback/agent-feedback.md`，状态为 `pending`，然后立即向用户汇总阻塞项，请用户决定是“修复后继续”还是“接受当前状态并停止/调整流程”。
+- **非阻塞反馈**：Reviewer 或 Tester 在 `APPROVED` 状态下给出的改进建议，也应先由 `feedback-curator` 记录；主流程可以继续，但在当前任务交付前统一向用户汇总并询问是否执行。
 - **未经用户确认，不得因为 Agent 反馈自动触发新的实现改动。**
-- **同类问题累计 2 次或以上**：除记录反馈外，还应同步更新 `docs/memory/feedback/prevents-recurrence.md` 或相关规范。
+- **同类问题累计 2 次或以上**：除记录反馈外，`feedback-curator` 还应更新 `docs/memory/feedback/prevents-recurrence.md` 中的提名或统计，并由主 agent 在用户确认后推动规范升级。
+
+## Feedback Curator 接入点
+
+- **交接后触发**：Reviewer 或 Tester 的交接文档中包含有效 `Feedback Record` 时立即触发 `feedback-curator`
+- **交付前触发**：当前任务准备交付前再次触发 `feedback-curator`，汇总尚未统一询问用户的非阻塞建议
+- **职责边界**：`feedback-curator` 可以写 memory 文件，但不得直接修改业务代码、Skill、Agent 定义或 `AGENTS.md`
 
 ## 统一交接文档格式
 
 ```markdown
 ## 交接：[from] → [to]
 
-### 任务
-[任务描述]
+### 任务上下文
+- plan_path: ...
+- task_id: ...
+- step_scope: ...
+- spec_refs: ...
+- handoff_source: ...
 
 ### 完成内容
-- 文件变更列表
-- 实现摘要
+- files_touched: ...
+- commands_run: ...
+- artifacts: ...
 
 ### 结果
-[审查结果 / 测试结果]
+- status: APPROVED / REJECTED / BLOCKED
+- blocking: true / false
+
+### 角色专项输出
+- ...
+
+### Open Questions
+- ...
 
 ### 建议
-[下一步建议]
-
-### 待解决问题
-- [ ] ...
+- ...
 
 ### Feedback Record
 source: reviewer | tester | self-check | none
@@ -146,6 +170,7 @@ APPROVED / REJECTED / BLOCKED
 ```
 
 当没有新增反馈时，`Feedback Record` 填写 `source: none`。
+角色可在“角色专项输出”中扩展各自字段，但必须保留上述公共骨架，确保主 agent 和 `feedback-curator` 能稳定消费。
 
 **单独调用时的行为**：
 

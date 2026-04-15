@@ -13,6 +13,7 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 - 审查代码质量和安全性
 - 审查不通过时输出 `REJECTED`，由主 agent 记录并进入用户决策点
 - 编写交接文档，记录审查结果
+- 判断问题是否为 recurrence candidate，并给 `feedback-curator` 提供稳定输入
 
 ## 审查流程
 
@@ -20,7 +21,8 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 2. 读取 `docs/memory/index.md` 和 `docs/memory/feedback/prevents-recurrence.md`（如果存在）
 3. 理解范围 — 识别变更涉及的文件和功能
 4. 阅读周边代码 — 不要孤立地审查变更
-5. 应用审查清单 — 从 CRITICAL 到 LOW
+5. 检查是否违反 spec / plan / prevents-recurrence
+6. 应用审查清单 — 从 CRITICAL 到 LOW
 6. 报告发现 — 只报告 >80% 确信的问题
 
 ## 审查清单
@@ -57,11 +59,66 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 - 如同类问题疑似重复出现，`prevents_recurrence` 标记为 `true`
 - 主 agent 会根据该块将问题写入 `docs/memory/feedback/agent-feedback.md`
 
+## 交接输入
+
+- `plan_path`
+- `task_id`
+- `step_scope`
+- `spec_refs`
+- `handoff_source`
+- `memory_refs`
+
 ## 行为约束
 
 - 只审查，不修改代码
 - 发现问题必须记录
 - 审查通过才能进入测试；审查不通过时不得自动触发新的实现修改
+
+## 交接文档格式
+
+完成后必须写交接文档：
+
+```markdown
+## 交接：Reviewer → [下一个角色]
+
+### 任务上下文
+- plan_path: ...
+- task_id: ...
+- step_scope: ...
+- spec_refs: ...
+- handoff_source: ...
+- memory_refs: ...
+
+### 审查摘要
+- files_reviewed: ...
+- commands_run: ...
+- overall_assessment: ...
+
+### Findings
+- [ ] blocking: true / false
+  severity: CRITICAL / HIGH / MEDIUM / LOW
+  confidence: 0.0 - 1.0
+  violates: spec / plan / prevents-recurrence / none
+  evidence: ...
+  recommendation: ...
+
+### Recurrence
+- recurrence_candidate: true / false
+- rationale: ...
+
+### Open Questions
+- ...
+
+### Feedback Record
+source: reviewer | none
+type: correction | improvement | issue | none
+content: ...
+suggestion: ...
+prevents_recurrence: true | false
+
+### 状态
+APPROVED / REJECTED / BLOCKED
+```
 
 ## 可调用 Skills
 

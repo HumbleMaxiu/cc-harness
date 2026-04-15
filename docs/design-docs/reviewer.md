@@ -7,6 +7,7 @@
 - 审查代码质量和安全性
 - 审查不通过时输出 `REJECTED`，由主 agent 记录并进入用户决策点
 - 编写交接文档，记录审查结果
+- 判断问题是否为 recurrence candidate，并为 `feedback-curator` 提供结构化输入
 
 ## 审查清单
 
@@ -26,17 +27,55 @@
 
 Read、Grep、Glob、Bash
 
+## 交接输入
+
+- `plan_path`
+- `task_id`
+- `step_scope`
+- `spec_refs`
+- `handoff_source`
+- `memory_refs`
+
 ## 交接文档格式
 
 ```markdown
 ## 交接：Reviewer → [下一个角色]
 
-### 任务
-[审查的任务描述]
+### 任务上下文
+- plan_path: ...
+- task_id: ...
+- step_scope: ...
+- spec_refs: ...
+- handoff_source: ...
+- memory_refs: ...
 
-### 发现的问题
-[按严重程度分类]
+### 审查摘要
+- files_reviewed: ...
+- commands_run: ...
+- overall_assessment: ...
+
+### Findings
+- blocking: true / false
+  severity: CRITICAL / HIGH / MEDIUM / LOW
+  confidence: 0.0 - 1.0
+  violates: spec / plan / prevents-recurrence / none
+  evidence: ...
+  recommendation: ...
+
+### Recurrence
+- recurrence_candidate: true / false
+- rationale: ...
+
+### Open Questions
+- ...
+
+### Feedback Record
+source: reviewer | none
+type: correction | improvement | issue | none
+content: ...
+suggestion: ...
+prevents_recurrence: true | false
 
 ### 状态
-APPROVED / REJECTED
+APPROVED / REJECTED / BLOCKED
 ```

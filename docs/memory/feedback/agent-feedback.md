@@ -17,10 +17,14 @@
 | `ask_user` | 是否已询问用户 (`pending` / `approved` / `rejected`) |
 | `user_decision` | 用户的决定 |
 | `prevents_recurrence` | 是否需要写入规范防止再犯 |
+| `recorded_by` | 记录者（通常为 `feedback-curator` 或主 agent） |
+| `evidence` | 交接文档或命令结果等依据 |
 
 ## 待询问用户的反馈
 
 <!-- 状态为 pending 的反馈列在此处 -->
+
+> 建议由 `feedback-curator` 追加记录，并保持最新待决策项位于顶部。
 
 ## 已处理反馈
 

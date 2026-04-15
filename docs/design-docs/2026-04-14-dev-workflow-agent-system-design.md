@@ -6,6 +6,7 @@
 ## 目标
 
 实现一套在 Claude Code 中运行的开发流程 agent 系统，包含 Architect/Developer/Reviewer/Tester 四种角色，支持 Skill/Subagent/Team 三种开发模式，遵循 harness engineering 原则。
+后续扩展包含 `Feedback Curator`，用于承担反馈整理和 memory 维护职责。
 
 ## 背景
 
