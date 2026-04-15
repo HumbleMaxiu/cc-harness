@@ -50,6 +50,7 @@
    - 已升级为 `prevents-recurrence` 的规则
    - 未关闭的跨任务风险
 4. 原始证据不进入 archive；保留在交接文档和 `evidence` 引用中
+5. 归档输出使用固定顺序：`月度概览` → `代表性问题模式` → `升级到 Prevents-Recurrence` → `备注`
 
 ### 触发时机
 
@@ -63,6 +64,7 @@
 - SessionStart hook 当前只负责注入 `using-brainstorming` skill，memory 读取仍由 workflow 和各角色在运行时显式完成
 - Reviewer / Tester 若发现问题，必须在交接文档中输出结构化的 `Feedback Record`，以便主 agent 追加到 `docs/memory/feedback/agent-feedback.md`
 - `feedback-curator` 负责消费 `Feedback Record`，维护 `agent-feedback.md`，并在需要时更新 `prevents-recurrence.md` 中的提名或统计
+- `feedback-curator` 在执行前应先读取 `docs/feedback/feedback-collection.md` 和 `docs/memory/index.md`，否则视为未完整加载约束
 - `REJECTED` 反馈属于阻塞项，但是否自动修复要看 `risk_level` 和 `action_type`；`APPROVED` 下的建议项可以在最终交付前统一汇总
 - 主流程的阻塞点由 `dev-workflow` 控制，而不是由 hook 或 shell 层面拦截控制
 - Tester 的验证入口探测属于运行时职责：先探测项目事实，再运行可执行验证，必要时询问用户

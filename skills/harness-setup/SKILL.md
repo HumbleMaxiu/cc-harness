@@ -17,6 +17,8 @@ description: 为任何软件项目搭建或更新 OpenAI 规范的 agent harness
 
 Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**，使 agent 能高效地在项目中导航、理解和工作。
 
+对于 `ARCHITECTURE.md`、`docs/DESIGN.md`、`docs/PLANS.md`、`docs/PRODUCT_SENSE.md`、`docs/RELIABILITY.md`、`docs/SECURITY.md`、`docs/FRONTEND.md` 这类项目级文档，scaffold 默认只生成 **skeleton-first** 骨架与占位说明；详细内容应在后续任务、设计和归档中逐步沉淀。
+
 ## Scaffold vs update
 
 **Scaffold（默认）** — 用户想要一个新的 harness 或首次设置。按照下面的 **阶段 1–5** 执行。在阶段 1 第 6 步（汇总）确认之前，不要创建任何文件。
@@ -44,16 +46,16 @@ Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**
 
 ### Phase 2 — 创建目录结构
 
-7. **创建核心目录** — `docs/`、子目录包括 `design-docs/`、`exec-plans/active/`、`exec-plans/completed/`、`generated/`、`memory/feedback/`、`product-specs/`、`references/`
+7. **创建核心目录** — `docs/`、子目录包括 `design-docs/`、`exec-plans/active/`、`exec-plans/completed/`、`generated/`、`memory/feedback/`、`memory/feedback/archive/`、`feedback/`、`product-specs/`、`references/`
 
 ### Phase 3 — 填充文件
 
 8. **填充根目录** — `AGENTS.md`、`ARCHITECTURE.md`（每个文件按 file-specs 包含 **How to use this harness**）
-9. **填充顶层 docs** — DESIGN、PLANS、PRODUCT_SENSE、QUALITY_SCORE、RELIABILITY、SECURITY、FRONTEND（如适用）、`memory/index.md`
+9. **填充顶层 docs** — DESIGN、PLANS、PRODUCT_SENSE、QUALITY_SCORE、RELIABILITY、SECURITY、FRONTEND（如适用）、`memory/index.md`、`feedback/feedback-collection.md`
 10. **填充 design docs** — `design-docs/index.md`、`core-beliefs.md`
 11. **填充 exec plans** — tech-debt-tracker、`active/`、`completed/`
 12. **填充 generated** — schema 占位符
-13. **填充 memory** — `docs/memory/feedback/user-feedback.md`、`agent-feedback.md`、`prevents-recurrence.md`
+13. **填充 memory** — `docs/memory/feedback/user-feedback.md`、`agent-feedback.md`、`prevents-recurrence.md`、`archive/index.md`、`archive/YYYY-MM.md`
 14. **填充 product specs** — index + per-domain 文件
 15. **填充 references** — LLM context stubs
 16. **⛔ 检查点** — 列出阶段 3 创建/更新的所有文件；用户可在阶段 4 前请求修复
@@ -61,7 +63,7 @@ Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**
 ### Phase 4 — 验证 & 审查
 
 17. **验证交叉链接** — 路径和 Markdown 链接可解析
-18. **最终报告** — 汇总表、下一步、如果选择了 Claude Code / Codex 则提供原生 AGENTS.md 支持
+18. **最终报告** — 汇总表、下一步、明确哪些项目级文档仍是 scaffold 草稿（如 `PLANS.md` 中的 TBD）以及如果选择了 Claude Code / Codex 则提供原生 AGENTS.md 支持
 19. **用户审查** — 需要时修改（最多 3 轮）
 
 ### Phase 5 — 生成后（无需额外提问）
@@ -145,7 +147,7 @@ digraph harness {
 
 ## Phase 2 — 创建目录结构
 
-只创建缺失的目录（不删除用户文件）。树结构：`docs/design-docs/`、`exec-plans/active|`completed/`、`generated/`、`memory/feedback/`、`product-specs/`、`references/`。
+只创建缺失的目录（不删除用户文件）。树结构：`docs/design-docs/`、`exec-plans/active|`completed/`、`generated/`、`memory/feedback/`、`memory/feedback/archive/`、`feedback/`、`product-specs/`、`references/`。
 
 **无目录树检查点** — 继续阶段 3。
 
@@ -160,7 +162,7 @@ digraph harness {
 - 已安装 Skills 快速参考（带使用场景）
 - **行为规则**（从 [references/behavior-rules.md](references/behavior-rules.md) 提取，作为 hooks 未生效时的后备）
 
-`docs/memory/index.md` 必须声明 `docs/memory/` 是工作记忆的事实来源，`docs/memory/feedback/` 必须包含用户反馈、Agent 反馈和防止再犯三份文档。
+`docs/memory/index.md` 必须声明 `docs/memory/` 是工作记忆的事实来源，`docs/memory/feedback/` 必须包含用户反馈、Agent 反馈、防止再犯和 archive 结构；`docs/feedback/feedback-collection.md` 必须作为 feedback 规则的事实来源之一生成到用户项目中。
 
 **单一检查点（第 16 步）：** 步骤 8–15 的所有文件存在后，列出路径并请求调整；然后进入阶段 4。
 
@@ -168,8 +170,21 @@ digraph harness {
 
 1. 列出创建/更新的路径。
 2. 确认交叉链接。
-3. CI/lint 提醒。
-4. 用户批准或修复（最多 3 轮）。
+3. 明确标记哪些项目级文档仍包含假设、TBD 或待确认内容，尤其是 `docs/PLANS.md`。
+4. CI/lint 提醒。
+5. 用户批准或修复（最多 3 轮）。
+
+## Skeleton-first 规则
+
+- 项目级文档优先生成骨架，不在 scaffold 阶段写满未经验证内容。
+- 若缺少足够用户输入，必须显式写出 `TBD`、假设或“待后续沉淀”。
+- 后续应从以下来源沉淀项目级文档：
+  - `docs/design-docs/*.md`
+  - `docs/exec-plans/active/*.md`
+  - `docs/exec-plans/completed/*.md`
+  - `docs/product-specs/*.md`
+  - `docs/memory/feedback/prevents-recurrence.md`
+- 这些项目级文档是“归档后的知识层”，不是初始化时的猜测层。
 
 ## Phase 5 — Agent platform bridges
 

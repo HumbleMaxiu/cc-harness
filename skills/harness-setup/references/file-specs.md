@@ -29,6 +29,9 @@
 - **Purpose：** 对人类和 agents 的顶层**技术地图**。
 - **Include：** ASCII 或文本图（services、data flow）；模块/包边界；如果是分层架构则包括依赖方向；链接到 `docs/DESIGN.md`、`docs/SECURITY.md`、`docs/design-docs/`。
 - **Avoid：** 完整的 endpoint 目录 — 放到 `docs/product-specs/` 或 `docs/generated/`。
+- **Relationship：** 项目级长期地图；不替代 `docs/design-docs/*.md` 的具体设计细节。
+- **Scaffold mode：** 只生成结构骨架、模块占位和“如何迭代补全”的说明，不要在初始化时假装架构已经成熟。
+- **Promote from：** `docs/design-docs/*.md`、真实目录结构、已稳定的模块边界。
 
 ## `docs/` top-level
 
@@ -36,16 +39,26 @@
 
 - **Purpose：** 简短设计**理念**（5–15 行）。
 - **Include：** 系统优化目标；链接到 `design-docs/index.md`。
+- **Relationship：** 项目级原则文档，不替代具体 design doc。
+- **Scaffold rule：** 如果用户没有给出足够项目背景，写最小原则和明确假设，不编造细节。
+- **Promote from：** 多个 `docs/design-docs/*.md` 中反复出现的稳定原则。
 
 ### `docs/PLANS.md`
 
 - **Purpose：** **路线图**阶段（产品），区别于 task 级 exec plans。也是**扩展工作流指导**的归宿，这些内容不适合放在 `AGENTS.md` 的 3 行使用表中（tech debt 分类、文档新鲜度维护等）。
 - **Include：** Phase 1 = harness/scaffold 完成；后续阶段为要点；链接到 `exec-plans/`。包含一个 **Workflows** section 用于 tech debt、文档新鲜度和任何项目特定例程。
+- **Relationship：** 项目级路线图/导航，不替代 `docs/exec-plans/*.md` 的具体任务计划。
+- **Scaffold rule：** 默认生成“工作流导航 + 路线图占位”。如果没有足够用户输入，不要随机编造 roadmap；使用 `TBD`、明确假设或“待用户确认”。
+- **Approval rule：** `PLANS.md` 在用户审查通过前只能视为 scaffold 草稿，不应被当作产品真实路线图。
+- **Promote from：** `docs/exec-plans/completed/*.md`、用户明确给出的中长期目标、稳定 workflow 约定。
 
 ### `docs/PRODUCT_SENSE.md`
 
 - **Purpose：** 产品为**谁**服务，**什么**是"好"。
 - **Include：** 3–7 个要点（personas、non-goals、UX 原则）。
+- **Relationship：** 项目级产品判断标准，不替代某个 domain spec。
+- **Scaffold rule：** 缺少明确产品输入时，只生成保守的占位结构和待确认项。
+- **Promote from：** 用户明确需求、`docs/product-specs/*.md` 的共性、已确认的非目标。
 
 ### `docs/QUALITY_SCORE.md`
 
@@ -57,11 +70,17 @@
 
 - **Purpose：** 运行时**可靠性**预期。
 - **Include：** 超时、重试（仅幂等）、幂等性说明、observability hooks（如果有）。
+- **Relationship：** 项目级可靠性原则；具体故障修复仍应进入 exec plan 或设计文档。
+- **Scaffold mode：** 生成恢复/幂等性模板，不要凭空捏造具体 SLA 或运行约束。
+- **Promote from：** bugfix exec plans、测试入口、已确认的故障处理经验。
 
 ### `docs/SECURITY.md`
 
 - **Purpose：** **Secrets、auth、audit** 预期。
 - **Include：** token 放在哪里；永不 log secrets；威胁相关约定；链接到 product specs 中的 auth flows。
+- **Relationship：** 项目级安全基线；具体漏洞修复仍应进入 task 级文档。
+- **Scaffold mode：** 生成安全基线模板，不要凭空捏造真实 auth 架构或 secrets 流。
+- **Promote from：** reviewer 反馈、已存在的部署/认证配置、已确认的合规要求。
 
 ### `docs/memory/index.md`
 
@@ -72,6 +91,9 @@
 
 - **Include when：** frontend 或 fullstack。纯 backend/CLI/library 如果不适用则省略。
 - **Include：** UI 约定、a11y 门槛、routing/state、链接到 design system references。
+- **Relationship：** 项目级前端基线；具体页面/交互设计进入 `design-docs/`。
+- **Scaffold mode：** 只生成前端约定骨架；不要在没有 UI 事实时伪造设计系统结论。
+- **Promote from：** UI design docs、组件实现、已确认的前端规范。
 
 ## `docs/design-docs/`
 
@@ -212,9 +234,37 @@ Before substantive edits: read `AGENTS.md`, `ARCHITECTURE.md`, `docs/exec-plans/
 ### `docs/memory/feedback/agent-feedback.md`
 
 - **Purpose：** 记录来自 Reviewer、Tester 或自检的问题。
-- **Include：** 字段说明、`pending / approved / rejected` 状态、建议处理方式。
+- **Include：** 字段说明、`pattern / rule / action_type / risk_level / scope / execution / final_report`、建议处理方式。
 
 ### `docs/memory/feedback/prevents-recurrence.md`
 
 - **Purpose：** 记录重复问题及其预防措施。
 - **Include：** 计数规则、同步到规范的位置、升级条件。
+
+### `docs/memory/feedback/archive/index.md`
+
+- **Purpose：** 历史 feedback 月度归档索引。
+- **Include：** rollup 规则、何时归档、每月归档文件列表。
+
+### `docs/memory/feedback/archive/YYYY-MM.md`
+
+- **Purpose：** 月度 feedback 趋势归档。
+- **Include：** 固定 section 顺序：`月度概览`、`代表性问题模式`、`升级到 Prevents-Recurrence`、`备注`。
+- **Avoid：** 复制原始 lint / test 输出。
+
+## `docs/feedback/`
+
+### `docs/feedback/feedback-collection.md`
+
+- **Purpose：** feedback 的事实来源规则文档。
+- **Include：** 用户反馈、agent feedback、risk-based auto-apply、rollup/archive 规则、`feedback-curator` 的读取约束。
+- **Required：** 任何依赖 feedback memory 的 agent 都必须把它当作运行前读取项之一。
+
+## `scripts/checks/`
+
+### `scripts/checks/harness-consistency.js`
+
+- **Purpose：** 用户项目可运行的通用 harness 自检脚本。
+- **Include：** 关键 harness 文档存在性、索引覆盖、基础 Markdown 链接、memory/feedback/plan 结构检查。
+- **Avoid：** 写死 `cc-harness` 仓库专有规则（例如 `.claude` / `.codex` / 根目录镜像完全一致）作为所有用户项目默认检查项。
+- **Scaffold rule：** 推荐在支持脚本的项目中生成；如果当前项目不适合生成脚本，也应在 `AGENTS.md` 或 `PLANS.md` 标注该能力缺失。

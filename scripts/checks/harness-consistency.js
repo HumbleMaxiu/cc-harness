@@ -245,6 +245,9 @@ function assertFeedbackArchiveDocs() {
   const feedbackDoc = read('docs/feedback/feedback-collection.md');
   const agentMemory = read('docs/memory/feedback/agent-feedback.md');
   const archiveIndex = read('docs/memory/feedback/archive/index.md');
+  const archiveMonth = read('docs/memory/feedback/archive/2026-04.md');
+  const curatorAgent = read('agents/feedback-curator.md');
+  const fileSpecs = read('skills/harness-setup/references/file-specs.md');
 
   if (!memoryIndex.includes('feedback/archive/')) {
     fail('docs/memory/index.md: expected feedback archive reference');
@@ -260,6 +263,73 @@ function assertFeedbackArchiveDocs() {
 
   if (!archiveIndex.includes('月度归档')) {
     fail('docs/memory/feedback/archive/index.md: expected monthly archive guidance');
+  }
+
+  if (!archiveMonth.includes('固定输出格式')) {
+    fail('docs/memory/feedback/archive/2026-04.md: expected fixed monthly rollup format guidance');
+  }
+
+  if (!archiveMonth.includes('feedback 直接记录一次性错误文本')) {
+    fail('docs/memory/feedback/archive/2026-04.md: expected sample rollup record');
+  }
+
+  if (!curatorAgent.includes('docs/feedback/feedback-collection.md')) {
+    fail('agents/feedback-curator.md: expected explicit feedback-collection read requirement');
+  }
+
+  if (!fileSpecs.includes('docs/feedback/feedback-collection.md')) {
+    fail('skills/harness-setup/references/file-specs.md: expected generated feedback-collection doc spec');
+  }
+
+  if (!fileSpecs.includes('docs/memory/feedback/archive/YYYY-MM.md')) {
+    fail('skills/harness-setup/references/file-specs.md: expected generated feedback archive spec');
+  }
+}
+
+function assertHarnessSetupCoverage() {
+  const harnessSetup = read('skills/harness-setup/SKILL.md');
+  const behaviorRules = read('skills/harness-setup/references/behavior-rules.md');
+  const harnessSpec = read('docs/product-specs/harness-engineering.md');
+  const fileSpecs = read('skills/harness-setup/references/file-specs.md');
+
+  if (!harnessSetup.includes('feedback/feedback-collection.md')) {
+    fail('skills/harness-setup/SKILL.md: expected scaffold coverage for docs/feedback/feedback-collection.md');
+  }
+
+  if (!harnessSetup.includes('memory/feedback/archive/')) {
+    fail('skills/harness-setup/SKILL.md: expected scaffold coverage for feedback archive directories');
+  }
+
+  if (behaviorRules.includes('执行前先征求用户同意')) {
+    fail('skills/harness-setup/references/behavior-rules.md: stale pre-autonomous feedback rule');
+  }
+
+  if (!harnessSpec.includes('文档责任矩阵')) {
+    fail('docs/product-specs/harness-engineering.md: expected document ownership matrix');
+  }
+
+  if (!harnessSpec.includes('项目级文档与任务级文档的边界')) {
+    fail('docs/product-specs/harness-engineering.md: expected project-vs-task document boundary guidance');
+  }
+
+  if (!fileSpecs.includes('默认生成“工作流导航 + 路线图占位”')) {
+    fail('skills/harness-setup/references/file-specs.md: expected non-random scaffold rule for PLANS.md');
+  }
+
+  if (!fileSpecs.includes('用户项目可运行的通用 harness 自检脚本')) {
+    fail('skills/harness-setup/references/file-specs.md: expected generic user-facing harness consistency script spec');
+  }
+
+  if (!harnessSpec.includes('沉淀触发条件')) {
+    fail('docs/product-specs/harness-engineering.md: expected promotion trigger guidance for project-level docs');
+  }
+
+  if (!harnessSetup.includes('skeleton-first')) {
+    fail('skills/harness-setup/SKILL.md: expected skeleton-first scaffold guidance');
+  }
+
+  if (!fileSpecs.includes('Promote from：')) {
+    fail('skills/harness-setup/references/file-specs.md: expected promote-from guidance for project-level docs');
   }
 }
 
@@ -360,6 +430,7 @@ function main() {
   assertClaudeMarketplaceManifest();
   assertAutonomousWorkflowDocs();
   assertFeedbackArchiveDocs();
+  assertHarnessSetupCoverage();
   assertDangerousModeSettingsDocs();
   assertMirrorDirectory('.claude/skills', 'skills');
   assertMirrorDirectory('.claude/skills', '.codex/skills');

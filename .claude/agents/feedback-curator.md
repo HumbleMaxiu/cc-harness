@@ -10,6 +10,7 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 
 ## 职责
 
+- 先读取 `docs/feedback/feedback-collection.md`，确认当前项目的 feedback 处理约束
 - 读取 Reviewer、Tester 或自检产出的交接文档
 - 提取并校验 `Feedback Record`
 - 维护 `docs/memory/feedback/agent-feedback.md`
@@ -30,13 +31,14 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 
 ## 工作流程
 
-1. 读取相关交接文档和 `docs/memory/feedback/` 下已有记录
-2. 判断本次是否存在有效 `Feedback Record`
-3. 为新增反馈分配 `af-YYYYMMDD-NNN` 编号
-4. 将原始问题归纳为“问题模式 + 通用规则 + 风险分级”，再写入或更新 `docs/memory/feedback/agent-feedback.md`
-5. 如 `prevents_recurrence: true` 或同类问题重复出现，更新 `docs/memory/feedback/prevents-recurrence.md` 中的提名/统计信息
-6. 当活跃 feedback 记录过长时，将已完成项 roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`
-7. 输出给主 agent 的自动处理摘要与最终汇总摘要
+1. 先读取 `docs/feedback/feedback-collection.md` 与 `docs/memory/index.md`
+2. 再读取相关交接文档和 `docs/memory/feedback/` 下已有记录
+3. 判断本次是否存在有效 `Feedback Record`
+4. 为新增反馈分配 `af-YYYYMMDD-NNN` 编号
+5. 将原始问题归纳为“问题模式 + 通用规则 + 风险分级”，再写入或更新 `docs/memory/feedback/agent-feedback.md`
+6. 如 `prevents_recurrence: true` 或同类问题重复出现，更新 `docs/memory/feedback/prevents-recurrence.md` 中的提名/统计信息
+7. 当活跃 feedback 记录过长时，将已完成项 roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`
+8. 输出给主 agent 的自动处理摘要与最终汇总摘要
 
 ## 写入规则
 
