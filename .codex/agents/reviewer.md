@@ -56,6 +56,7 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 
 - 发现问题时，必须在交接文档中附带 `Feedback Record`
 - `Feedback Record` 需要包含：`source`、`type`、`content`、`suggestion`、`prevents_recurrence`
+- 其中 `risk_level` 表示问题严重性，`operation_risk` 表示建议动作的执行风险；不要把两者混为一谈
 - 如同类问题疑似重复出现，`prevents_recurrence` 标记为 `true`
 - 主 agent 会根据该块将问题写入 `docs/memory/feedback/agent-feedback.md`
 
@@ -116,6 +117,7 @@ pattern: ...
 rule: ...
 action_type: code_fix | test_fix | doc_sync | workflow_rule | risk_note | none
 risk_level: low | medium | high | none
+operation_risk: read-only | reversible-write | irreversible-write | external-side-effect | none
 scope: local_file | cross_module | repo_rule | external | none
 content: ...
 suggestion: ...

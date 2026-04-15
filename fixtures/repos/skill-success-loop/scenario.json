@@ -1,0 +1,30 @@
+{
+  "id": "skill-success-loop",
+  "title": "Skill mode closes the loop as a single-agent workflow",
+  "input_repo_state": "Task is small, bounded, and suitable for Skill mode.",
+  "user_request": "Complete the task using dev-workflow in Skill mode.",
+  "expected_artifacts": [
+    "Skill Workflow Record",
+    "Mode Decision",
+    "Self Review",
+    "Verification"
+  ],
+  "failure_signals": [
+    "Skill mode is just a label with no workflow record",
+    "Self review or verification stage is skipped"
+  ],
+  "required_paths": [
+    "skills/dev-workflow/SKILL.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`skill-success-loop`"
+    },
+    {
+      "file": "skills/dev-workflow/SKILL.md",
+      "includes": "## Skill Workflow Record"
+    }
+  ]
+}

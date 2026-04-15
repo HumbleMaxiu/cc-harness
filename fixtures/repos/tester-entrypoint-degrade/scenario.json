@@ -1,0 +1,29 @@
+{
+  "id": "tester-entrypoint-degrade",
+  "title": "Tester-style verification degrades explicitly when entrypoints are uncertain",
+  "input_repo_state": "Repository has partial or ambiguous validation entrypoints.",
+  "user_request": "Choose the best available verification path and record the limits.",
+  "expected_artifacts": [
+    "Entrypoint detection guidance",
+    "Assumptions and uncovered risk recording"
+  ],
+  "failure_signals": [
+    "Verification assumes a fixed script",
+    "No uncovered risk is recorded",
+    "Uncertain validation surface is hidden"
+  ],
+  "required_paths": [
+    "skills/dev-workflow/internal-skills/verification-skill/SKILL.md",
+    "docs/product-specs/agent-system.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`tester-entrypoint-degrade`"
+    },
+    {
+      "file": "skills/dev-workflow/internal-skills/verification-skill/SKILL.md",
+      "includes": "Do not conceal uncovered risks"
+    }
+  ]
+}

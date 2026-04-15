@@ -1,0 +1,30 @@
+{
+  "id": "skill-verification-uncertainty",
+  "title": "Verification records assumptions and uncovered risks when certainty is limited",
+  "input_repo_state": "Verify stage has repo signals but no perfect single validation command.",
+  "user_request": "Run the best available verification and record uncertainty explicitly.",
+  "expected_artifacts": [
+    "Detected entrypoints",
+    "Executed checks",
+    "Assumptions",
+    "Uncovered risks"
+  ],
+  "failure_signals": [
+    "Verification claims confidence without evidence",
+    "Assumptions or uncovered risks are omitted"
+  ],
+  "required_paths": [
+    "skills/dev-workflow/internal-skills/verification-skill/SKILL.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`skill-verification-uncertainty`"
+    },
+    {
+      "file": "skills/dev-workflow/internal-skills/verification-skill/SKILL.md",
+      "includes": "assumptions"
+    }
+  ]
+}

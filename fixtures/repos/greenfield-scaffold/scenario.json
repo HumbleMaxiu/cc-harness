@@ -1,0 +1,32 @@
+{
+  "id": "greenfield-scaffold",
+  "title": "Greenfield scaffold baseline docs and workflow assets exist",
+  "input_repo_state": "Empty or near-empty repository with no harness installed.",
+  "user_request": "Initialize a harness scaffold for a new project.",
+  "expected_artifacts": [
+    "AGENTS.md",
+    "docs/PLANS.md",
+    "docs/QUALITY_SCORE.md",
+    "skills/harness-setup/SKILL.md"
+  ],
+  "failure_signals": [
+    "Core harness entry docs are missing",
+    "Scaffold references are broken",
+    "No harness setup skill exists"
+  ],
+  "required_paths": [
+    "AGENTS.md",
+    "docs/QUALITY_SCORE.md",
+    "skills/harness-setup/SKILL.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`greenfield-scaffold`"
+    },
+    {
+      "file": "docs/product-specs/harness-engineering.md",
+      "includes": "### `/harness-setup` Skill"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "bridge-file-merge",
+  "title": "Bridge file generation and merge expectations stay documented",
+  "input_repo_state": "Project needs platform bridge files or merged facts across sources.",
+  "user_request": "Generate or merge bridge artifacts without losing canonical context.",
+  "expected_artifacts": [
+    "Bridge generation guidance",
+    "Merged fact source awareness"
+  ],
+  "failure_signals": [
+    "Bridge files are omitted from workflow guidance",
+    "Merged outputs lose fact source traceability"
+  ],
+  "required_paths": [
+    "docs/references/eval-scenarios.md",
+    "docs/product-specs/harness-engineering.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`bridge-file-merge`"
+    },
+    {
+      "file": "docs/product-specs/harness-engineering.md",
+      "includes": "生成 platform bridges"
+    }
+  ]
+}

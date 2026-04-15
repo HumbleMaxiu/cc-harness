@@ -32,6 +32,22 @@ Skill 模式的默认状态机为：
 
 当任务出现循环审查、强状态追踪、高风险工具操作或需要独立 reviewer / tester 视角时，应从 Skill 模式升级到 Subagent 或 Team 模式。
 
+### 统一风险语言
+
+Agent System 使用两套互补字段：
+
+- `risk_level`：反馈或问题本身的严重性，使用 `low / medium / high`
+- `operation_risk`：动作或工具调用的执行风险，使用 `read-only / reversible-write / irreversible-write / external-side-effect`
+
+其中：
+
+- `read-only`：默认允许，主 agent 可继续推进
+- `reversible-write`：在自动执行白名单内可继续推进，并在最终交付统一汇报
+- `irreversible-write`：不得自动执行，执行前需要用户明确确认
+- `external-side-effect`：不得自动执行，执行前需要用户明确确认
+
+这套风险语言适用于 Skill / Subagent / Team 三种模式，避免各角色各自使用不同口径描述“能不能自动做”。
+
 ### 反馈决策
 
 - `REJECTED` 属于阻塞型反馈：主 agent 先记录，再自动回到实现修复并继续主流程
@@ -71,6 +87,8 @@ Feedback Curator（如产生 `Feedback Record`）
 - `status`
 - `blocking`
 - `Feedback Record`
+- `operation_risk`
+- `confirmation_needed`
 
 在此基础上：
 
@@ -80,6 +98,8 @@ Feedback Curator（如产生 `Feedback Record`）
 - Tester 输出验证入口探测、测试矩阵、环境假设和未覆盖风险
 
 Skill 模式下不要求多角色 handoff，但必须至少输出一份包含 `Context`、`Mode Decision`、`Execution`、`Self Review`、`Verification`、`Doc Sync`、`Final Summary` 的 `Skill Workflow Record`。
+
+如果计划动作属于 `irreversible-write` 或 `external-side-effect`，交接文档或 `Skill Workflow Record` 中还必须包含一段 `Operation Gate`，明确目标、影响范围、可回滚性与确认状态。
 
 ## 相关文档
 

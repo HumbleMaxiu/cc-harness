@@ -1,0 +1,29 @@
+{
+  "id": "skill-self-review-feedback-record",
+  "title": "Self review produces reusable structured feedback records",
+  "input_repo_state": "Execute stage has finished and the change needs a structured self-review.",
+  "user_request": "Review the change and record issues in Skill mode.",
+  "expected_artifacts": [
+    "Checklist",
+    "Issues found",
+    "feedback_record"
+  ],
+  "failure_signals": [
+    "Self review gives only a vague summary",
+    "No reusable feedback record is emitted"
+  ],
+  "required_paths": [
+    "skills/dev-workflow/internal-skills/self-review-skill/SKILL.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`skill-self-review-feedback-record`"
+    },
+    {
+      "file": "skills/dev-workflow/internal-skills/self-review-skill/SKILL.md",
+      "includes": "feedback_record"
+    }
+  ]
+}

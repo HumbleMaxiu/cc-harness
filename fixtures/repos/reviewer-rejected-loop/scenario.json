@@ -1,0 +1,31 @@
+{
+  "id": "reviewer-rejected-loop",
+  "title": "Reviewer rejected loop is recorded and can auto-remediate by policy",
+  "input_repo_state": "Subagent workflow in progress with reviewer feedback.",
+  "user_request": "Handle reviewer rejection and continue safely when low risk.",
+  "expected_artifacts": [
+    "Feedback Record guidance",
+    "Auto-remediation policy",
+    "Reviewer loop contract"
+  ],
+  "failure_signals": [
+    "Rejected feedback is not recorded",
+    "No distinction between low-risk and high-risk fixes",
+    "Workflow stops or over-applies without policy"
+  ],
+  "required_paths": [
+    "skills/dev-workflow/SKILL.md",
+    "docs/feedback/feedback-collection.md",
+    "docs/memory/feedback/agent-feedback.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`reviewer-rejected-loop`"
+    },
+    {
+      "file": "skills/dev-workflow/SKILL.md",
+      "includes": "自动执行白名单"
+    }
+  ]
+}

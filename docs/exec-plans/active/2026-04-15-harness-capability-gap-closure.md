@@ -33,7 +33,7 @@ docs/
   guides/
     harness-guide.md                 # planned
   references/
-    eval-scenarios.md                # planned
+    eval-scenarios.md
 
 skills/
   harness-setup/SKILL.md
@@ -42,12 +42,12 @@ skills/
 scripts/
   checks/
     harness-consistency.js
-    harness-evals.js                 # planned
+    harness-evals.js
   sync/
     mirror-claude-artifacts.js       # planned
 
 fixtures/
-  repos/                             # planned
+  repos/
 ```
 
 ## Phase 1：建立评估与约束基础设施
@@ -63,7 +63,7 @@ fixtures/
 - 修改：`package.json`
 - 修改：`docs/QUALITY_SCORE.md`
 
-- [ ] **步骤 1：定义 eval 场景矩阵**
+- [x] **步骤 1：定义 eval 场景矩阵**
 
 至少覆盖以下场景：
 
@@ -86,7 +86,12 @@ fixtures/
 - 预期产物
 - 关键失败信号
 
-- [ ] **步骤 2：实现最小 eval runner**
+当前落地产物：
+
+- `docs/references/eval-scenarios.md` 已定义完整场景矩阵
+- `fixtures/repos/*/scenario.json` 已为首批场景补最小 fixture manifests
+
+- [x] **步骤 2：实现最小 eval runner**
 
 实现 `scripts/checks/harness-evals.js`，至少支持：
 
@@ -95,7 +100,13 @@ fixtures/
 - 对照核心断言输出通过/失败
 - 为后续 prompt / workflow 回归留出扩展点
 
-- [ ] **步骤 3：补充质量评分入口**
+当前落地产物：
+
+- `scripts/checks/harness-evals.js` 会读取 `fixtures/repos/*/scenario.json`
+- 支持校验 required paths 与基于文件内容的核心 assertions
+- 保留从 manifest 继续扩展到更强 fixture runner 的空间
+
+- [x] **步骤 3：补充质量评分入口**
 
 在 `package.json` 中新增例如：
 
@@ -110,6 +121,12 @@ fixtures/
 
 并把 `docs/QUALITY_SCORE.md` 从静态说明升级为“能力成熟度 + 信号来源”面板。
 
+当前落地产物：
+
+- `package.json` 已新增 `check:evals`
+- `npm test` 已同时执行 consistency + eval checks
+- `docs/QUALITY_SCORE.md` 已反映 eval 场景覆盖与能力成熟度
+
 ### 任务 2：将 consistency check 从文案匹配升级为结构/行为断言
 
 **优先级：** P0
@@ -119,14 +136,18 @@ fixtures/
 - 修改：`scripts/hooks/session-start.js`
 - 修改：相关文档（如 `docs/feedback/feedback-collection.md`、`README.md`）
 
-- [ ] **步骤 1：修正现有漂移**
+- [x] **步骤 1：修正现有漂移**
 
 修正当前 check 与 hook 行为之间的旧假设漂移，尤其是：
 
 - SessionStart memory 注入行为
 - hook 文档与实现不一致的断言
 
-- [ ] **步骤 2：重构检查方式**
+当前落地产物：
+
+- `scripts/hooks/session-start.js`、`docs/feedback/feedback-collection.md`、`scripts/checks/harness-consistency.js` 已统一到“注入 `using-brainstorming` + 最小 memory 快照”的事实
+
+- [x] **步骤 2：重构检查方式**
 
 将检查从“文件包含某句话”优先升级为：
 
@@ -135,9 +156,19 @@ fixtures/
 - JSON/配置断言
 - hook/脚本行为相关的最小行为断言
 
-- [ ] **步骤 3：保留必要的文档语义检查**
+当前落地产物：
+
+- `scripts/checks/harness-consistency.js` 已覆盖索引覆盖、Markdown 链接、JSON/配置、镜像目录一致性与 hook 最小行为断言
+- `scripts/checks/harness-evals.js` 已补充 fixture manifest + 文件断言层的 eval 检查
+
+- [x] **步骤 3：保留必要的文档语义检查**
 
 仅对必须稳定存在的契约性语义保留文案检查，避免让 check 对正常文案演进过于脆弱。
+
+当前落地产物：
+
+- consistency check 仅对 autonomous/final-gate、feedback archive、dangerous-mode、Skill 模式与 eval 接线等契约性语义保留检查
+- 目录结构、索引、镜像与配置正确性优先通过结构化断言完成
 
 ## Phase 2：补齐运行时安全与自适应能力
 
@@ -350,7 +381,7 @@ fixtures/
 - 修改：`skills/dev-workflow/SKILL.md`
 - 修改：相关 agent 定义
 
-- [ ] **步骤 1：定义风险等级**
+- [x] **步骤 1：定义风险等级**
 
 至少定义：
 
@@ -365,13 +396,29 @@ fixtures/
 - 自动执行白名单/黑名单
 - 最终确认要求
 
-- [ ] **步骤 2：把风险模型接入 workflow**
+当前落地产物：
+
+- `docs/SECURITY.md` 已定义 `read-only / reversible-write / irreversible-write / external-side-effect` 四级操作风险
+- 已明确默认策略、自动执行白名单/黑名单与最终确认要求
+
+- [x] **步骤 2：把风险模型接入 workflow**
 
 让 `dev-workflow`、Reviewer、Tester、Feedback Curator 在记录与决策时使用统一风险语言，避免各处各自表述。
 
-- [ ] **步骤 3：补充用户输入到工具调用的约束模板**
+当前落地产物：
+
+- `skills/dev-workflow/SKILL.md` 已接入统一 `operation_risk` 语言与 `Operation Gate`
+- `agents/reviewer.md`、`agents/tester.md`、`agents/feedback-curator.md` 已同步风险模型
+- `docs/product-specs/agent-system.md` 已补齐跨模式统一风险语言
+
+- [x] **步骤 3：补充用户输入到工具调用的约束模板**
 
 为高风险工具调用定义更清晰的参数校验与用户确认语义，降低 prompt 层单点失效风险。
+
+当前落地产物：
+
+- `docs/SECURITY.md`、`docs/product-specs/harness-engineering.md`、`skills/dev-workflow/SKILL.md` 已加入 `Operation Gate` 约束模板
+- workflow 使用统一的风险/权限语言处理自动执行与高风险确认
 
 ### 任务 5：让 harness-setup 支持自适应 scaffold profile
 
@@ -422,7 +469,7 @@ fixtures/
 - 修改：相关 agent 文档
 - 创建：必要的轨迹格式说明文档
 
-- [ ] **步骤 1：定义 run trace 最小结构**
+- [x] **步骤 1：定义 run trace 最小结构**
 
 至少记录：
 
@@ -433,13 +480,28 @@ fixtures/
 - 最近失败原因
 - 恢复入口
 
-- [ ] **步骤 2：定义 resume protocol**
+当前落地产物：
+
+- `docs/references/run-trace-protocol.md` 已定义最小 `Run Trace` 结构
+- `skills/dev-workflow/SKILL.md` 已把 `Run Trace` 接入 `Skill Workflow Record` 和统一交接文档骨架
+
+- [x] **步骤 2：定义 resume protocol**
 
 明确新会话、`/compact`、中断恢复时的读取顺序和停止条件，避免仅靠口头恢复。
 
-- [ ] **步骤 3：确定哪些轨迹写入长期 memory，哪些只保留在任务层**
+当前落地产物：
+
+- `docs/RELIABILITY.md` 与 `docs/references/run-trace-protocol.md` 已定义新会话、`/compact`、中断恢复的读取顺序与停止条件
+- `dev-workflow` 已明确遇到未决 `Operation Gate` 时不得继续高风险动作
+
+- [x] **步骤 3：确定哪些轨迹写入长期 memory，哪些只保留在任务层**
 
 避免把临时运行日志污染长期知识层。
+
+当前落地产物：
+
+- `docs/memory/index.md` 已明确长期 memory 与任务层 `Run Trace` 的边界
+- `docs/references/run-trace-protocol.md` 已区分长期记忆、任务层轨迹和不应沉淀的临时日志
 
 ### 任务 7：建立单一事实源与镜像同步机制
 
@@ -451,17 +513,33 @@ fixtures/
 - 修改：`docs/QUALITY_SCORE.md`
 - 修改：相关 check
 
-- [ ] **步骤 1：明确单一事实源**
+- [x] **步骤 1：明确单一事实源**
 
 继续以 `.claude/` 为事实源，但把同步过程工具化，而不是仅靠人工维护。
 
-- [ ] **步骤 2：实现最小 sync 命令**
+当前落地产物：
+
+- README 已明确 `.claude/` 为事实源
+- 新增 `scripts/sync/mirror-claude-artifacts.js` 作为可重复执行的镜像同步入口
+
+- [x] **步骤 2：实现最小 sync 命令**
 
 将 `.claude/skills`、`.claude/agents` 到根目录和 `.codex/` 的镜像更新收敛到一个可重复运行的脚本。
 
-- [ ] **步骤 3：把 sync 校验接入 repo checks**
+当前落地产物：
+
+- `npm run sync:mirrors` 已接入 `scripts/sync/mirror-claude-artifacts.js`
+- 当前同步范围覆盖 `.claude/skills`、`.claude/agents`、`.claude/scripts/hooks` 到根目录和 `.codex/`
+- 根目录 `hooks/` 也会同步到 `.claude/hooks` 与 `.codex/hooks`
+
+- [x] **步骤 3：把 sync 校验接入 repo checks**
 
 保证镜像失配可以被自动发现。
+
+当前落地产物：
+
+- `scripts/checks/harness-consistency.js` 已校验 `sync:mirrors` 脚本入口与镜像同步文档
+- 现有 mirror directory checks 会在镜像内容失配时直接失败
 
 ## Phase 4：补齐用户可见层
 

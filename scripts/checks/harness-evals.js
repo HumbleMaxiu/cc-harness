@@ -6,9 +6,18 @@ const path = require('path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const failures = [];
+const fixturesRoot = path.join(repoRoot, 'fixtures', 'repos');
 
 function read(relPath) {
   return fs.readFileSync(path.join(repoRoot, relPath), 'utf8');
+}
+
+function exists(relPath) {
+  return fs.existsSync(path.join(repoRoot, relPath));
+}
+
+function readJson(relPath) {
+  return JSON.parse(read(relPath));
 }
 
 function fail(message) {
@@ -57,9 +66,83 @@ function checkSkillContracts() {
   expectIncludes(verification, 'uncovered_risks', 'verification-skill');
 }
 
+function listFixtureScenarioFiles() {
+  if (!fs.existsSync(fixturesRoot)) {
+    fail('fixtures/repos: missing fixture scenario directory');
+    return [];
+  }
+
+  return fs.readdirSync(fixturesRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => path.join('fixtures', 'repos', entry.name, 'scenario.json'))
+    .filter((relPath) => exists(relPath))
+    .sort();
+}
+
+function checkFixtureScenarios() {
+  const scenarioFiles = listFixtureScenarioFiles();
+
+  if (scenarioFiles.length === 0) {
+    fail('fixtures/repos: expected at least one fixture scenario');
+    return;
+  }
+
+  for (const relPath of scenarioFiles) {
+    const scenario = readJson(relPath);
+    const label = `${relPath} (${scenario.id || 'unknown-id'})`;
+
+    [
+      'id',
+      'title',
+      'input_repo_state',
+      'user_request',
+      'expected_artifacts',
+      'failure_signals',
+      'required_paths',
+      'assertions',
+    ].forEach((field) => {
+      if (!(field in scenario)) {
+        fail(`${label}: missing field "${field}"`);
+      }
+    });
+
+    if (!Array.isArray(scenario.required_paths) || scenario.required_paths.length === 0) {
+      fail(`${label}: required_paths must be a non-empty array`);
+      continue;
+    }
+
+    if (!Array.isArray(scenario.assertions) || scenario.assertions.length === 0) {
+      fail(`${label}: assertions must be a non-empty array`);
+      continue;
+    }
+
+    for (const requiredPath of scenario.required_paths) {
+      if (!exists(requiredPath)) {
+        fail(`${label}: missing required path ${requiredPath}`);
+      }
+    }
+
+    for (const assertion of scenario.assertions) {
+      if (!assertion.file || !assertion.includes) {
+        fail(`${label}: each assertion needs file and includes`);
+        continue;
+      }
+
+      if (!exists(assertion.file)) {
+        fail(`${label}: assertion file missing ${assertion.file}`);
+        continue;
+      }
+
+      const content = read(assertion.file);
+      expectIncludes(content, assertion.includes, `${label}: ${assertion.file}`);
+    }
+  }
+}
+
 function main() {
   checkEvalScenarioCoverage();
   checkSkillContracts();
+  checkFixtureScenarios();
 
   if (failures.length > 0) {
     console.error('Harness eval checks failed:');

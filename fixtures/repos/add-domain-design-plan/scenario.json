@@ -1,0 +1,29 @@
+{
+  "id": "add-domain-design-plan",
+  "title": "Add domain/spec/design/plan workflow keeps indexes linked",
+  "input_repo_state": "Repository already has harness structure and active documentation trees.",
+  "user_request": "Add a domain spec, design doc, or exec plan and keep indexes healthy.",
+  "expected_artifacts": [
+    "Indexed docs",
+    "Cross-linked design and exec plan references"
+  ],
+  "failure_signals": [
+    "New docs become orphaned",
+    "Indexes drift from directory contents"
+  ],
+  "required_paths": [
+    "docs/design-docs/index.md",
+    "docs/exec-plans/index.md",
+    "docs/product-specs/index.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`add-domain-design-plan`"
+    },
+    {
+      "file": "scripts/checks/harness-consistency.js",
+      "includes": "assertIndexCoversDirectory"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "skill-plan-check-escalation",
+  "title": "Plan check can escalate a complex task out of Skill mode",
+  "input_repo_state": "Task starts in Skill mode but spans risky or unclear scope.",
+  "user_request": "Decide whether the task can remain in Skill mode.",
+  "expected_artifacts": [
+    "Mode Decision with fit_for_skill_mode=false when needed",
+    "Escalation reason and plan gaps"
+  ],
+  "failure_signals": [
+    "Complex tasks stay in Skill mode without explanation",
+    "Escalation reason is missing"
+  ],
+  "required_paths": [
+    "skills/dev-workflow/internal-skills/plan-check-skill/SKILL.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`skill-plan-check-escalation`"
+    },
+    {
+      "file": "skills/dev-workflow/internal-skills/plan-check-skill/SKILL.md",
+      "includes": "fit_for_skill_mode: true | false"
+    }
+  ]
+}

@@ -150,6 +150,37 @@
 
 只有像 `.claude ↔ skills ↔ .codex` 镜像一致性这类仓库私有规则，才属于插件自身自检，而不是所有用户项目的默认要求。
 
+### 风险模型脚手架责任
+
+`/harness-setup` 生成或更新 harness 时，应为用户项目提供统一的风险/权限语言，而不是把高风险动作的判断留给单次 prompt 即兴处理。
+
+至少应在生成的 workflow / 安全文档中覆盖：
+
+- `risk_level` 与 `operation_risk` 的区分
+- `read-only / reversible-write / irreversible-write / external-side-effect` 四级操作风险
+- 自动执行白名单 / 黑名单
+- 高风险动作的 `Operation Gate` 模板
+
+这样用户项目在接入 `dev-workflow`、Reviewer、Tester、Feedback Curator 时，才能共享同一套“什么可以自动做、什么必须先确认”的语义。
+
+### 用户输入到工具调用的约束模板
+
+当 harness 预期执行高风险动作时，scaffold 或 update 应引导 workflow 输出结构化约束块，而不是直接把模糊的自然语言传给工具层：
+
+```markdown
+### Operation Gate
+- objective:
+- requested_action:
+- target_paths_or_systems:
+- operation_risk:
+- expected_side_effects:
+- reversibility:
+- rollback_plan:
+- confirmation_status:
+```
+
+这能降低 prompt 层单点失效，把高风险动作变成可审计、可中断的显式 gate。
+
 ### 交互流程
 
 1. 自动检测项目 baseline（greenfield vs existing）

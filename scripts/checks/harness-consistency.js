@@ -121,13 +121,33 @@ function assertExecPlanIndexMatches() {
 function assertHookDocsMatchImplementation() {
   const feedbackDoc = read('docs/feedback/feedback-collection.md');
   const sessionStartHook = read('scripts/hooks/session-start.js');
+  const expectedMemoryFiles = [
+    'docs/memory/index.md',
+    'docs/memory/feedback/prevents-recurrence.md',
+    'docs/memory/feedback/user-feedback.md',
+    'docs/memory/feedback/agent-feedback.md',
+  ];
 
   if (!sessionStartHook.includes('using-brainstorming')) {
     fail('scripts/hooks/session-start.js: expected using-brainstorming injection behavior');
   }
 
-  if (feedbackDoc.includes('注入 `docs/memory/index.md`')) {
-    fail('docs/feedback/feedback-collection.md: claims SessionStart injects memory docs, but implementation only injects using-brainstorming');
+  if (!sessionStartHook.includes('const memoryFiles = [')) {
+    fail('scripts/hooks/session-start.js: expected explicit memoryFiles injection list');
+  }
+
+  for (const memoryFile of expectedMemoryFiles) {
+    if (!sessionStartHook.includes(memoryFile)) {
+      fail(`scripts/hooks/session-start.js: missing memory injection target ${memoryFile}`);
+    }
+  }
+
+  if (!feedbackDoc.includes('SessionStart hook 当前会注入 `using-brainstorming` skill')) {
+    fail('docs/feedback/feedback-collection.md: expected session-start skill injection guidance');
+  }
+
+  if (!feedbackDoc.includes('也会附带 `docs/memory/index.md`')) {
+    fail('docs/feedback/feedback-collection.md: expected session-start memory injection guidance');
   }
 }
 
@@ -362,6 +382,160 @@ function assertDangerousModeSettingsDocs() {
   }
 }
 
+function assertEvalCoverageDocs() {
+  const packageJson = readJson('package.json');
+  const qualityScore = read('docs/QUALITY_SCORE.md');
+  const referencesIndex = read('docs/references/index.md');
+  const evalScenarios = read('docs/references/eval-scenarios.md');
+
+  if (!packageJson.scripts || packageJson.scripts['check:evals'] !== 'node scripts/checks/harness-evals.js') {
+    fail('package.json: expected check:evals script');
+  }
+
+  if (!packageJson.scripts || typeof packageJson.scripts.test !== 'string' || !packageJson.scripts.test.includes('scripts/checks/harness-evals.js')) {
+    fail('package.json: expected test script to include harness evals');
+  }
+
+  if (!referencesIndex.includes('eval-scenarios.md')) {
+    fail('docs/references/index.md: expected eval scenario reference');
+  }
+
+  if (!qualityScore.includes('Harness eval check') && !qualityScore.includes('harness-evals.js')) {
+    fail('docs/QUALITY_SCORE.md: expected eval signal source');
+  }
+
+  [
+    '`skill-success-loop`',
+    '`skill-plan-check-escalation`',
+    '`skill-self-review-feedback-record`',
+    '`skill-verification-uncertainty`',
+  ].forEach((snippet) => {
+    if (!evalScenarios.includes(snippet)) {
+      fail(`docs/references/eval-scenarios.md: missing required scenario ${snippet}`);
+    }
+  });
+}
+
+function assertRiskModelDocs() {
+  const security = read('docs/SECURITY.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
+  const harnessSpec = read('docs/product-specs/harness-engineering.md');
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const reviewer = read('agents/reviewer.md');
+  const tester = read('agents/tester.md');
+  const curator = read('agents/feedback-curator.md');
+  const feedbackDoc = read('docs/feedback/feedback-collection.md');
+  const agentMemory = read('docs/memory/feedback/agent-feedback.md');
+
+  const requiredLevels = ['read-only', 'reversible-write', 'irreversible-write', 'external-side-effect'];
+
+  for (const level of requiredLevels) {
+    if (!security.includes(level)) {
+      fail(`docs/SECURITY.md: missing operation risk level ${level}`);
+    }
+    if (!agentSpec.includes(level)) {
+      fail(`docs/product-specs/agent-system.md: missing operation risk level ${level}`);
+    }
+    if (!workflow.includes(level)) {
+      fail(`skills/dev-workflow/SKILL.md: missing operation risk level ${level}`);
+    }
+  }
+
+  if (!security.includes('### Operation Gate')) {
+    fail('docs/SECURITY.md: expected Operation Gate template');
+  }
+
+  if (!harnessSpec.includes('### 用户输入到工具调用的约束模板')) {
+    fail('docs/product-specs/harness-engineering.md: expected tool-call constraint template guidance');
+  }
+
+  if (!workflow.includes('operation_risk: read-only | reversible-write | irreversible-write | external-side-effect | none')) {
+    fail('skills/dev-workflow/SKILL.md: expected Feedback Record operation_risk field');
+  }
+
+  if (!reviewer.includes('operation_risk: read-only | reversible-write | irreversible-write | external-side-effect | none')) {
+    fail('agents/reviewer.md: expected operation_risk field');
+  }
+
+  if (!tester.includes('operation_risk: read-only | reversible-write | irreversible-write | external-side-effect | none')) {
+    fail('agents/tester.md: expected operation_risk field');
+  }
+
+  if (!curator.includes('operation_risk')) {
+    fail('agents/feedback-curator.md: expected operation_risk handling guidance');
+  }
+
+  if (!feedbackDoc.includes('operation_risk')) {
+    fail('docs/feedback/feedback-collection.md: expected operation_risk guidance');
+  }
+
+  if (!agentMemory.includes('operation_risk')) {
+    fail('docs/memory/feedback/agent-feedback.md: expected operation_risk field');
+  }
+}
+
+function assertMirrorSyncTooling() {
+  const packageJson = readJson('package.json');
+  const readme = read('README.md');
+  const qualityScore = read('docs/QUALITY_SCORE.md');
+
+  if (!exists('scripts/sync/mirror-claude-artifacts.js')) {
+    fail('missing required path: scripts/sync/mirror-claude-artifacts.js');
+  }
+
+  if (!packageJson.scripts || packageJson.scripts['sync:mirrors'] !== 'node scripts/sync/mirror-claude-artifacts.js') {
+    fail('package.json: expected sync:mirrors script');
+  }
+
+  if (!readme.includes('npm run sync:mirrors')) {
+    fail('README.md: expected mirror sync command guidance');
+  }
+
+  if (!qualityScore.includes('mirror-claude-artifacts.js')) {
+    fail('docs/QUALITY_SCORE.md: expected mirror sync tooling signal');
+  }
+}
+
+function assertRunTraceDocs() {
+  const reliability = read('docs/RELIABILITY.md');
+  const memoryIndex = read('docs/memory/index.md');
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const referencesIndex = read('docs/references/index.md');
+  const runTraceProtocol = read('docs/references/run-trace-protocol.md');
+
+  if (!referencesIndex.includes('run-trace-protocol.md')) {
+    fail('docs/references/index.md: expected run trace protocol reference');
+  }
+
+  if (!reliability.includes('### Run Trace')) {
+    fail('docs/RELIABILITY.md: expected run trace section');
+  }
+
+  if (!reliability.includes('### Resume Protocol')) {
+    fail('docs/RELIABILITY.md: expected resume protocol section');
+  }
+
+  if (!memoryIndex.includes('与 Run Trace 的边界')) {
+    fail('docs/memory/index.md: expected run trace boundary guidance');
+  }
+
+  if (!workflow.includes('## 运行轨迹与恢复')) {
+    fail('skills/dev-workflow/SKILL.md: expected run trace section');
+  }
+
+  if (!workflow.includes('### Run Trace')) {
+    fail('skills/dev-workflow/SKILL.md: expected run trace block');
+  }
+
+  if (!runTraceProtocol.includes('### Run Trace')) {
+    fail('docs/references/run-trace-protocol.md: expected run trace template');
+  }
+
+  if (!runTraceProtocol.includes('## Resume Protocol')) {
+    fail('docs/references/run-trace-protocol.md: expected resume protocol');
+  }
+}
+
 function assertMirrorDirectory(sourceDir, mirrorDir) {
   const sourceFiles = listFilesRecursive(sourceDir);
   const mirrorFiles = listFilesRecursive(mirrorDir);
@@ -422,6 +596,8 @@ function main() {
   assertRelativeLinksExist('docs/design-docs/index.md');
   assertRelativeLinksExist('docs/exec-plans/index.md');
   assertRelativeLinksExist('docs/product-specs/index.md');
+  assertRelativeLinksExist('docs/references/index.md');
+  assertRelativeLinksExist('docs/references/eval-scenarios.md');
 
   assertIndexCoversDirectory('docs/design-docs/index.md', 'docs/design-docs');
   assertIndexCoversDirectory('docs/product-specs/index.md', 'docs/product-specs');
@@ -432,6 +608,10 @@ function main() {
   assertFeedbackArchiveDocs();
   assertHarnessSetupCoverage();
   assertDangerousModeSettingsDocs();
+  assertEvalCoverageDocs();
+  assertRiskModelDocs();
+  assertMirrorSyncTooling();
+  assertRunTraceDocs();
   assertMirrorDirectory('.claude/skills', 'skills');
   assertMirrorDirectory('.claude/skills', '.codex/skills');
   assertMirrorDirectory('.claude/agents', 'agents');

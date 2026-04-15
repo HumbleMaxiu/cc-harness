@@ -4,7 +4,7 @@
 /**
  * session-start.js
  *
- * ECC SessionStart hook - injects the using-brainstorming skill and project memory into new sessions.
+ * ECC SessionStart hook - injects the using-brainstorming skill plus a minimal project memory snapshot into new sessions.
  */
 
 const fs = require('fs');

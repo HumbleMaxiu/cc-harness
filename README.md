@@ -220,6 +220,14 @@
 - [.claude/hooks/hooks.json](.claude/hooks/hooks.json)
 - [.codex/hooks/hooks.json](.codex/hooks/hooks.json)
 
+镜像同步不再只靠手工复制。现在可以运行：
+
+```bash
+npm run sync:mirrors
+```
+
+它会把 `.claude/skills`、`.claude/agents`、`.claude/scripts/hooks` 同步到根目录和 `.codex/`，并把根目录 `hooks/` 同步到 `.claude/hooks` 与 `.codex/hooks`。
+
 ### 主要目录
 
 - [`.claude/`](.claude/)：Claude Code 事实来源
@@ -251,6 +259,12 @@
 
 ```bash
 npm test
+```
+
+如修改了 `.claude/` 事实源中的 skills / agents / hooks，实现前或提交前建议先运行：
+
+```bash
+npm run sync:mirrors
 ```
 
 它会运行 harness 一致性检查，包括：

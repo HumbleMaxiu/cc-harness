@@ -24,7 +24,7 @@
    - 低风险反馈（通常为局部代码、测试、文档同步）→ 主 agent 可自动修复并继续流程
    - 中高风险反馈（跨模块、删除/迁移、外部副作用、规范升级）→ 记录并保留到最终总结或显式 gate
    - 非阻塞建议（`APPROVED` 下的改进项）→ 当前主流程可继续，在最终交付前统一向用户汇总
-4. **执行/拒绝**：只有 `risk_level=low` 且 `action_type` 在自动执行白名单内的项默认自动修复；其余项进入最终总结
+4. **执行/拒绝**：只有 `risk_level=low`、`operation_risk` 不高于 `reversible-write`，且 `action_type` 在自动执行白名单内的项默认自动修复；其余项进入最终总结或显式 gate
 5. **归档**：更新自动执行状态和最终用户决定
 6. **预防**：检查是否需要防止再犯
 7. **滚动归档**：当 `agent-feedback.md` 开始积累过多已完成记录时，将历史项 roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`
@@ -68,13 +68,15 @@
 ## 运行时集成
 
 - `docs/memory/index.md` 是反馈记忆入口，也是会话恢复时的默认读取点
-- SessionStart hook 当前只负责注入 `using-brainstorming` skill，memory 读取仍由 workflow 和各角色在运行时显式完成
+- SessionStart hook 当前会注入 `using-brainstorming` skill，也会附带 `docs/memory/index.md`、`docs/memory/feedback/prevents-recurrence.md` 以及可用的 feedback 快照，帮助新会话获得最小恢复上下文
+- 即便 hook 已注入 memory 快照，workflow 和各角色仍应把 `docs/memory/` 视为事实来源；需要更完整上下文时继续显式读取原文件，而不是只依赖 hook 注入片段
 - Skill 模式执行时，主 agent 必须在最终交付前整理 `Skill Workflow Record`，作为恢复、memory 写入和最终汇总的事实来源
 - Reviewer / Tester 若发现问题，必须在交接文档中输出结构化的 `Feedback Record`，以便主 agent 追加到 `docs/memory/feedback/agent-feedback.md`
 - Skill 模式若在 `Self Review` / `Verification` 中发现问题，也必须输出结构化的 `feedback_record`，再决定自动修复、升级模式或进入最终汇总
 - `feedback-curator` 负责消费 `Feedback Record`，维护 `agent-feedback.md`，并在需要时更新 `prevents-recurrence.md` 中的提名或统计
 - `feedback-curator` 在执行前应先读取 `docs/feedback/feedback-collection.md` 和 `docs/memory/index.md`，否则视为未完整加载约束
-- `REJECTED` 反馈属于阻塞项，但是否自动修复要看 `risk_level` 和 `action_type`；`APPROVED` 下的建议项可以在最终交付前统一汇总
+- `REJECTED` 反馈属于阻塞项，但是否自动修复要看 `risk_level`、`operation_risk` 和 `action_type`；`APPROVED` 下的建议项可以在最终交付前统一汇总
+- `risk_level` 表示问题严重性；`operation_risk` 表示建议动作的执行风险。对于 `irreversible-write` / `external-side-effect`，主 agent 必须先输出 `Operation Gate` 并等待确认
 - 主流程的阻塞点由 `dev-workflow` 控制，而不是由 hook 或 shell 层面拦截控制
 - Tester 的验证入口探测属于运行时职责：先探测项目事实，再运行可执行验证，必要时询问用户
 - 当同类问题累计 2 次或以上时，主 agent 必须同步更新 `docs/memory/feedback/prevents-recurrence.md` 和相应规范文件

@@ -16,6 +16,7 @@
 | `rule` | 建议沉淀的通用规则或约束 |
 | `action_type` | `code_fix` / `test_fix` / `doc_sync` / `workflow_rule` / `risk_note` |
 | `risk_level` | `low` / `medium` / `high` |
+| `operation_risk` | `read-only` / `reversible-write` / `irreversible-write` / `external-side-effect` |
 | `scope` | `local_file` / `cross_module` / `repo_rule` / `external` |
 | `content` | 反馈摘要；使用归纳后的描述，而不是原始 lint / test 输出全文 |
 | `suggestion` | 建议的处理方式 |

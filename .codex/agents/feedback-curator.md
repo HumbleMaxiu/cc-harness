@@ -42,11 +42,12 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 
 ## 写入规则
 
-- 阻塞型反馈（通常为 `REJECTED`）只有在低风险且命中自动执行白名单时，才标记为自动回流修复或已自动执行
+- 阻塞型反馈（通常为 `REJECTED`）只有在 `risk_level=low` 且 `operation_risk` 不高于 `reversible-write`，并命中自动执行白名单时，才标记为自动回流修复或已自动执行
 - 非阻塞建议写入后标记为 `final_report: pending`，在最终交付时统一汇总
 - 若未发现有效反馈，允许输出“无新增反馈”的交接文档，但不要改动业务代码
 - `agent-feedback.md` 记录的是通用规则和模式；原始 lint / test 输出应保留在交接文档中
 - 已完成且不再影响当前决策的旧记录，应汇总迁移到 `docs/memory/feedback/archive/`
+- 若 `operation_risk` 为 `irreversible-write` 或 `external-side-effect`，应标记为 `manual-only` 或等待确认，而不是自动执行
 
 ## 行为约束
 

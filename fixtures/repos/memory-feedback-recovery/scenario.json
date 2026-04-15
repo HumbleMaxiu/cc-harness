@@ -1,0 +1,31 @@
+{
+  "id": "memory-feedback-recovery",
+  "title": "Memory and feedback recovery remains part of harness workflow",
+  "input_repo_state": "Task resumes after /compact or in a new session.",
+  "user_request": "Recover context from memory and continue without losing constraints.",
+  "expected_artifacts": [
+    "Memory index",
+    "Recurrence-prevention rules",
+    "Documented recovery order"
+  ],
+  "failure_signals": [
+    "Agent resumes from conversation only",
+    "Memory index is ignored",
+    "Prevents-recurrence guidance is skipped"
+  ],
+  "required_paths": [
+    "docs/memory/index.md",
+    "docs/memory/feedback/prevents-recurrence.md",
+    "AGENTS.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`memory-feedback-recovery`"
+    },
+    {
+      "file": "AGENTS.md",
+      "includes": "新会话或 `/compact` 后恢复上下文时，先读 `docs/memory/index.md`"
+    }
+  ]
+}

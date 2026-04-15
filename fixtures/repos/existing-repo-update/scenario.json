@@ -1,0 +1,30 @@
+{
+  "id": "existing-repo-update",
+  "title": "Existing repo update path preserves incremental harness changes",
+  "input_repo_state": "Repository already has partial harness files and needs incremental update.",
+  "user_request": "Update the existing harness without destroying user-owned files.",
+  "expected_artifacts": [
+    "/harness-setup update path",
+    "Incremental update guidance",
+    "No destructive overwrite assumption"
+  ],
+  "failure_signals": [
+    "Update mode is undocumented",
+    "Repo update path is treated as re-scaffold only",
+    "Incremental update contract is missing"
+  ],
+  "required_paths": [
+    "skills/harness-setup/SKILL.md",
+    "docs/product-specs/harness-engineering.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`existing-repo-update`"
+    },
+    {
+      "file": "docs/product-specs/harness-engineering.md",
+      "includes": "/harness-setup update"
+    }
+  ]
+}
