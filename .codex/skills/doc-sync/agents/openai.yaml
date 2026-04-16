@@ -1,0 +1,4 @@
+interface:
+  display_name: "Doc Sync"
+  short_description: "Sync affected docs, indexes, and architecture notes"
+  default_prompt: "Use $doc-sync to review recent repository changes and sync any affected docs."

@@ -18,6 +18,11 @@
 - `docs/feedback/feedback-collection.md` 与 `docs/memory/feedback/archive/` — feedback 规则与历史归档结构
 - Agent platform bridge 文件（按需）
 
+并应在生成结果中暴露最小默认 workflow 入口，包括：
+
+- `/dev-workflow` — 实现、审查、验证主流程
+- `/doc-sync` — 代码或流程变更后的文档同步入口
+
 `/harness-setup` 还应根据仓库信号推荐一个 scaffold profile：
 
 - `light`
@@ -50,6 +55,7 @@
 | `docs/references/*` | `/harness-setup` 占位 | 人工维护或专项 skill |
 | `docs/QUALITY_SCORE.md` | `/harness-setup` | `architect` / update workflow |
 | `scripts/checks/harness-consistency.js` | `/harness-setup`（推荐生成） | `architect` / tester |
+| 文档同步入口（如 `/doc-sync`） | `/harness-setup` 暴露入口 | `architect` / `dev-workflow` / 用户 |
 
 ### 当前原则
 
@@ -228,6 +234,7 @@ profile 影响至少应体现在：
 |--------|------|
 | `/harness-setup` | Claude Code skill 入口 |
 | `/harness-setup update` | 增量更新现有 harness |
+| `/doc-sync` | scaffold 后可直接用于文档维护与 docs freshness |
 
 ## Edge Cases
 

@@ -6,6 +6,7 @@
 |------|------|------|---------|
 | **测试覆盖** | 仓库自检可运行 | 部分 | `package.json` 中的 `test` 脚本已运行 harness consistency check |
 | **Eval 场景覆盖** | 关键 workflow 有回归入口 | 部分 | `docs/references/eval-scenarios.md` 定义场景矩阵，`scripts/checks/harness-evals.js` 校验文档级场景，`scripts/checks/harness-behavior-evals.js` 提供行为级样板 |
+| **Fresh repo smoke** | 新仓库接入插件后可做最小安装和 scaffold 验收 | 部分 | `scripts/checks/harness-fresh-repo-smoke.js` 运行 SessionStart 安装冒烟和 greenfield scaffold 验收 |
 | **镜像同步机制** | 单一事实源可重复同步 | 部分 | `scripts/sync/mirror-claude-artifacts.js` 和 `npm run sync:mirrors` 已提供最小同步入口，consistency check 负责发现失配 |
 | **Linting** | 代码规范检查 | 部分 | 当前以 repo-local consistency check 替代传统 lint，覆盖文档与索引一致性 |
 | **TypeScript 类型** | 类型安全 | TBD | 无 `tsconfig.json` |
@@ -21,6 +22,7 @@
 | Harness eval planning | 已接入基础版 | 已有场景矩阵与最小 eval 检查入口 |
 | Skill mode evals | 已纳入首批 | 覆盖闭环、升级、自检记录、验证不确定性 |
 | Fixture-based regression | 已接入基础版 | 已有行为级 eval runner 和首个完整样板场景 `reviewer-rejected-loop` |
+| Fresh repo smoke test | 已接入基础版 | 已验证 fresh repo SessionStart 注入和 greenfield scaffold 样板验收 |
 | Mirror sync tooling | 已接入基础版 | 可从 `.claude/` 同步到根目录与 `.codex`，仍待更细粒度工作流集成 |
 
 ## 说明

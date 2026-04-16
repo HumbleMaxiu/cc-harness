@@ -38,6 +38,7 @@ function checkEvalScenarioCoverage() {
     '`skill-plan-check-escalation`',
     '`skill-self-review-feedback-record`',
     '`skill-verification-uncertainty`',
+    '`doc-sync-cross-mode-contract`',
   ].forEach((id) => expectIncludes(scenarios, id, 'docs/references/eval-scenarios.md'));
 
   [
@@ -45,6 +46,7 @@ function checkEvalScenarioCoverage() {
     'Mode Decision',
     'feedback_record',
     'uncovered risks',
+    'Doc Sync Result',
   ].forEach((snippet) => expectIncludes(scenarios, snippet, 'docs/references/eval-scenarios.md'));
 }
 
@@ -54,16 +56,26 @@ function checkSkillContracts() {
   const planCheck = read('skills/dev-workflow/internal-skills/plan-check-skill/SKILL.md');
   const selfReview = read('skills/dev-workflow/internal-skills/self-review-skill/SKILL.md');
   const verification = read('skills/dev-workflow/internal-skills/verification-skill/SKILL.md');
+  const docSync = read('skills/doc-sync/SKILL.md');
+  const docSyncYaml = read('skills/doc-sync/agents/openai.yaml');
+  const architect = read('docs/design-docs/architect.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
 
   expectIncludes(workflow, 'Plan Check', 'skills/dev-workflow/SKILL.md');
   expectIncludes(workflow, 'Self Review', 'skills/dev-workflow/SKILL.md');
   expectIncludes(workflow, 'Verify', 'skills/dev-workflow/SKILL.md');
   expectIncludes(workflow, '内部子 Skill 调用模式', 'skills/dev-workflow/SKILL.md');
+  expectIncludes(workflow, '/doc-sync', 'skills/dev-workflow/SKILL.md');
 
   expectIncludes(specialized, '最小调用模式', 'skills/dev-workflow/references/skill-mode-specialized-skills.md');
   expectIncludes(planCheck, '### Mode Decision', 'plan-check-skill');
   expectIncludes(selfReview, 'feedback_record', 'self-review-skill');
   expectIncludes(verification, 'uncovered_risks', 'verification-skill');
+  expectIncludes(docSync, '### Doc Sync Result', 'doc-sync');
+  expectIncludes(docSync, 'reviewed_no_change', 'doc-sync');
+  expectIncludes(docSyncYaml, 'default_prompt', 'skills/doc-sync/agents/openai.yaml');
+  expectIncludes(architect, '/doc-sync', 'docs/design-docs/architect.md');
+  expectIncludes(agentSpec, '/doc-sync', 'docs/product-specs/agent-system.md');
 }
 
 function listFixtureScenarioFiles() {

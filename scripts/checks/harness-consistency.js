@@ -311,6 +311,7 @@ function assertHarnessSetupCoverage() {
   const behaviorRules = read('skills/harness-setup/references/behavior-rules.md');
   const harnessSpec = read('docs/product-specs/harness-engineering.md');
   const fileSpecs = read('skills/harness-setup/references/file-specs.md');
+  const agentsTemplate = read('skills/harness-setup/templates/AGENTS-index.md');
 
   if (!harnessSetup.includes('feedback/feedback-collection.md')) {
     fail('skills/harness-setup/SKILL.md: expected scaffold coverage for docs/feedback/feedback-collection.md');
@@ -350,6 +351,22 @@ function assertHarnessSetupCoverage() {
 
   if (!fileSpecs.includes('Promote from：')) {
     fail('skills/harness-setup/references/file-specs.md: expected promote-from guidance for project-level docs');
+  }
+
+  if (!harnessSetup.includes('/doc-sync')) {
+    fail('skills/harness-setup/SKILL.md: expected scaffold guidance for /doc-sync');
+  }
+
+  if (!fileSpecs.includes('/doc-sync')) {
+    fail('skills/harness-setup/references/file-specs.md: expected AGENTS scaffold guidance for /doc-sync');
+  }
+
+  if (!agentsTemplate.includes('/doc-sync')) {
+    fail('skills/harness-setup/templates/AGENTS-index.md: expected default /doc-sync skill entry');
+  }
+
+  if (!harnessSpec.includes('/doc-sync')) {
+    fail('docs/product-specs/harness-engineering.md: expected /doc-sync scaffold capability');
   }
 }
 
@@ -468,11 +485,63 @@ function assertEvalCoverageDocs() {
     '`skill-plan-check-escalation`',
     '`skill-self-review-feedback-record`',
     '`skill-verification-uncertainty`',
+    '`doc-sync-cross-mode-contract`',
   ].forEach((snippet) => {
     if (!evalScenarios.includes(snippet)) {
       fail(`docs/references/eval-scenarios.md: missing required scenario ${snippet}`);
     }
   });
+}
+
+function assertDocSyncContracts() {
+  const agentsDoc = read('AGENTS.md');
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const architect = read('docs/design-docs/architect.md');
+  const claudeArchitect = read('.claude/agents/architect.md');
+  const codexArchitect = read('.codex/agents/architect.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
+  const docSync = read('skills/doc-sync/SKILL.md');
+  const docSyncYaml = read('skills/doc-sync/agents/openai.yaml');
+
+  if (!agentsDoc.includes('/doc-sync')) {
+    fail('AGENTS.md: expected /doc-sync skill entry');
+  }
+
+  if (!workflow.includes('/doc-sync')) {
+    fail('skills/dev-workflow/SKILL.md: expected Doc Sync stage to reference /doc-sync');
+  }
+
+  if (!architect.includes('/doc-sync')) {
+    fail('docs/design-docs/architect.md: expected /doc-sync integration');
+  }
+
+  if (!claudeArchitect.includes('/doc-sync')) {
+    fail('.claude/agents/architect.md: expected /doc-sync integration');
+  }
+
+  if (!codexArchitect.includes('/doc-sync')) {
+    fail('.codex/agents/architect.md: expected /doc-sync integration');
+  }
+
+  if (!agentSpec.includes('/doc-sync')) {
+    fail('docs/product-specs/agent-system.md: expected /doc-sync shared-capability guidance');
+  }
+
+  if (!docSync.includes('### Doc Sync Result')) {
+    fail('skills/doc-sync/SKILL.md: expected Doc Sync Result contract');
+  }
+
+  if (!docSync.includes('reviewed_no_change')) {
+    fail('skills/doc-sync/SKILL.md: expected reviewed_no_change guidance');
+  }
+
+  if (!docSyncYaml.includes('display_name: "Doc Sync"')) {
+    fail('skills/doc-sync/agents/openai.yaml: expected display_name');
+  }
+
+  if (!docSyncYaml.includes('$doc-sync')) {
+    fail('skills/doc-sync/agents/openai.yaml: expected default_prompt to mention $doc-sync');
+  }
 }
 
 function assertRiskModelDocs() {
@@ -636,6 +705,12 @@ function main() {
     '.claude/hooks/hooks.json',
     '.codex/hooks/hooks.json',
     '.codex/agents/feedback-curator.md',
+    'skills/doc-sync/SKILL.md',
+    'skills/doc-sync/agents/openai.yaml',
+    '.claude/skills/doc-sync/SKILL.md',
+    '.claude/skills/doc-sync/agents/openai.yaml',
+    '.codex/skills/doc-sync/SKILL.md',
+    '.codex/skills/doc-sync/agents/openai.yaml',
     'examples/claude-code/project-settings.json',
     'examples/claude-code/global-settings.json',
     'skills/dev-workflow/SKILL.md',
@@ -670,6 +745,7 @@ function main() {
   assertHarnessGuideDocs();
   assertDangerousModeSettingsDocs();
   assertEvalCoverageDocs();
+  assertDocSyncContracts();
   assertRiskModelDocs();
   assertMirrorSyncTooling();
   assertRunTraceDocs();

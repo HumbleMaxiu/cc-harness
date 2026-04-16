@@ -1,0 +1,4 @@
+{
+  "expected": "pass",
+  "description": "A fresh repo scaffold includes the minimum docs, memory, and AGENTS navigation surface."
+}

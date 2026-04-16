@@ -10,6 +10,7 @@
 - **Length：** 目标约 100 行；**硬上限 120 行**。超过 120 行是质量缺陷。
 - **Include：** 项目一句话描述；优先级顺序（user > harness docs > defaults）；技术栈表；仓库布局表；secrets/logging 规则；测试门槛；链接到 `ARCHITECTURE.md` 和关键 `docs/` 文件。
 - **Include：** 如果仓库启用了记忆机制，在 docs 导航中加入 `docs/memory/index.md`。
+- **Include：** 如果仓库启用了 workflow / 文档维护能力，在 Skill 快速参考中给出 `/doc-sync`，说明它用于代码或流程变更后的文档同步。
 - **Include — How to use this harness：** 一个短的 `## How to use this harness` section，最多**3 行**，并链接到 `docs/PLANS.md` 获取扩展工作流：
 
 | Scenario | Start here | Then |
@@ -23,6 +24,8 @@
 - **Avoid：** 长教程；重复 `product-specs/`；粘贴 API 列表 — **链接**代替。
 
 **Update rules（harness update 模式）：** 添加 domain 时，如需要则在 Quick nav / Deep dives 表追加一行；添加新的 `docs/product-specs/<domain>.md` 并更新 `docs/product-specs/index.md`。不要删除不相关的 sections。
+
+**Scaffold rule：** 如果 scaffold 输出里已经包含 `/dev-workflow`、review/test workflow 或文档同步规则，则默认也要暴露 `/doc-sync`，避免“要求同步文档”但没有明确入口。
 
 ### `ARCHITECTURE.md`
 

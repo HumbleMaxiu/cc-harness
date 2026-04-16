@@ -92,7 +92,7 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 
 | 角色 | Agent | 职责 |
 |------|-------|------|
-| 架构师 | architect | 任务开始前检查计划，开发完成后识别 docs impact 并触发文档同步 |
+| 架构师 | architect | 任务开始前检查计划，开发完成后维护文档 |
 | 开发者 | developer | TDD 实现功能 |
 | 审查者 | reviewer | 代码审查，质量把关 |
 | 测试工程师 | tester | 测试验证 |
@@ -225,14 +225,14 @@ Skill 模式后续建议引入少量阶段型专用 Skill，用于稳定单 agen
 - `self-review-skill`
 - `verification-skill`
 
-`Doc Sync` 阶段不再继续内嵌自由发挥逻辑，而是应直接复用顶级 `/doc-sync` Skill 的输入输出契约。
-
 详细契约见：
 
 - [references/skill-mode-specialized-skills.md](references/skill-mode-specialized-skills.md)
 - [internal-skills/plan-check-skill/SKILL.md](internal-skills/plan-check-skill/SKILL.md)
 - [internal-skills/self-review-skill/SKILL.md](internal-skills/self-review-skill/SKILL.md)
 - [internal-skills/verification-skill/SKILL.md](internal-skills/verification-skill/SKILL.md)
+
+`Doc Sync` 阶段不再继续内嵌自由发挥逻辑，而是应直接复用顶级 `/doc-sync` Skill 的输入输出契约。
 
 这些子 Skill 初期应作为 `dev-workflow` 的内部子 skill 使用，不急于暴露成用户直接调用的顶层入口。`/doc-sync` 是例外：它既服务 Skill 模式，也服务 Subagent 模式，应作为跨模式复用的顶级 Skill 维护。
 

@@ -84,3 +84,5 @@ module.exports = {
 - 是否只对白名单中的低风险动作自动修复
 - 是否正确恢复到下一个 workflow 阶段
 - 是否阻止 `irreversible-write` 被误当作可自动执行
+
+`greenfield-scaffold` 也已提供一个 fresh-repo scaffold 验收样板，用于检查最小 harness 是否真的可用，而不是只停留在场景文档里。

@@ -1,0 +1,4 @@
+{
+  "expected": "fail",
+  "description": "A scaffold without the AGENTS workflow entrypoint should fail acceptance."
+}

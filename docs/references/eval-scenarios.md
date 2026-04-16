@@ -17,6 +17,7 @@
 | `skill-plan-check-escalation` | 任务跨模块、风险高或边界不清 | 以 Skill 模式启动复杂任务 | `plan-check-skill` 判定升级到 `Subagent` | `Mode Decision.fit_for_skill_mode=false`，包含明确 `escalation_reason`、`plan_gaps`、`scope_risks` | 复杂任务被错误留在 Skill 模式、升级理由空泛 |
 | `skill-self-review-feedback-record` | Skill 模式已完成 Execute | 进入自检阶段 | `self-review-skill` 结构化审查变更 | `Self Review` 包含 checklist、issues、`feedback_record`、`escalate_to_subagent` | 只有口头结论、无 `feedback_record` 字段、问题不可复用 |
 | `skill-verification-uncertainty` | Repo 验证面不完整或信号冲突 | 进入 Verify 阶段 | `verification-skill` 选择最佳验证并记录不确定性 | `Verification` 包含 detected entrypoints、executed checks、assumptions、uncovered risks、必要时 `feedback_record` | 假装验证充分、未记录未覆盖风险、无升级建议 |
+| `doc-sync-cross-mode-contract` | 代码或 workflow 已改动，且进入文档同步阶段 | 直接调用 `/doc-sync`，或在 Skill/Subagent 模式进入 `Doc Sync` | `/doc-sync` 识别受影响文档并输出结构化同步结果 | `Doc Sync Result` 包含 docs_checked、docs_updated、reviewed_no_change、follow_up_needed、nav_or_index_updated | 文档同步仍靠自由发挥、缺少 reviewed_no_change、Architect 与 dev-workflow 口径漂移 |
 
 ## Skill 模式专项断言
 
@@ -26,7 +27,8 @@
 2. `plan-check-skill` 必须能输出可直接并入 `Mode Decision` 的结构化字段。
 3. `self-review-skill` 必须能输出可复用的 `feedback_record`。
 4. `verification-skill` 必须在验证不确定时显式记录 `assumptions` 与 `uncovered_risks`。
-5. Eval 结论必须覆盖“继续 Skill 模式”与“升级到 Subagent/Team”两类路径。
+5. `/doc-sync` 必须能输出跨模式复用的 `Doc Sync Result`。
+6. Eval 结论必须覆盖“继续 Skill 模式”与“升级到 Subagent/Team”两类路径。
 
 ## 行为级 eval 基线
 
