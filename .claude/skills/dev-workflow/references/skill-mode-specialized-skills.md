@@ -172,7 +172,6 @@
 以下阶段先保留在 `dev-workflow` 主 skill 中：
 
 - `Execute`
-- `Doc Sync`
 - `Final Summary`
 
 原因：
@@ -181,27 +180,32 @@
 - 过早拆分会让 Skill 模式碎片化
 - 容易把 Skill 模式重新推向伪多角色设计
 
+`Doc Sync` 现已例外上提为顶级 `/doc-sync` Skill，因为它同时服务 Skill 模式与 Subagent 模式，且需要被 `Architect` 复用。
+
 ## 下一步实现建议
 
-1. `plan-check-skill`、`self-review-skill`、`verification-skill` 已可落成内部子 skill 目录骨架
-2. 下一步再决定是否补充脚本、模板或 eval fixtures
-3. 一旦落成独立 skill，必须同步：
+1. `plan-check-skill`、`self-review-skill`、`verification-skill` 作为内部子 skill 目录骨架持续维护
+2. `/doc-sync` 作为跨模式顶级 Skill 单独维护
+3. 下一步再决定是否补充脚本、模板或 eval fixtures
+4. 一旦落成独立 skill，必须同步：
    - `.claude/skills/`
    - `.codex/skills/`
    - consistency check
-4. 后续 eval 要覆盖：
+5. 后续 eval 要覆盖：
    - `plan-check-skill` 的模式判断
    - `self-review-skill` 的反馈记录质量
    - `verification-skill` 的验证入口探测质量
+   - `/doc-sync` 的文档影响分析与同步结果质量
 
 ## 最小调用模式
 
-`dev-workflow` 在 Skill 模式下可按以下顺序使用这 3 个内部子 skill：
+`dev-workflow` 在 Skill 模式下可按以下顺序使用 3 个内部子 skill，并在 `Doc Sync` 阶段调用顶级 `/doc-sync`：
 
 1. `Plan Check` 阶段加载 `plan-check-skill`，把输出直接写入 `Mode Decision`
 2. `Execute` 完成后加载 `self-review-skill`，把输出直接写入 `Self Review`
 3. `Verify` 阶段加载 `verification-skill`，把输出直接写入 `Verification`
-4. 三者都不单独生成平行报告，而是回填到同一份 `Skill Workflow Record`
+4. `Doc Sync` 阶段调用 `/doc-sync`，把输出写入 `Doc Sync`
+5. 上述阶段都不单独生成平行报告，而是回填到同一份 `Skill Workflow Record`
 
 简化示意：
 
@@ -211,6 +215,6 @@ dev-workflow (Skill mode)
   -> execute task
   -> self-review-skill
   -> verification-skill
-  -> doc sync
+  -> /doc-sync
   -> final summary
 ```

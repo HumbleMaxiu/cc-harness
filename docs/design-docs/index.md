@@ -11,6 +11,7 @@
 | [2026-04-15-automation-enforcement-design.md](2026-04-15-automation-enforcement-design.md) | 文档约束到自动化约束设计 | 已实现 |
 | [2026-04-15-autonomous-until-final-gate-design.md](2026-04-15-autonomous-until-final-gate-design.md) | 持续运行到最终确认设计 | 已实现 |
 | [2026-04-15-dev-workflow-skill-mode-design.md](2026-04-15-dev-workflow-skill-mode-design.md) | Dev Workflow Skill 模式设计 | 草稿 |
+| [2026-04-15-doc-sync-skill-design.md](2026-04-15-doc-sync-skill-design.md) | Doc Sync 顶级 Skill 与跨模式文档维护设计 | 草稿 |
 | [architect.md](architect.md) | Architect Agent 定义 | 草稿 |
 | [developer.md](developer.md) | Developer Agent 定义 | 草稿 |
 | [reviewer.md](reviewer.md) | Reviewer Agent 定义 | 草稿 |

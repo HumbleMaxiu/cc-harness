@@ -19,6 +19,50 @@ Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**
 
 对于 `ARCHITECTURE.md`、`docs/DESIGN.md`、`docs/PLANS.md`、`docs/PRODUCT_SENSE.md`、`docs/RELIABILITY.md`、`docs/SECURITY.md`、`docs/FRONTEND.md` 这类项目级文档，scaffold 默认只生成 **skeleton-first** 骨架与占位说明；详细内容应在后续任务、设计和归档中逐步沉淀。
 
+## Scaffold profiles
+
+`harness-setup` 不应总是生成同一强度的 harness。默认根据仓库信号推荐一个 profile，并允许用户在 Phase 1 汇总时确认或覆盖：
+
+| Profile | 适用场景 | 默认强度 |
+|---------|---------|---------|
+| `light` | 小项目、低风险、快速起步 | 最小文档集 + 最小 workflow 提示 |
+| `standard` | 默认团队协作项目 | 完整基础文档集 + 标准 workflow / feedback / checks |
+| `strict` | 高风险、高规范、需要更强 gate 的项目 | 标准文档集 + 更明确的风险/验证/恢复 guardrail |
+
+### 自动推荐规则
+
+优先根据以下信号做推荐：
+
+- 推荐 `light`
+  - 仓库规模小
+  - 单一 runtime / 单一包
+  - 缺少 CI、复杂部署或敏感目录
+  - 目标更偏实验、脚本、个人项目
+- 推荐 `standard`
+  - 默认情况
+  - 已有基础测试、多人协作或持续开发迹象
+  - 需要完整 docs / memory / feedback / plan 结构
+- 推荐 `strict`
+  - 存在部署脚本、基础设施、认证/权限、支付、生产数据或其他敏感边界
+  - 需要更强 reviewer / tester / risk gate
+  - 用户明确要求高规范或高审计性
+
+如果检测信号不足，默认推荐 `standard`，并在汇总表中说明原因。
+
+### Profile 对 scaffold 输出的影响
+
+- `light`
+  - 仍生成核心入口文档与索引，但项目级文档保持更轻的 skeleton
+  - 默认强调 `Skill` / 单 agent workflow
+  - checks / hooks 以推荐项为主，避免过度框架化
+- `standard`
+  - 生成完整基础文档集
+  - 默认启用 memory / feedback / quality / reliability / security 结构
+  - workflow 强度保持当前默认值
+- `strict`
+  - 在 `SECURITY.md`、`RELIABILITY.md`、`QUALITY_SCORE.md`、`AGENTS.md` 中更明确地突出 risk gate、验证、恢复和规范升级路径
+  - 最终报告中显式提醒高风险动作、profile 选择理由和后续治理建议
+
 ## Scaffold vs update
 
 **Scaffold（默认）** — 用户想要一个新的 harness 或首次设置。按照下面的 **阶段 1–5** 执行。在阶段 1 第 6 步（汇总）确认之前，不要创建任何文件。
@@ -41,7 +85,7 @@ Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**
 2. **Identity + 检测表** — 显示检测结果；询问项目名称和一句话目的（自由格式）
 3. **Shape + architecture** — 一次交互：项目类型 + 架构风格（结构化选项）
 4. **Domains** — 主要产品领域，用于 `docs/product-specs/*.md`（自由格式）
-5. **Agent platforms** — 一次交互：团队使用的 agent 工具（多选：Cursor、Claude Code、Codex、Windsurf、GitHub Copilot、Cline、Other）
+5. **Agent platforms + profile** — 一次交互：团队使用的 agent 工具 + 推荐 scaffold profile
 6. **确认汇总** — 紧凑表格，用户批准 ⛔ 门槛：批准前不创建文件
 
 ### Phase 2 — 创建目录结构
@@ -128,7 +172,10 @@ digraph harness {
 
 **Step 4** — Domains（自由格式）：列出主要产品领域；每个领域生成 `docs/product-specs/<domain>.md`。
 
-**Step 5** — Agent platforms（多选）：**Cursor**、**Claude Code**、**Codex**、**Windsurf**、**GitHub Copilot**、**Cline**、**Other**
+**Step 5** — Agent platforms + profile：
+
+- Agent platforms（多选）：**Cursor**、**Claude Code**、**Codex**、**Windsurf**、**GitHub Copilot**、**Cline**、**Other**
+- Scaffold profile：推荐 `light` / `standard` / `strict`，并给出 1 句推荐理由
 
 **Step 6 — 汇总表 + GATE**
 
@@ -142,6 +189,7 @@ digraph harness {
 | Domains | 列表 |
 | Architecture | 风格 |
 | Agent platforms | 哪些工具（用于阶段 5 bridges） |
+| Profile | `light` / `standard` / `strict` + 推荐理由 |
 
 用户批准 → Phase 2。
 
@@ -153,7 +201,7 @@ digraph harness {
 
 ## Phase 3 — 填充文件
 
-目录存在后，按照 [references/file-specs.md](references/file-specs.md) 的顺序填充。`AGENTS.md` **必须**包含 **How to use this harness**（3 行使用表 + 链接到 `docs/PLANS.md`）。`AGENTS.md` 必须保持在 **120 行硬性上限**以内。
+目录存在后，按照 [references/file-specs.md](references/file-specs.md) 的顺序填充。`AGENTS.md` **必须**包含 **How to use this harness**（3 行使用表 + 链接到 `docs/PLANS.md`）。`AGENTS.md` 必须保持在 **120 行硬性上限**以内。填充时根据已确认 profile 调整文档强度，但不破坏核心目录和索引结构。
 
 **AGENTS.md 生成约束：** 使用 [templates/AGENTS-index.md](templates/AGENTS-index.md) 模板生成 `AGENTS.md`。内容应只包括：
 - 一句话项目描述
@@ -165,6 +213,19 @@ digraph harness {
 `docs/memory/index.md` 必须声明 `docs/memory/` 是工作记忆的事实来源，`docs/memory/feedback/` 必须包含用户反馈、Agent 反馈、防止再犯和 archive 结构；`docs/feedback/feedback-collection.md` 必须作为 feedback 规则的事实来源之一生成到用户项目中。
 
 **单一检查点（第 16 步）：** 步骤 8–15 的所有文件存在后，列出路径并请求调整；然后进入阶段 4。
+
+### Profile-specific output rules
+
+- `light`
+  - 保持 skeleton-first，更少治理性措辞
+  - `QUALITY_SCORE.md`、`RELIABILITY.md`、`SECURITY.md` 可以更偏模板化
+  - 最终报告强调“可后续升级到 standard/strict”
+- `standard`
+  - 使用默认 file-specs 输出
+  - 适合作为大多数团队项目的起点
+- `strict`
+  - 在 `AGENTS.md`、`SECURITY.md`、`RELIABILITY.md`、`QUALITY_SCORE.md` 中更明确地写出 gate、验证、恢复、风险与反馈升级路径
+  - 如检测到敏感目录、部署脚本或生产边界，在最终报告中单独点出
 
 ## Phase 4 — 验证 & 审查
 

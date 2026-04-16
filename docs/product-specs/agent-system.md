@@ -12,7 +12,7 @@
 
 | 角色 | 文件 | 职责 | 触发时机 |
 |------|------|------|---------|
-| Architect | `.claude/agents/architect.md` | 计划检查、文档维护 | 任务开始前 / 完成后 |
+| Architect | `.claude/agents/architect.md` | 计划检查、docs impact 判断、触发文档同步 | 任务开始前 / 完成后 |
 | Developer | `.claude/agents/developer.md` | TDD 实现 | 收到 Architect 交接后 |
 | Reviewer | `.claude/agents/reviewer.md` | 代码质量和安全审查 | 收到 Developer 交接后 |
 | Tester | `.claude/agents/tester.md` | 探测验证入口并执行测试验证 | 收到 Reviewer 交接后 |
@@ -29,6 +29,8 @@
 Skill 模式的默认状态机为：
 
 `Input Ready -> Plan Check -> Execute -> Self Review -> Verify -> Doc Sync -> Final Summary`
+
+其中 `Doc Sync` 阶段应复用顶级 `/doc-sync` Skill 的契约，而不是由主 agent 临场决定文档维护方式。
 
 当任务出现循环审查、强状态追踪、高风险工具操作或需要独立 reviewer / tester 视角时，应从 Skill 模式升级到 Subagent 或 Team 模式。
 
@@ -75,6 +77,10 @@ Feedback Curator（如产生 `Feedback Record`）
 交付
 ```
 
+跨模式共享能力：
+
+- `/doc-sync`：用于 Skill 模式的 `Doc Sync` 阶段，以及 Subagent 模式下 `Architect` 的文档同步执行
+
 ## 交接文档
 
 每个角色完成后必须输出交接文档。交接文档采用“公共骨架 + 角色专项字段”的模式，至少包含：
@@ -93,6 +99,7 @@ Feedback Curator（如产生 `Feedback Record`）
 在此基础上：
 
 - Architect 输出计划校验清单、范围确认和文档影响矩阵
+- 如触发文档同步，Architect 还应附带 `Doc Sync Result`
 - Developer 输出 completed / remaining steps 与结构化自检结果
 - Reviewer 输出 severity / confidence / violates / recurrence candidate
 - Tester 输出验证入口探测、测试矩阵、环境假设和未覆盖风险

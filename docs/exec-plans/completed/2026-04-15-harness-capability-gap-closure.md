@@ -14,6 +14,11 @@
 - Anthropic: “Building effective agents”
 - Anthropic Docs: “Tool use with Claude”
 
+**归档说明（2026-04-15）：**
+- 任务 1–8 已按当前阶段目标落地并完成验证
+- 任务 9 经用户确认暂缓，不纳入本次归档范围
+- 本计划归档为“阶段性完成”，后续如需继续 migration 系统，可新开执行计划承接
+
 ---
 
 ## 文件结构概览
@@ -430,7 +435,7 @@ fixtures/
 - 修改：`docs/product-specs/harness-engineering.md`
 - 修改：`README.md`
 
-- [ ] **步骤 1：定义 profile**
+- [x] **步骤 1：定义 profile**
 
 至少定义：
 
@@ -438,7 +443,12 @@ fixtures/
 - standard：默认团队协作
 - strict：高风险 / 高规范 / 更强 gate
 
-- [ ] **步骤 2：定义自动检测规则**
+当前落地产物：
+
+- `.claude/skills/harness-setup/SKILL.md` 已定义 `light / standard / strict`
+- `docs/product-specs/harness-engineering.md` 与 `README.md` 已同步 profile 语义
+
+- [x] **步骤 2：定义自动检测规则**
 
 根据仓库信号决定推荐 profile，例如：
 
@@ -447,7 +457,12 @@ fixtures/
 - 是否有多平台 agent 使用需求
 - 是否存在敏感目录或部署脚本
 
-- [ ] **步骤 3：调整 scaffold 输出**
+当前落地产物：
+
+- `harness-setup` 已在 Phase 1 中加入 profile 推荐/确认
+- profile 推荐规则已覆盖 repo 规模、CI/tests、agent 平台与敏感边界
+
+- [x] **步骤 3：调整 scaffold 输出**
 
 不同 profile 应影响：
 
@@ -455,6 +470,12 @@ fixtures/
 - workflow 强度
 - hooks / checks 推荐程度
 - 用户需要看到的操作复杂度
+
+当前落地产物：
+
+- `harness-setup` 已定义 `Profile-specific output rules`
+- `docs/HARNESS_METHODOLOGY.md` 已补 `Profile-first scaffold`
+- consistency check 已覆盖 profile 文档接线，避免后续漂移
 
 ## Phase 3：增强恢复性与运维能力
 
@@ -552,7 +573,7 @@ fixtures/
 - 修改：`README.md`
 - 修改：`AGENTS.md`（如需增加导航）
 
-- [ ] **步骤 1：从内部方法论提炼用户版原则**
+- [x] **步骤 1：从内部方法论提炼用户版原则**
 
 保留：
 
@@ -563,17 +584,34 @@ fixtures/
 
 不直接暴露内部治理细节。
 
-- [ ] **步骤 2：补齐升级路径**
+当前落地产物：
+
+- `docs/guides/harness-guide.md` 已提炼用户版入口原则
+- 已覆盖 `/harness-setup`、workflow 选择、strict profile 升级和 docs/memory/feedback 维护
+
+- [x] **步骤 2：补齐升级路径**
 
 给用户明确“小项目轻量用法”与“复杂项目增强用法”的决策树。
 
-- [ ] **步骤 3：接入 README**
+当前落地产物：
+
+- `docs/guides/harness-guide.md` 已包含“小项目轻量用法”与“复杂项目增强用法”两条路径
+- 同时补充了恢复任务时的最小读取顺序
+
+- [x] **步骤 3：接入 README**
 
 确保用户从 README 就能发现这份指南，而不必自己在多个内部文档间跳转。
+
+当前落地产物：
+
+- `README.md` 与 `AGENTS.md` 已加入 `docs/guides/harness-guide.md` 入口
+- consistency check 已校验 guide 文档与导航接线
 
 ### 任务 9：把 update 模式升级为迁移系统
 
 **优先级：** P2
+
+**状态：** Deferred by user。当前阶段不继续实现 migration system；如后续恢复，建议新开专门 exec plan 承接。
 
 **文件：**
 - 修改：`skills/harness-setup/SKILL.md`

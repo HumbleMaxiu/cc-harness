@@ -353,6 +353,65 @@ function assertHarnessSetupCoverage() {
   }
 }
 
+function assertHarnessProfilesDocs() {
+  const harnessSetup = read('.claude/skills/harness-setup/SKILL.md');
+  const harnessSpec = read('docs/product-specs/harness-engineering.md');
+  const methodology = read('docs/HARNESS_METHODOLOGY.md');
+  const readme = read('README.md');
+
+  for (const profile of ['light', 'standard', 'strict']) {
+    if (!harnessSetup.includes(`\`${profile}\``)) {
+      fail(`.claude/skills/harness-setup/SKILL.md: missing scaffold profile ${profile}`);
+    }
+    if (!harnessSpec.includes(`\`${profile}\``)) {
+      fail(`docs/product-specs/harness-engineering.md: missing scaffold profile ${profile}`);
+    }
+  }
+
+  if (!harnessSetup.includes('Agent platforms + profile')) {
+    fail('.claude/skills/harness-setup/SKILL.md: expected profile selection step');
+  }
+
+  if (!harnessSetup.includes('Profile-specific output rules')) {
+    fail('.claude/skills/harness-setup/SKILL.md: expected profile-specific output rules');
+  }
+
+  if (!methodology.includes('Profile-first scaffold')) {
+    fail('docs/HARNESS_METHODOLOGY.md: expected profile-first scaffold guidance');
+  }
+
+  if (!readme.includes('`/harness-setup` 现在支持三种 scaffold profile')) {
+    fail('README.md: expected scaffold profile overview');
+  }
+}
+
+function assertHarnessGuideDocs() {
+  const readme = read('README.md');
+  const agentsDoc = read('AGENTS.md');
+  const guide = read('docs/guides/harness-guide.md');
+
+  if (!readme.includes('docs/guides/harness-guide.md')) {
+    fail('README.md: expected harness guide link');
+  }
+
+  if (!agentsDoc.includes('docs/guides/harness-guide.md')) {
+    fail('AGENTS.md: expected harness guide link');
+  }
+
+  [
+    '/harness-setup',
+    '/brainstorming',
+    '/writing-plans',
+    '/dev-workflow',
+    'strict',
+    'docs / memory / feedback',
+  ].forEach((snippet) => {
+    if (!guide.includes(snippet)) {
+      fail(`docs/guides/harness-guide.md: missing "${snippet}"`);
+    }
+  });
+}
+
 function assertDangerousModeSettingsDocs() {
   const requiredSetting = '"skipDangerousModePermissionPrompt": true';
   const readme = read('README.md');
@@ -607,6 +666,8 @@ function main() {
   assertAutonomousWorkflowDocs();
   assertFeedbackArchiveDocs();
   assertHarnessSetupCoverage();
+  assertHarnessProfilesDocs();
+  assertHarnessGuideDocs();
   assertDangerousModeSettingsDocs();
   assertEvalCoverageDocs();
   assertRiskModelDocs();

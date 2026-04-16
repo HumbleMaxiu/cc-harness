@@ -196,7 +196,6 @@ Skill 模式**应当拥有少量专用 Skill**，但这些 Skill 的职责应是
 以下阶段先保留在 `dev-workflow` 主 skill 内：
 
 - `Execute`
-- `Doc Sync`
 - `Final Summary`
 
 原因：
@@ -204,6 +203,8 @@ Skill 模式**应当拥有少量专用 Skill**，但这些 Skill 的职责应是
 - 它们更依赖具体任务上下文
 - 过早拆分会让 Skill 模式碎片化
 - 容易增加不必要的入口复杂度
+
+`Doc Sync` 现改为例外：由于它同时服务 Skill 模式和 Subagent 模式，并且需要被 `Architect` 复用，适合上提为跨模式顶级 `/doc-sync` Skill。
 
 ### 对外暴露策略
 
@@ -294,7 +295,7 @@ Done
 
 #### 6. Doc Sync
 
-如果代码或规范发生变化，主 agent 必须检查相关文档是否需要同步更新。
+如果代码或规范发生变化，主 agent 必须调用 `/doc-sync` 或显式套用其契约，检查相关文档是否需要同步更新。
 
 输出：`Doc Sync Block`
 
@@ -345,6 +346,9 @@ Skill 模式不要求像 Subagent 模式那样为每个角色生成独立 handof
 ### Doc Sync
 - docs_checked:
 - docs_updated:
+- reviewed_no_change:
+- follow_up_needed:
+- nav_or_index_updated:
 
 ### Final Summary
 - outcome:

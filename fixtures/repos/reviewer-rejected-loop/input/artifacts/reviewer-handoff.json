@@ -1,0 +1,12 @@
+{
+  "source": "reviewer",
+  "status": "REJECTED",
+  "feedback_record": {
+    "pattern": "Low-risk implementation issue found during review",
+    "rule": "Record reviewer rejections in agent memory before remediation",
+    "action_type": "code_fix",
+    "risk_level": "low",
+    "operation_risk": "reversible-write",
+    "scope": "local_file"
+  }
+}

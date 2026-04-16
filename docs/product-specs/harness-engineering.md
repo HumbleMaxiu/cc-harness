@@ -18,6 +18,14 @@
 - `docs/feedback/feedback-collection.md` 与 `docs/memory/feedback/archive/` — feedback 规则与历史归档结构
 - Agent platform bridge 文件（按需）
 
+`/harness-setup` 还应根据仓库信号推荐一个 scaffold profile：
+
+- `light`
+- `standard`
+- `strict`
+
+并允许用户在确认汇总时覆盖推荐值。
+
 ### 文档责任矩阵
 
 `file-specs.md` 中定义的文档不一定都需要“一个独立 skill”，但必须至少有一个明确责任入口：要么是 scaffold 生成，要么是某个 agent/skill 在运行期维护。
@@ -91,6 +99,28 @@
 - 默认只应包含 harness 工作流导航和项目路线图占位
 - 不应在用户未确认时随机生成具体 roadmap
 - 在用户审查通过前，不应被当作项目真实路线图使用
+
+### Scaffold profile
+
+`cc-harness` 不应把所有项目都 scaffold 成同一种强度。至少支持：
+
+- `light`：小项目 / 低风险 / 快速起步
+- `standard`：默认团队协作
+- `strict`：高风险 / 高规范 / 更强 gate
+
+自动推荐时至少参考：
+
+- repo 规模
+- 是否已有 CI / tests / monorepo 结构
+- 是否有多平台 agent 使用需求
+- 是否存在敏感目录、部署脚本、认证/权限边界
+
+profile 影响至少应体现在：
+
+- 默认生成文档的详细程度
+- workflow 强度与风险提示
+- hooks / checks 的推荐程度
+- 最终报告中的治理建议强度
 
 ### 沉淀触发条件
 

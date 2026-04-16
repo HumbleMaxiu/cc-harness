@@ -1,0 +1,15 @@
+{
+  "reviewer_decision": {
+    "status": "REJECTED",
+    "risk_level": "low"
+  },
+  "auto_remediation": {
+    "eligible": true,
+    "applied": true,
+    "action_type": "code_fix",
+    "action_risk": "irreversible-write"
+  },
+  "operation_gate_triggered": false,
+  "workflow_resumed": true,
+  "next_stage": "developer"
+}

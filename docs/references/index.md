@@ -4,6 +4,7 @@
 
 ## 已有的 Reference 文件
 
+- [Harness Behavior Evals](harness-behavior-evals.md) — 行为级 fixture 规范、grader 约定与 runner 用法
 - [Harness Eval Scenarios](eval-scenarios.md) — harness 回归场景矩阵，包含 Skill 模式专项 eval
 - [Run Trace Protocol](run-trace-protocol.md) — 运行轨迹最小结构、恢复协议与长期 memory 边界
 

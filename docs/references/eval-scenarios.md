@@ -1,6 +1,6 @@
 # Harness Eval Scenarios
 
-> `cc-harness` 的回归场景矩阵。当前以文档断言 + 最小脚本检查为主，后续可逐步接入 fixture 仓库与更强的行为验证。
+> `cc-harness` 的回归场景矩阵。当前同时包含文档断言回归，以及首批基于 fixture + grader 的行为级验证基线。
 
 ## 场景矩阵
 
@@ -28,8 +28,19 @@
 4. `verification-skill` 必须在验证不确定时显式记录 `assumptions` 与 `uncovered_risks`。
 5. Eval 结论必须覆盖“继续 Skill 模式”与“升级到 Subagent/Team”两类路径。
 
+## 行为级 eval 基线
+
+- `scripts/checks/harness-behavior-evals.js` 会发现带 `grader.js` 的 fixture，并运行其 `samples/`
+- `reviewer-rejected-loop` 已作为首个完整样板，包含 `task.md`、`input/`、`grader.js`、通过/失败样例
+- 后续新场景应优先沿用同一结构，先写 grader，再补通过/失败样例，最后再接真实 harness 输出
+- 推荐评分同时覆盖：
+  - 最终仓库状态
+  - 结构化 run trace
+  - feedback / memory 写入
+  - gate / auto-remediation 是否符合风险模型
+
 ## 后续扩展
 
-- 为每个场景补最小 fixture 仓库
-- 让 `scripts/checks/harness-evals.js` 从文档断言升级为 fixture 回归 runner
-- 将质量面板中的 eval 信号从“文档覆盖”升级为“场景通过率”
+- 为每个场景补 `task.md + input/ + grader.js + samples/`
+- 把真实 harness 运行结果接到 `--submission` 入口，而不只跑内置样例
+- 将质量面板中的 eval 信号从“文档覆盖”逐步升级为“场景通过率”

@@ -1,0 +1,4 @@
+{
+  "expected": "fail",
+  "description": "High-risk or irreversible remediation must not be auto-applied just because the reviewer rejected the change."
+}

@@ -16,7 +16,8 @@
   "required_paths": [
     "skills/dev-workflow/SKILL.md",
     "docs/feedback/feedback-collection.md",
-    "docs/memory/feedback/agent-feedback.md"
+    "docs/memory/feedback/agent-feedback.md",
+    "docs/references/eval-scenarios.md"
   ],
   "assertions": [
     {
@@ -26,6 +27,22 @@
     {
       "file": "skills/dev-workflow/SKILL.md",
       "includes": "自动执行白名单"
+    },
+    {
+      "file": "skills/dev-workflow/SKILL.md",
+      "includes": "REJECTED + low risk"
+    },
+    {
+      "file": "docs/feedback/feedback-collection.md",
+      "includes": "只有 `risk_level=low`、`operation_risk` 不高于 `reversible-write`，且 `action_type` 在自动执行白名单内的项默认自动修复"
+    },
+    {
+      "file": "docs/memory/feedback/agent-feedback.md",
+      "includes": "| `execution` | 自动执行状态"
+    },
+    {
+      "file": "docs/memory/feedback/agent-feedback.md",
+      "includes": "| `final_report` | 是否已进入最终汇总"
     }
   ]
 }

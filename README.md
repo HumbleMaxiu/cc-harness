@@ -128,6 +128,16 @@
 
 如果你是在一个新项目里引入这套体系，通常从 `/harness-setup` 开始。
 
+如果你想先看一份面向最终用户的入口说明，可以直接读 [docs/guides/harness-guide.md](docs/guides/harness-guide.md)。
+
+`/harness-setup` 现在支持三种 scaffold profile：
+
+- `light`：小项目、低风险、快速起步
+- `standard`：默认推荐
+- `strict`：高风险、强规范、更强调 gate
+
+如果仓库信号不足，它会默认推荐 `standard`，再由用户确认是否覆盖。
+
 `/dev-workflow` 当前支持三种模式：
 
 - `Skill`：单 agent 串行 workflow，适合小而清楚的任务
@@ -248,6 +258,7 @@ npm run sync:mirrors
 | 质量评分 | [docs/QUALITY_SCORE.md](docs/QUALITY_SCORE.md) | 质量维度记分卡 |
 | 可靠性 | [docs/RELIABILITY.md](docs/RELIABILITY.md) | 超时、重试、幂等性、observability |
 | 安全 | [docs/SECURITY.md](docs/SECURITY.md) | Secrets、auth、audit 预期 |
+| 用户指南 | [docs/guides/harness-guide.md](docs/guides/harness-guide.md) | 从哪里开始、如何升级 workflow 与维护 harness |
 | Memory | [docs/memory/index.md](docs/memory/index.md) | 项目记忆与反馈索引 |
 | 反馈 | [docs/feedback/feedback-collection.md](docs/feedback/feedback-collection.md) | 反馈收集和处理规范 |
 | 执行计划 | [docs/exec-plans/index.md](docs/exec-plans/index.md) | 主动执行中的计划 |

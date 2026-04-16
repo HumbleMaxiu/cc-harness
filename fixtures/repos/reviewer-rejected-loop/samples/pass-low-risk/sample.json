@@ -1,0 +1,4 @@
+{
+  "expected": "pass",
+  "description": "Low-risk reviewer rejection is recorded, auto-remediated, and the workflow resumes."
+}
