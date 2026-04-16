@@ -1,0 +1,30 @@
+{
+  "id": "developer-tdd-handoff",
+  "title": "Developer handoff records TDD-oriented implementation and self-check results",
+  "input_repo_state": "Implementation task is ready for the developer agent.",
+  "user_request": "Implement the scoped task with TDD and hand off the result.",
+  "expected_artifacts": [
+    "Developer handoff",
+    "Self-check results",
+    "TDD evidence"
+  ],
+  "failure_signals": [
+    "No test commands are recorded",
+    "Self-check result is omitted",
+    "Handoff status is unclear"
+  ],
+  "required_paths": [
+    "agents/developer.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`developer-tdd-handoff`"
+    },
+    {
+      "file": "agents/developer.md",
+      "includes": "### 自检结果"
+    }
+  ]
+}

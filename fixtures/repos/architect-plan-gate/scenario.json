@@ -1,0 +1,30 @@
+{
+  "id": "architect-plan-gate",
+  "title": "Architect validates plan readiness and docs impact before execution",
+  "input_repo_state": "Task has a plan candidate and needs an architect gate before implementation starts.",
+  "user_request": "Check whether the task is ready to execute and identify document impact.",
+  "expected_artifacts": [
+    "Architect handoff",
+    "Scope confirmation",
+    "Docs impact matrix"
+  ],
+  "failure_signals": [
+    "Execution readiness is not stated",
+    "Docs impact is omitted",
+    "Plan checklist is missing"
+  ],
+  "required_paths": [
+    "agents/architect.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`architect-plan-gate`"
+    },
+    {
+      "file": "agents/architect.md",
+      "includes": "### 文档影响矩阵"
+    }
+  ]
+}

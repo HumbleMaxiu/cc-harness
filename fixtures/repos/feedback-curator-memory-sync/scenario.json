@@ -1,0 +1,30 @@
+{
+  "id": "feedback-curator-memory-sync",
+  "title": "Feedback curator records structured agent feedback into memory and outputs a summary",
+  "input_repo_state": "A reviewer or tester handoff contains a valid Feedback Record that must be persisted.",
+  "user_request": "Consume the feedback record, update memory, and provide an auto-processing summary.",
+  "expected_artifacts": [
+    "Updated agent-feedback memory",
+    "Curator handoff summary",
+    "Assigned af- identifier"
+  ],
+  "failure_signals": [
+    "Feedback record is not persisted",
+    "No af- identifier is assigned",
+    "Curator summary omits auto-processing status"
+  ],
+  "required_paths": [
+    "agents/feedback-curator.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`feedback-curator-memory-sync`"
+    },
+    {
+      "file": "agents/feedback-curator.md",
+      "includes": "### 自动处理摘要"
+    }
+  ]
+}

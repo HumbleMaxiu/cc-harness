@@ -1,0 +1,4 @@
+{
+  "expected": "pass",
+  "description": "Feedback curator writes a new af- record and summarizes what was auto-processed."
+}

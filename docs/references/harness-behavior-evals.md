@@ -47,6 +47,11 @@ node scripts/checks/harness-behavior-evals.js --fixture reviewer-rejected-loop -
 node scripts/checks/harness-behavior-evals.js \
   --fixture reviewer-rejected-loop \
   --submission /abs/path/to/submission
+
+# 真执行一个 E2E 场景，再对产物打分
+node scripts/checks/harness-execute-e2e.js \
+  --fixture brainstorming-dev-workflow-e2e \
+  --keep-output
 ```
 
 ## grader.js 约定
@@ -86,3 +91,9 @@ module.exports = {
 - 是否阻止 `irreversible-write` 被误当作可自动执行
 
 `greenfield-scaffold` 也已提供一个 fresh-repo scaffold 验收样板，用于检查最小 harness 是否真的可用，而不是只停留在场景文档里。
+
+`architect-plan-gate`、`developer-tdd-handoff`、`reviewer-blocking-feedback`、`tester-entrypoint-degrade`、`feedback-curator-memory-sync` 则形成了 5 个核心 agent 的单体行为样板。
+
+`brainstorming-dev-workflow-e2e` 负责验证一个小任务是否能从 `brainstorming` 进入 `dev-workflow` 并在关键节点闭环。
+
+该场景现在同时带有 `executor.js`，可真实执行阶段、读取对应 `SKILL.md`、落地 prompt/transcript/artifact/execution log，再由原有 grader 验收最终结果。

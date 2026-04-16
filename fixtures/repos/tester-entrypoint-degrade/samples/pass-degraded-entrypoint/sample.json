@@ -1,0 +1,4 @@
+{
+  "expected": "pass",
+  "description": "Tester chooses the best available validation path and records assumptions and uncovered risk."
+}

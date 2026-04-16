@@ -49,6 +49,9 @@ fixtures/repos/<scenario-id>/
 ```bash
 npm run check:evals
 npm run check:behavior-evals
+npm run check:agents
+npm run check:e2e
+npm run run:e2e
 node scripts/checks/harness-behavior-evals.js --fixture reviewer-rejected-loop
 node scripts/checks/harness-behavior-evals.js --fixture reviewer-rejected-loop --sample pass-low-risk
 npm run check:smoke

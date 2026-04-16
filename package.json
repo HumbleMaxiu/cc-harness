@@ -6,6 +6,9 @@
     "check:harness": "node scripts/checks/harness-consistency.js",
     "check:evals": "node scripts/checks/harness-evals.js",
     "check:behavior-evals": "node scripts/checks/harness-behavior-evals.js",
+    "check:agents": "node scripts/checks/harness-agent-evals.js",
+    "check:e2e": "node scripts/checks/harness-e2e-evals.js",
+    "run:e2e": "node scripts/checks/harness-execute-e2e.js --fixture brainstorming-dev-workflow-e2e --keep-output",
     "check:smoke": "node scripts/checks/harness-fresh-repo-smoke.js",
     "test": "node scripts/checks/harness-consistency.js && node scripts/checks/harness-evals.js && node scripts/checks/harness-behavior-evals.js"
   }

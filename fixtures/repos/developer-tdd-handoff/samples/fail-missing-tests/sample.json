@@ -1,0 +1,4 @@
+{
+  "expected": "fail",
+  "description": "Developer handoff should fail when it omits test commands and self-check evidence."
+}

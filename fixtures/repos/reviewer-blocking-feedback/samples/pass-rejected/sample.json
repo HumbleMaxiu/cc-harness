@@ -1,0 +1,4 @@
+{
+  "expected": "pass",
+  "description": "Reviewer emits a blocking finding, a structured feedback record, and a REJECTED status."
+}

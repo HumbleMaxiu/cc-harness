@@ -1,0 +1,30 @@
+{
+  "id": "reviewer-blocking-feedback",
+  "title": "Reviewer emits blocking findings with a structured feedback record",
+  "input_repo_state": "Developer handoff is ready for review and contains a blocking issue.",
+  "user_request": "Review the change and return structured blocking feedback when needed.",
+  "expected_artifacts": [
+    "Reviewer handoff",
+    "Blocking finding",
+    "Feedback Record"
+  ],
+  "failure_signals": [
+    "Blocking issue is not marked",
+    "Feedback Record is missing",
+    "Final status is not REJECTED"
+  ],
+  "required_paths": [
+    "agents/reviewer.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`reviewer-blocking-feedback`"
+    },
+    {
+      "file": "agents/reviewer.md",
+      "includes": "### Feedback Record"
+    }
+  ]
+}

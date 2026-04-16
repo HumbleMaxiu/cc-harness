@@ -1,0 +1,4 @@
+{
+  "expected": "fail",
+  "description": "Reviewer output should fail if it reports a problem but omits the structured feedback record."
+}

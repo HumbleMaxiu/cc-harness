@@ -1,0 +1,32 @@
+{
+  "id": "brainstorming-dev-workflow-e2e",
+  "title": "A small task can move from brainstorming to dev-workflow completion with valid checkpoints",
+  "input_repo_state": "A small task starts from problem framing and should complete in Skill mode.",
+  "user_request": "Brainstorm, plan, execute, verify, and summarize a bounded workflow change.",
+  "expected_artifacts": [
+    "Brainstorming artifact",
+    "Exec plan",
+    "Skill Workflow Record",
+    "Run trace"
+  ],
+  "failure_signals": [
+    "Brainstorming does not explore options",
+    "Plan is skipped",
+    "Verification or final summary is missing"
+  ],
+  "required_paths": [
+    "skills/brainstorming/SKILL.md",
+    "skills/dev-workflow/SKILL.md",
+    "docs/references/eval-scenarios.md"
+  ],
+  "assertions": [
+    {
+      "file": "docs/references/eval-scenarios.md",
+      "includes": "`brainstorming-dev-workflow-e2e`"
+    },
+    {
+      "file": "skills/dev-workflow/SKILL.md",
+      "includes": "## Skill Workflow Record"
+    }
+  ]
+}

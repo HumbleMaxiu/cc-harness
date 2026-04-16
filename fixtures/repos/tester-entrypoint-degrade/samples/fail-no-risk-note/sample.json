@@ -1,0 +1,4 @@
+{
+  "expected": "fail",
+  "description": "Tester output should fail when it hides assumptions and uncovered risk."
+}

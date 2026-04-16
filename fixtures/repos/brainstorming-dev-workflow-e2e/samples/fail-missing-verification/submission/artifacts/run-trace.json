@@ -1,0 +1,9 @@
+{
+  "trace_id": "e2e-small-task-002",
+  "current_phase": "Done",
+  "workflow_status": "APPROVED",
+  "checkpoints": [
+    "brainstorming",
+    "dev-workflow"
+  ]
+}

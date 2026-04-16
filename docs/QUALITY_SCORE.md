@@ -22,6 +22,8 @@
 | Harness eval planning | 已接入基础版 | 已有场景矩阵与最小 eval 检查入口 |
 | Skill mode evals | 已纳入首批 | 覆盖闭环、升级、自检记录、验证不确定性 |
 | Fixture-based regression | 已接入基础版 | 已有行为级 eval runner 和首个完整样板场景 `reviewer-rejected-loop` |
+| Agent behavior evals | 已接入基础版 | 已有 5 个核心 agent 的单体样板和单独入口 `check:agents` |
+| Workflow e2e evals | 已接入基础版 | 已有 `brainstorming-dev-workflow-e2e` 的真实执行 runner、artifact log 和入口 `check:e2e` / `run:e2e` |
 | Fresh repo smoke test | 已接入基础版 | 已验证 fresh repo SessionStart 注入和 greenfield scaffold 样板验收 |
 | Mirror sync tooling | 已接入基础版 | 可从 `.claude/` 同步到根目录与 `.codex`，仍待更细粒度工作流集成 |
 
