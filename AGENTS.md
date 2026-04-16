@@ -47,17 +47,32 @@ ls .claude/agents/
 | `/writing-plans` | 多步骤任务规格和需求（先于实现） |
 | `/dev-workflow` | A/Dev/R/T 四角色开发流程（Skill/Subagent/Team 模式） |
 | `/doc-sync` | 基于代码和流程变更同步相关文档、索引和导航 |
+| `/plan-persist` | 为当前 active plan 和 Run Trace 提供轻量持续化与恢复锚点 |
+| `/harness-help` | 命令索引、根入口和常见场景快速参考 |
+| `/harness-audit` | 检查当前项目的 harness 健康度和关键缺口 |
+| `/harness-guide` | 根据场景推荐应该进入哪个 skill / workflow |
+| `/harness-quality-gate` | 交付、提交或阶段收尾前的质量门禁 |
 | `/feedback` | 用自然语言提交用户反馈，并自动落到 feedback memory |
 | `/feedback-query` | 查询 feedback 历史、summary 和 recurrence 记录 |
 | `/skill-creator` | 创建、编辑和改进 AgentSkills |
 | `/harness-setup` | 为项目搭建或更新 agent harness |
 | `/exa-search` | 网络、代码和公司研究（神经搜索） |
 
+## Harness 命令
+
+| 命令 | 描述 |
+|------|------|
+| `harness help` | 查看根入口、场景推荐和命令索引 |
+| `harness audit` | 检查当前项目的 harness 健康状态 |
+| `harness guide` | 根据当前任务推荐 skill / workflow |
+| `harness quality gate` | 运行交付前质量门禁 |
+
 ## Agent 团队
 
 | 角色 | 定义文件 | 职责 |
 |------|----------|------|
 | Architect | [docs/design-docs/architect.md](docs/design-docs/architect.md) | 任务开始前检查计划，开发完成后维护文档 |
+| Challenger | [docs/design-docs/challenger.md](docs/design-docs/challenger.md) | 对计划、claim、API 假设和完成声明做对抗式验证 |
 | Developer | [docs/design-docs/developer.md](docs/design-docs/developer.md) | TDD 实现功能 |
 | Reviewer | [docs/design-docs/reviewer.md](docs/design-docs/reviewer.md) | 代码质量和安全审查 |
 | Tester | [docs/design-docs/tester.md](docs/design-docs/tester.md) | 探测验证入口并执行测试验证 |
@@ -100,5 +115,7 @@ ls .claude/agents/
 | 新功能 | `docs/product-specs/<domain>.md` | 在 `docs/exec-plans/active/` 创建计划 → 实现 → 移动到 `completed/` |
 | Bug 修复 | `docs/RELIABILITY.md` + `docs/SECURITY.md` | 修复 → 更新 `docs/QUALITY_SCORE.md` |
 | 架构变更 | `ARCHITECTURE.md` | 添加 `docs/design-docs/<name>.md` → 从 index 链接 → 实现 |
+| 不知道从哪开始 | `harness help` | 再根据场景进入 `harness guide` 或具体 skill |
+| 想看当前 harness 健康度 | `harness audit` | 优先修高风险缺口，再回到主 workflow |
 
 Tech debt、文档维护和其他工作流请参阅 [docs/PLANS.md](docs/PLANS.md)。

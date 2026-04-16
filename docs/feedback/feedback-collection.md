@@ -106,3 +106,32 @@
 - `AGENTS.md` — 全局行为规则
 - 相关 Agent 定义文件 — 特定角色的规则
 - `docs/RELIABILITY.md` — 可靠性相关规范
+
+## Memory → Skill 升级路径
+
+当某类问题不只是需要“防止再犯”，而是已经形成稳定、可复用的处理流程时，应进一步考虑升级为 project-local skill。
+
+### 触发条件
+
+- 同类问题在 feedback / recurrence 中出现 `>= 2` 次
+- 修复或处理动作已经稳定，能抽象为重复 workflow
+- 已能明确描述输入、输出、边界和不适用场景
+
+### 记录方式
+
+当满足上述条件时，在相关反馈或 recurrence 记录旁增加：
+
+```markdown
+### Skill Promotion Candidate
+- source_record:
+- recurring_pattern:
+- candidate_skill_name:
+- recommended_scope:
+- status: proposed / accepted / created / rejected
+```
+
+### 后续动作
+
+- 只需要查询和评估时，可通过 `/feedback-query` 查看候选项
+- 一旦确定要创建 skill，转交 `/skill-creator`
+- 未升级为 skill 前，仍保留在 feedback / prevents-recurrence 体系中，不要直接跳过记忆层

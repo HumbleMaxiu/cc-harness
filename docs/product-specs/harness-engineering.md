@@ -22,6 +22,10 @@
 
 - `/dev-workflow` — 实现、审查、验证主流程
 - `/doc-sync` — 代码或流程变更后的文档同步入口
+- `/harness-help` — 根入口与场景索引
+- `/harness-guide` — 场景到 workflow 的推荐入口
+- `/harness-audit` — 项目健康检查
+- `/harness-quality-gate` — 交付前质量门禁
 
 `/harness-setup` 还应根据仓库信号推荐一个 scaffold profile：
 
@@ -54,6 +58,7 @@
 | `docs/generated/*` | `/harness-setup` 占位 | 领域实现流程或项目脚本 |
 | `docs/references/*` | `/harness-setup` 占位 | 人工维护或专项 skill |
 | `docs/QUALITY_SCORE.md` | `/harness-setup` | `architect` / update workflow |
+| 健康检查入口（如 `/harness-audit`） | `/harness-setup` 暴露入口 | `architect` / `tester` / 用户 |
 | `scripts/checks/harness-consistency.js` | `/harness-setup`（推荐生成） | `architect` / tester |
 | 文档同步入口（如 `/doc-sync`） | `/harness-setup` 暴露入口 | `architect` / `dev-workflow` / 用户 |
 
@@ -172,6 +177,28 @@ profile 影响至少应体现在：
 - `cc-harness` 的首要目标是为用户项目生成好用的 harness，而不是只让本仓库自洽
 - 本仓库中的实现和自检，应优先服务于“用户 scaffold 后能否真正使用”
 - repo 自身同步只是测试手段，不是最终目标
+
+### Pain-point-first 对外表达
+
+`cc-harness` 对外应优先按“协作失败模式”组织能力表达，而不是按文件树或内部模块名组织。
+
+至少应覆盖这些核心 pain points：
+
+- 先写代码后思考
+- 计划漂移
+- 验证缺失
+- 文档腐坏
+- 反馈无法沉淀
+- 恢复困难
+
+对外文档至少应能给出一份简化能力地图，说明：
+
+- 每类痛点的当前解法
+- 当前能力强度
+- 当前仍有的缺口
+- 推荐入口
+
+这样用户拿到 scaffold 后，看到的是“我该怎么用它解决问题”，而不是“它生成了哪些文件”。
 
 ### Generic Harness Check
 

@@ -30,6 +30,17 @@ cc-harness 是一个 **无状态文档框架**，运行在 Claude Code 的会话
 | **/compact 后** | Agent 先读 `Run Trace` 与关联的 `Skill Workflow Record` / handoff，再决定恢复阶段 |
 | **新会话** | 从 `AGENTS.md` → `docs/memory/index.md` → active exec plan → `resume_entry` 恢复 |
 
+### Hook 辅助连续性
+
+为减少长会话中的计划漂移，`cc-harness` 允许使用 `plan-persist` 相关 hooks 对以下信号做轻量回注：
+
+- `UserPromptSubmit`：显示当前 active exec plan 与最近的 `Run Trace` 摘要
+- `PreToolUse`：在工具执行前重新锚定当前 plan / trace
+- `PostToolUse`：写入后提醒更新 `Run Trace` 或 `Skill Workflow Record`
+- `Stop`：在退出前提示当前 active plan 是否仍有未完成步骤
+
+这些 hooks 的目标是增强恢复与连续性，而不是替代正式的计划文档。
+
 ### Resume Protocol
 
 恢复顺序：

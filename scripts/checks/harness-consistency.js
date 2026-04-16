@@ -416,6 +416,10 @@ function assertHarnessGuideDocs() {
   }
 
   [
+    'harness help',
+    'harness audit',
+    'harness guide',
+    'harness quality gate',
     '/harness-setup',
     '/brainstorming',
     '/writing-plans',
@@ -427,6 +431,245 @@ function assertHarnessGuideDocs() {
       fail(`docs/guides/harness-guide.md: missing "${snippet}"`);
     }
   });
+}
+
+function assertHarnessEntrySkills() {
+  const agentsDoc = read('AGENTS.md');
+  const guide = read('docs/guides/harness-guide.md');
+  const skillSystem = read('docs/product-specs/skill-system.md');
+
+  [
+    '/harness-help',
+    '/harness-audit',
+    '/harness-guide',
+    '/harness-quality-gate',
+  ].forEach((snippet) => {
+    if (!agentsDoc.includes(snippet)) {
+      fail(`AGENTS.md: expected ${snippet} skill entry`);
+    }
+
+    if (!skillSystem.includes(snippet.replace('/', ''))) {
+      fail(`docs/product-specs/skill-system.md: expected ${snippet} builtin skill reference`);
+    }
+  });
+
+  [
+    'harness help',
+    'harness audit',
+    'harness guide',
+    'harness quality gate',
+  ].forEach((snippet) => {
+    if (!guide.includes(snippet)) {
+      fail(`docs/guides/harness-guide.md: expected "${snippet}" root entry guidance`);
+    }
+  });
+}
+
+function assertPlanPersistDocs() {
+  const hooksJson = read('hooks/hooks.json');
+  const reliability = read('docs/RELIABILITY.md');
+  const runTraceProtocol = read('docs/references/run-trace-protocol.md');
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
+  const agentsDoc = read('AGENTS.md');
+  const guide = read('docs/guides/harness-guide.md');
+  const skillSystem = read('docs/product-specs/skill-system.md');
+
+  [
+    '"UserPromptSubmit"',
+    '"PreToolUse"',
+    '"PostToolUse"',
+    '"Stop"',
+    'scripts/hooks/plan-status.js',
+    'scripts/hooks/plan-refresh.js',
+    'scripts/hooks/plan-write-reminder.js',
+    'scripts/hooks/plan-stop-check.js',
+  ].forEach((snippet) => {
+    if (!hooksJson.includes(snippet)) {
+      fail(`hooks/hooks.json: missing ${snippet}`);
+    }
+  });
+
+  if (!agentsDoc.includes('/plan-persist')) {
+    fail('AGENTS.md: expected /plan-persist skill entry');
+  }
+
+  if (!guide.includes('/plan-persist')) {
+    fail('docs/guides/harness-guide.md: expected /plan-persist usage guidance');
+  }
+
+  if (!skillSystem.includes('plan-persist')) {
+    fail('docs/product-specs/skill-system.md: expected plan-persist builtin skill reference');
+  }
+
+  if (!workflow.includes('/plan-persist')) {
+    fail('skills/dev-workflow/SKILL.md: expected /plan-persist integration');
+  }
+
+  if (!agentSpec.includes('/plan-persist')) {
+    fail('docs/product-specs/agent-system.md: expected /plan-persist shared capability');
+  }
+
+  ['UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'Stop'].forEach((snippet) => {
+    if (!reliability.includes(snippet)) {
+      fail(`docs/RELIABILITY.md: expected ${snippet} hook continuity guidance`);
+    }
+
+    if (!runTraceProtocol.includes(snippet)) {
+      fail(`docs/references/run-trace-protocol.md: expected ${snippet} hook-assisted resume guidance`);
+    }
+  });
+}
+
+function assertChallengerDocs() {
+  const agentsDoc = read('AGENTS.md');
+  const designIndex = read('docs/design-docs/index.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const challengerDesign = read('docs/design-docs/2026-04-16-challenger-agent-design.md');
+  const challengerDoc = read('docs/design-docs/challenger.md');
+  const challengerAgent = read('agents/challenger.md');
+
+  if (!agentsDoc.includes('Challenger')) {
+    fail('AGENTS.md: expected Challenger team entry');
+  }
+
+  if (!designIndex.includes('challenger.md')) {
+    fail('docs/design-docs/index.md: expected challenger agent doc entry');
+  }
+
+  if (!designIndex.includes('2026-04-16-challenger-agent-design.md')) {
+    fail('docs/design-docs/index.md: expected challenger design doc entry');
+  }
+
+  if (!agentSpec.includes('.claude/agents/challenger.md')) {
+    fail('docs/product-specs/agent-system.md: expected challenger agent spec entry');
+  }
+
+  if (!workflow.includes('challenger')) {
+    fail('skills/dev-workflow/SKILL.md: expected challenger integration');
+  }
+
+  if (!challengerDesign.includes('CLAIM:')) {
+    fail('docs/design-docs/2026-04-16-challenger-agent-design.md: expected challenger output contract');
+  }
+
+  if (!challengerDoc.includes('CLAIM:')) {
+    fail('docs/design-docs/challenger.md: expected challenger handoff format');
+  }
+
+  if (!challengerAgent.includes('VERDICT: CONFIRMED / REFUTED / UNVERIFIED')) {
+    fail('agents/challenger.md: expected challenger verdict contract');
+  }
+}
+
+function assertHarnessAuditDocs() {
+  const qualityScore = read('docs/QUALITY_SCORE.md');
+  const harnessAudit = read('skills/harness-audit/SKILL.md');
+  const harnessSpec = read('docs/product-specs/harness-engineering.md');
+  const harnessSetup = read('skills/harness-setup/SKILL.md');
+  const fileSpecs = read('skills/harness-setup/references/file-specs.md');
+
+  if (!qualityScore.includes('Harness Audit 映射')) {
+    fail('docs/QUALITY_SCORE.md: expected Harness Audit mapping section');
+  }
+
+  if (!qualityScore.includes('### Harness Audit Report')) {
+    fail('docs/QUALITY_SCORE.md: expected audit output contract');
+  }
+
+  if (!harnessAudit.includes('category_scores')) {
+    fail('skills/harness-audit/SKILL.md: expected category_scores in audit output');
+  }
+
+  if (!harnessSpec.includes('/harness-audit')) {
+    fail('docs/product-specs/harness-engineering.md: expected /harness-audit scaffold capability');
+  }
+
+  if (!harnessSetup.includes('/harness-audit')) {
+    fail('skills/harness-setup/SKILL.md: expected harness root entry exposure');
+  }
+
+  if (!fileSpecs.includes('/harness-audit')) {
+    fail('skills/harness-setup/references/file-specs.md: expected harness audit root entry guidance');
+  }
+}
+
+function assertMemoryToSkillDocs() {
+  const feedbackDoc = read('docs/feedback/feedback-collection.md');
+  const recurrenceDoc = read('docs/memory/feedback/prevents-recurrence.md');
+  const feedbackQuery = read('skills/feedback-query/SKILL.md');
+  const skillCreator = read('skills/skill-creator/SKILL.md');
+  const skillSystem = read('docs/product-specs/skill-system.md');
+  const designIndex = read('docs/design-docs/index.md');
+
+  if (!feedbackDoc.includes('### Skill Promotion Candidate')) {
+    fail('docs/feedback/feedback-collection.md: expected Skill Promotion Candidate section');
+  }
+
+  if (!recurrenceDoc.includes('### Skill Promotion Candidate')) {
+    fail('docs/memory/feedback/prevents-recurrence.md: expected Skill Promotion Candidate section');
+  }
+
+  if (!feedbackQuery.includes('skill-candidates')) {
+    fail('skills/feedback-query/SKILL.md: expected skill-candidates query guidance');
+  }
+
+  if (!skillCreator.includes('Memory-to-Skill Promotion')) {
+    fail('skills/skill-creator/SKILL.md: expected memory-driven skill creation guidance');
+  }
+
+  if (!skillSystem.includes('Memory-driven Skill Promotion')) {
+    fail('docs/product-specs/skill-system.md: expected memory-to-skill spec guidance');
+  }
+
+  if (!designIndex.includes('2026-04-16-memory-to-skill-design.md')) {
+    fail('docs/design-docs/index.md: expected memory-to-skill design entry');
+  }
+}
+
+function assertPainPointDocs() {
+  const readme = read('README.md');
+  const methodology = read('docs/HARNESS_METHODOLOGY.md');
+  const plans = read('docs/PLANS.md');
+  const harnessSpec = read('docs/product-specs/harness-engineering.md');
+  const designIndex = read('docs/design-docs/index.md');
+  const painPointDoc = read('docs/design-docs/2026-04-16-harness-pain-point-matrix.md');
+
+  [
+    '先写代码后思考',
+    '计划漂移',
+    '验证缺失',
+    '文档腐坏',
+    '反馈无法沉淀',
+    '恢复困难',
+  ].forEach((snippet) => {
+    if (!painPointDoc.includes(snippet)) {
+      fail(`docs/design-docs/2026-04-16-harness-pain-point-matrix.md: missing core pain point ${snippet}`);
+    }
+  });
+
+  if (!readme.includes('## 核心痛点与当前解法')) {
+    fail('README.md: expected pain-point-first overview section');
+  }
+
+  if (!methodology.includes('Pain-point-first 产品表达')) {
+    fail('docs/HARNESS_METHODOLOGY.md: expected pain-point-first methodology section');
+  }
+
+  ['P0', 'P1', 'P2'].forEach((snippet) => {
+    if (!plans.includes(snippet)) {
+      fail(`docs/PLANS.md: expected roadmap layer ${snippet}`);
+    }
+  });
+
+  if (!harnessSpec.includes('Pain-point-first 对外表达')) {
+    fail('docs/product-specs/harness-engineering.md: expected pain-point-first product requirement');
+  }
+
+  if (!designIndex.includes('2026-04-16-harness-pain-point-matrix.md')) {
+    fail('docs/design-docs/index.md: expected pain-point matrix entry');
+  }
 }
 
 function assertDangerousModeSettingsDocs() {
@@ -695,27 +938,60 @@ function main() {
     'AGENTS.md',
     'README.md',
     'agents/architect.md',
+    'agents/challenger.md',
     'agents/feedback-curator.md',
     'docs/design-docs/index.md',
+    'docs/design-docs/challenger.md',
+    'docs/design-docs/2026-04-16-challenger-agent-design.md',
+    'docs/design-docs/2026-04-16-harness-pain-point-matrix.md',
     'docs/exec-plans/index.md',
     'docs/exec-plans/completed/2026-04-15-claude-marketplace-install.md',
     '.claude/agents/tester.md',
+    '.claude/agents/challenger.md',
     '.claude-plugin/plugin.json',
     '.claude-plugin/marketplace.json',
     '.claude/hooks/hooks.json',
     '.codex/hooks/hooks.json',
     '.codex/agents/feedback-curator.md',
+    '.codex/agents/challenger.md',
     'skills/doc-sync/SKILL.md',
+    'skills/plan-persist/SKILL.md',
+    'skills/harness-help/SKILL.md',
+    'skills/harness-audit/SKILL.md',
+    'skills/harness-guide/SKILL.md',
+    'skills/harness-quality-gate/SKILL.md',
     'skills/doc-sync/agents/openai.yaml',
     '.claude/skills/doc-sync/SKILL.md',
+    '.claude/skills/plan-persist/SKILL.md',
+    '.claude/skills/harness-help/SKILL.md',
+    '.claude/skills/harness-audit/SKILL.md',
+    '.claude/skills/harness-guide/SKILL.md',
+    '.claude/skills/harness-quality-gate/SKILL.md',
     '.claude/skills/doc-sync/agents/openai.yaml',
     '.codex/skills/doc-sync/SKILL.md',
+    '.codex/skills/plan-persist/SKILL.md',
+    '.codex/skills/harness-help/SKILL.md',
+    '.codex/skills/harness-audit/SKILL.md',
+    '.codex/skills/harness-guide/SKILL.md',
+    '.codex/skills/harness-quality-gate/SKILL.md',
     '.codex/skills/doc-sync/agents/openai.yaml',
     'examples/claude-code/project-settings.json',
     'examples/claude-code/global-settings.json',
     'skills/dev-workflow/SKILL.md',
     '.claude/skills/dev-workflow/SKILL.md',
     'scripts/hooks/session-start.js',
+    '.claude/scripts/hooks/plan-status.js',
+    '.claude/scripts/hooks/plan-refresh.js',
+    '.claude/scripts/hooks/plan-write-reminder.js',
+    '.claude/scripts/hooks/plan-stop-check.js',
+    'scripts/hooks/plan-status.js',
+    'scripts/hooks/plan-refresh.js',
+    'scripts/hooks/plan-write-reminder.js',
+    'scripts/hooks/plan-stop-check.js',
+    '.codex/scripts/hooks/plan-status.js',
+    '.codex/scripts/hooks/plan-refresh.js',
+    '.codex/scripts/hooks/plan-write-reminder.js',
+    '.codex/scripts/hooks/plan-stop-check.js',
   ];
 
   for (const relPath of requiredPaths) {
@@ -743,6 +1019,12 @@ function main() {
   assertHarnessSetupCoverage();
   assertHarnessProfilesDocs();
   assertHarnessGuideDocs();
+  assertHarnessEntrySkills();
+  assertPlanPersistDocs();
+  assertChallengerDocs();
+  assertHarnessAuditDocs();
+  assertMemoryToSkillDocs();
+  assertPainPointDocs();
   assertDangerousModeSettingsDocs();
   assertEvalCoverageDocs();
   assertDocSyncContracts();

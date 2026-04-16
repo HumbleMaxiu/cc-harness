@@ -12,6 +12,19 @@
 
 如果仓库已经有完整 harness，而你只是补一个 domain、design doc 或执行计划，优先用 `harness update`，而不是重新 scaffold。
 
+## 根入口怎么选
+
+当你还不知道具体该用哪个 skill 时，优先从这四个根入口里选：
+
+- `harness help`
+  - 想看入口索引和高频场景
+- `harness guide`
+  - 想根据当前任务推荐最合适的 workflow
+- `harness audit`
+  - 想检查当前项目的 harness 健康度
+- `harness quality gate`
+  - 准备交付、提交或阶段收尾，想先跑质量门禁
+
 ## 先选合适的 profile
 
 `/harness-setup` 会推荐一个 scaffold profile：
@@ -59,6 +72,10 @@
   - 任务有多个步骤
   - 需要把范围、顺序、验收标准写清楚
   - 希望后续恢复时有稳定事实来源
+- `/plan-persist`
+  - 任务较小，但仍希望当前 plan 和 Run Trace 持续回注
+  - 适合 bugfix、探索任务或 `/compact` 前后的轻量恢复
+  - 不替代 `/writing-plans`
 - `/dev-workflow`
   - 计划和输入已经足够清楚
   - 要开始实现、审查、验证和文档同步
@@ -73,6 +90,18 @@
 - `/feedback-query`
   - 想查历史反馈、看 summary 或找 recurrence 条目
   - 不准备提交新的用户反馈，只是回看和审计
+- `/harness-help`
+  - 不知道从哪里开始
+  - 想快速看全局入口和高频场景
+- `/harness-guide`
+  - 想按任务类型得到最合适的 skill / workflow 推荐
+  - 不确定该走 brainstorming、planning 还是直接执行
+- `/harness-audit`
+  - 想看当前项目的 harness 健康状态
+  - 想知道下一轮基础设施补齐该优先做什么
+- `/harness-quality-gate`
+  - 准备交付、提交或结束当前阶段
+  - 想先集中检查验证、文档同步和剩余风险
 
 ## 轻量路径 vs 增强路径
 

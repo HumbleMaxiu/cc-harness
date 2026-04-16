@@ -32,6 +32,21 @@
 
 在达到正式升级门槛前，`feedback-curator` 可以先以 `candidate` 状态记录提名，等待主 agent 与用户确认后再升级为正式规范变更。
 
+### Skill Promotion Candidate（可选）
+
+当某条 recurrence 已不只是“写规则避免再犯”，而是足以沉淀成稳定 workflow 时，可追加：
+
+```markdown
+### Skill Promotion Candidate
+- source_record:
+- recurring_pattern:
+- candidate_skill_name:
+- recommended_scope:
+- status: proposed / accepted / created / rejected
+```
+
+这类候选项后续应转交 `/skill-creator`，而不是只停留在 recurrence 记录里。
+
 ## 已记录的防止再犯条目
 
 | ID | 问题类型 | 描述 | 预防措施 | 次数 | 提名状态 | 已同步位置 |

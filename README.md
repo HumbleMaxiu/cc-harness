@@ -12,21 +12,20 @@
 
 目标不是做一个新的执行引擎，而是把“AI 如何在仓库里协作”这件事产品化、版本化、可审查化。
 
-## 解决什么问题
+## 核心痛点与当前解法
 
-很多团队已经在用 Claude Code、Codex 或其他 coding agents，但常见问题是：
+`cc-harness` 不是单纯往项目里塞一批 prompt，而是针对 AI 协作里最常见的失败模式给出固定入口。
 
-- 任务开始前没有统一的设计和计划入口
-- AI 改完代码后没有稳定的审查和测试闭环
-- 反馈只停留在聊天记录里，无法沉淀成规则
-- 项目规范散落在多个文件中，新会话难以恢复上下文
+| 痛点 | 当前解法 | 当前强度 |
+|------|----------|----------|
+| 先写代码后思考 | `/brainstorming` + `/writing-plans` + `AGENTS.md` hard gate | 强 |
+| 计划漂移 | `docs/exec-plans/active/` + Run Trace + `/plan-persist` + planning hooks | 中强 |
+| 验证缺失 | `/dev-workflow` + Reviewer / Tester / Challenger + `/harness-quality-gate` | 中强 |
+| 文档腐坏 | `/doc-sync` + index + consistency checks | 强 |
+| 反馈无法沉淀 | `/feedback` + feedback memory + recurrence + skill promotion path | 中强 |
+| 恢复困难 | SessionStart memory 注入 + Run Trace + `/plan-persist` hooks | 中强 |
 
-`cc-harness` 用 Markdown-first 的方式，把这些约束放进仓库本身：
-
-- 先 brainstorm，再写计划，再实现
-- Agent 分工清晰，交接文档固定
-- 反馈进入 memory，而不是只留在临时上下文
-- 设计、计划、规范和执行状态全部进入 Git
+更完整的产品视图见 [docs/design-docs/2026-04-16-harness-pain-point-matrix.md](docs/design-docs/2026-04-16-harness-pain-point-matrix.md)。
 
 ## 核心能力
 
@@ -41,20 +40,34 @@
 - `docs/product-specs/`
 - `docs/memory/`
 
-### 2. 结构化开发流程
+### 2. 产品级根入口
+
+除了实现 workflow，本仓库还提供面向最终用户的根入口：
+
+- `/harness-help`
+- `/harness-guide`
+- `/harness-audit`
+- `/harness-quality-gate`
+- `/feedback`
+
+它们分别负责入口导航、场景推荐、健康检查、交付前门禁和用户反馈收集。
+
+### 3. 结构化开发流程
 
 内置多种协作技能：
 
 - `/brainstorming`
 - `/writing-plans`
 - `/dev-workflow`
+- `/plan-persist`
+- `/doc-sync`
 - `/skill-creator`
 - `/harness-setup`
 - `/exa-search`
 
 这些 skills 共同覆盖从需求澄清、计划编写、实现、审查到反馈沉淀的完整链路。
 
-### 3. Agent 团队约束
+### 4. Agent 团队约束
 
 仓库内置了面向 Claude Code 的角色定义：
 
@@ -62,18 +75,22 @@
 - Developer
 - Reviewer
 - Tester
+- Challenger
 - Feedback Curator
 
 这些角色把职责边界、交接格式、阻塞反馈和 memory 更新策略显式写进仓库。
 
-### 4. 会话级 hook
+### 5. 会话级 hook
 
-插件会通过 SessionStart hook 注入必要的协作上下文，例如：
+插件会通过多类 hook 持续注入和刷新必要的协作上下文，例如：
 
-- `using-brainstorming` skill
-- 项目 memory
+- `SessionStart`：注入 `using-brainstorming` 和项目 memory
+- `UserPromptSubmit`：显示当前 active plan 与最近 trace
+- `PreToolUse`：回注当前 plan，减少执行漂移
+- `PostToolUse`：提醒更新 Run Trace / Skill Workflow Record
+- `Stop`：提示未关闭的计划步骤或 phase
 
-这样可以减少“新会话忘记规则”的问题。
+这样不只减少“新会话忘记规则”，也降低长任务中途偏航的概率。
 
 ## 安装
 
@@ -121,10 +138,12 @@
 
 典型使用路径：
 
-1. 用 `/brainstorming` 澄清需求和设计边界
-2. 用 `/writing-plans` 生成执行计划，保存到 `docs/exec-plans/active/`
-3. 用 `/dev-workflow` 进入实现、审查、测试和反馈整理流程
-4. 完成后把计划移动到 `docs/exec-plans/completed/`
+1. 不知道从哪开始时，先用 `/harness-help` 或 `/harness-guide`
+2. 用 `/brainstorming` 澄清需求和设计边界
+3. 用 `/writing-plans` 或 `/plan-persist` 建立计划与状态持续化
+4. 用 `/dev-workflow` 进入实现、审查、测试和反馈整理流程
+5. 交付前运行 `/harness-quality-gate`
+6. 完成后把计划移动到 `docs/exec-plans/completed/`
 
 如果你是在一个新项目里引入这套体系，通常从 `/harness-setup` 开始。
 
@@ -159,6 +178,13 @@
 | `/brainstorming` | 创造性工作前的协作式需求和设计探索 |
 | `/writing-plans` | 多步骤任务规格和执行计划编写 |
 | `/dev-workflow` | A/Dev/R/T/Feedback Curator 协作流程 |
+| `/plan-persist` | 小任务和 bugfix 的轻量 planning 与状态持续化 |
+| `/doc-sync` | 代码或流程变更后的文档影响分析与同步 |
+| `/harness-help` | 根入口、命令索引和高频场景起点 |
+| `/harness-guide` | 根据场景推荐 skill 和 workflow |
+| `/harness-audit` | 读取仓库信号并输出 harness 健康检查 |
+| `/harness-quality-gate` | 交付前质量门禁 |
+| `/feedback` | 用自然语言提交用户反馈 |
 | `/skill-creator` | 创建、编辑和改进 Agent Skills |
 | `/harness-setup` | 为项目搭建或更新 harness |
 | `/exa-search` | 网络、代码和公司研究 |
@@ -171,6 +197,7 @@
 | Developer | [docs/design-docs/developer.md](docs/design-docs/developer.md) | TDD 实现功能 |
 | Reviewer | [docs/design-docs/reviewer.md](docs/design-docs/reviewer.md) | 代码质量和安全审查 |
 | Tester | [docs/design-docs/tester.md](docs/design-docs/tester.md) | 探测验证入口并执行测试验证 |
+| Challenger | [docs/design-docs/challenger.md](docs/design-docs/challenger.md) | 对计划、claim、外部 API 假设做对抗式验证 |
 | Feedback Curator | [docs/design-docs/feedback-curator.md](docs/design-docs/feedback-curator.md) | 整理 Agent 反馈、维护 memory、输出自动处理轨迹与最终汇总摘要 |
 
 ## 行为规则

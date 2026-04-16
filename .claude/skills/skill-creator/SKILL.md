@@ -14,6 +14,10 @@ specialized knowledge, workflows, and tools. Think of them as "onboarding guides
 domains or tasks—they transform Codex from a general-purpose agent into a specialized agent
 equipped with procedural knowledge that no model can fully possess.
 
+When the current repository already records repeated friction in `docs/memory/feedback/` or
+`docs/memory/feedback/prevents-recurrence.md`, those records should be treated as high-signal
+inputs for deciding whether a new skill should exist.
+
 ### What Skills Provide
 
 1. Specialized workflows - Multi-step procedures for specific domains
@@ -210,6 +214,16 @@ Skill creation involves these steps:
 6. Iterate based on real usage
 
 Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
+
+### Memory-to-Skill Promotion
+
+Before creating a new skill from scratch, check whether the repository already has a
+`Skill Promotion Candidate` recorded in feedback / recurrence memory. If such a candidate exists,
+use it as the default starting point for:
+
+1. naming the skill
+2. defining scope boundaries
+3. deciding what should remain a rule vs what should become a reusable workflow
 
 ### Skill Naming
 

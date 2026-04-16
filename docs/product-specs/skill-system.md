@@ -48,6 +48,11 @@ description: <一句话描述>
 | dev-workflow | A/Dev/R/T 角色开发流程 |
 | feedback | 用户反馈提交入口 |
 | feedback-query | feedback 历史查询与摘要 |
+| plan-persist | 轻量 planning 持续化与恢复锚点 |
+| harness-help | 根入口索引与场景快速参考 |
+| harness-audit | harness 健康检查 |
+| harness-guide | 按场景推荐 skill / workflow |
+| harness-quality-gate | 交付前质量门禁 |
 | harness-setup | Harness 脚手架生成与更新 |
 | skill-creator | Skill 创作工具 |
 | writing-plans | 多步骤计划编写 |
@@ -62,6 +67,30 @@ description: <一句话描述>
 2. 生成 `user-feedback.md` 所需的结构化记录
 3. 立即推动当前任务按该反馈执行
 4. 在需要时提示是否应升级为 `prevents-recurrence`
+
+### Harness Root Entry Skills
+
+`cc-harness` 应提供一组产品级根入口，让用户先按意图找到正确 workflow，而不是要求用户先理解全部内部 skill：
+
+1. `/harness-help`：显示命令索引、根入口和高频场景
+2. `/harness-audit`：读取质量与结构信号，输出健康检查
+3. `/harness-guide`：根据任务场景推荐 skill / workflow
+4. `/harness-quality-gate`：在交付或提交前运行质量门禁
+
+这四个 Skill 的目标不是替代具体 workflow，而是让用户更容易发现和进入已有能力。
+
+### `/plan-persist` Skill
+
+用户运行 `/plan-persist` 时，应围绕现有 `docs/exec-plans/active/`、`Run Trace` 和 `Skill Workflow Record` 提供轻量状态持续化，而不是新建第二套 planning 文件体系。
+
+### Memory-driven Skill Promotion
+
+当 feedback 或 recurrence 中出现稳定、重复、可复用的 workflow 时，系统应允许通过 `Skill Promotion Candidate` 把记忆层问题升级为 project-local skill。
+
+推荐分工：
+
+1. `/feedback-query`：查看 candidate
+2. `/skill-creator`：将 candidate 落成真正的 skill
 
 ## 相关文档
 

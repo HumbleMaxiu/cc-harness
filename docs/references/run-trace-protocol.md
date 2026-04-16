@@ -64,6 +64,17 @@
 3. 检查 `current_phase` 与 `last_result`
 4. 若 `last_result=REJECTED / BLOCKED`，先处理阻塞而不是直接继续实现
 
+### Hook-assisted 恢复
+
+当启用 `plan-persist` 相关 hooks 时，恢复协议会获得额外的轻量帮助：
+
+- `UserPromptSubmit` 提示当前 active plan 与最近 `Run Trace`
+- `PreToolUse` 在每次工具调用前重新带回当前锚点
+- `PostToolUse` 提醒在写入后补齐状态记录
+- `Stop` 在退出前检查 active plan 是否仍有未完成步骤
+
+这些 hook 只做“提醒与回注”，不应替代结构化 `Run Trace` 本身。
+
 ### 中断恢复
 
 1. 找到最近一次写入的结构化记录

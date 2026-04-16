@@ -13,6 +13,7 @@
 | 角色 | 文件 | 职责 | 触发时机 |
 |------|------|------|---------|
 | Architect | `.claude/agents/architect.md` | 计划检查、docs impact 判断、触发文档同步 | 任务开始前 / 完成后 |
+| Challenger | `.claude/agents/challenger.md` | 对计划、claim、API 假设和完成声明做对抗式验证 | 计划形成后 / 完成声明复杂时 |
 | Developer | `.claude/agents/developer.md` | TDD 实现 | 收到 Architect 交接后 |
 | Reviewer | `.claude/agents/reviewer.md` | 代码质量和安全审查 | 收到 Developer 交接后 |
 | Tester | `.claude/agents/tester.md` | 探测验证入口并执行测试验证 | 收到 Reviewer 交接后 |
@@ -46,6 +47,8 @@ Skill 模式的默认状态机为：
 - 是否产生了未记录的 follow-up
 
 当任务出现循环审查、强状态追踪、高风险工具操作或需要独立 reviewer / tester 视角时，应从 Skill 模式升级到 Subagent 或 Team 模式。
+
+当计划、claim 或完成声明依赖未经验证的外部事实、API 假设或复杂推断时，应触发 `challenger` 做对抗式验证。
 
 ### 统一风险语言
 
@@ -93,6 +96,7 @@ Feedback Curator（如产生 `Feedback Record`）
 跨模式共享能力：
 
 - `/doc-sync`：用于 Skill 模式的 `Doc Sync` 阶段，以及 Subagent 模式下 `Architect` 的文档同步执行
+- `/plan-persist`：用于小任务、探索任务和恢复场景中的轻量 planning 持续化；围绕 active exec plan 与 `Run Trace` 提供 hook 辅助连续性
 
 ## 交接文档
 

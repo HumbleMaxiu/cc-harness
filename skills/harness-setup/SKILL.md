@@ -13,7 +13,7 @@ description: 为任何软件项目搭建或更新 OpenAI 规范的 agent harness
 - 生成 `AGENTS.md` — agent 的操作入口和索引
 - 生成 `ARCHITECTURE.md` — 项目技术架构图
 - 创建 `docs/` 目录树及模板文件
-- 暴露默认 harness 能力入口（例如 `/dev-workflow`、`/doc-sync`）
+- 暴露默认 harness 能力入口（例如 `/dev-workflow`、`/doc-sync`、`/harness-help`、`/harness-audit`、`/harness-quality-gate`）
 - 确立文档规范，让 AI coding agents 从第一天起就能理解和参与项目
 
 Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**，使 agent 能高效地在项目中导航、理解和工作。
@@ -210,7 +210,7 @@ digraph harness {
 - 一句话项目描述
 - `docs/` 导航目录（带超链接）
 - 常用命令快速参考（构建 / 测试 / lint / 运行）
-- 已安装 Skills 快速参考（带使用场景；默认包含 `/doc-sync` 作为文档维护入口）
+- 已安装 Skills 快速参考（带使用场景；默认包含 `/doc-sync`、`/harness-help`、`/harness-audit`、`/harness-guide`、`/harness-quality-gate`）
 - **行为规则**（从 [references/behavior-rules.md](references/behavior-rules.md) 提取，作为 hooks 未生效时的后备）
 
 `docs/memory/index.md` 必须声明 `docs/memory/` 是工作记忆的事实来源，`docs/memory/feedback/` 必须包含用户反馈、Agent 反馈、防止再犯和 archive 结构；`docs/feedback/feedback-collection.md` 必须作为 feedback 规则的事实来源之一生成到用户项目中。

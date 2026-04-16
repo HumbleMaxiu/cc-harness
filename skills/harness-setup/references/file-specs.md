@@ -11,6 +11,7 @@
 - **Include：** 项目一句话描述；优先级顺序（user > harness docs > defaults）；技术栈表；仓库布局表；secrets/logging 规则；测试门槛；链接到 `ARCHITECTURE.md` 和关键 `docs/` 文件。
 - **Include：** 如果仓库启用了记忆机制，在 docs 导航中加入 `docs/memory/index.md`。
 - **Include：** 如果仓库启用了 workflow / 文档维护能力，在 Skill 快速参考中给出 `/doc-sync`，说明它用于代码或流程变更后的文档同步。
+- **Include：** 如果仓库启用了产品级根入口，在 Skill 快速参考中给出 `/harness-help`、`/harness-audit`、`/harness-guide`、`/harness-quality-gate`。
 - **Include — How to use this harness：** 一个短的 `## How to use this harness` section，最多**3 行**，并链接到 `docs/PLANS.md` 获取扩展工作流：
 
 | Scenario | Start here | Then |
@@ -67,6 +68,7 @@
 
 - **Purpose：** 质量维度的**记分卡**。
 - **Include：** 表格 — criterion | target | notes（typecheck、tests、docs 新鲜度、覆盖率 if used）。
+- **Include：** 一段 `Harness Audit 映射`，把质量维度对应到 repo-local checks 和文档信号。
 - **Refresh rules（harness update）：** 每个条目必须引用**具体仓库信号**（例如 `jest.config.ts` 存在、`pyproject.toml` 中有 `pytest`、CI workflow 名称）。如果某个标准没有找到信号，写 **TBD** — 不要编造数字或百分比。
 
 ### `docs/RELIABILITY.md`
