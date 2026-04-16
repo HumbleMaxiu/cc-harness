@@ -66,6 +66,13 @@
   - 已经完成代码、配置、workflow 或 agent 变更
   - 需要显式同步相关 docs、index、导航
   - 想把文档维护从实现步骤里拆开单独做
+- `/feedback`
+  - 想直接给当前项目或 workflow 提意见、纠正、投诉或新要求
+  - 希望 agent 自动把反馈整理进 memory，而不是手工描述字段
+  - 想让这条意见成为后续会话可恢复的事实
+- `/feedback-query`
+  - 想查历史反馈、看 summary 或找 recurrence 条目
+  - 不准备提交新的用户反馈，只是回看和审计
 
 ## 轻量路径 vs 增强路径
 
@@ -93,7 +100,7 @@
 ### memory
 
 - `docs/memory/` 是长期事实来源
-- 用户反馈进 `user-feedback.md`
+- 用户反馈优先通过 `/feedback` 进入 `user-feedback.md`
 - Agent / 自检反馈进 `agent-feedback.md`
 - 重复问题升级到 `prevents-recurrence.md`
 

@@ -17,3 +17,4 @@
 | [completed/2026-04-15-autonomous-until-final-gate.md](completed/2026-04-15-autonomous-until-final-gate.md) | 持续运行到最终确认实施计划 | 2026-04-15 |
 | [completed/2026-04-15-claude-marketplace-install.md](completed/2026-04-15-claude-marketplace-install.md) | Claude Code marketplace git 安装形态改造 | 2026-04-15 |
 | [completed/2026-04-15-harness-capability-gap-closure.md](completed/2026-04-15-harness-capability-gap-closure.md) | 基于方法论与外部最佳实践补齐 harness 能力缺口（任务 9 延后） | 2026-04-15 |
+| [completed/2026-04-16-feedback-skill.md](completed/2026-04-16-feedback-skill.md) | 用户反馈提交根 Skill 实施计划 | 2026-04-16 |

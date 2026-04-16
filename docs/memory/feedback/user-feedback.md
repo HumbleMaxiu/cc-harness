@@ -23,6 +23,7 @@
 
 | id | date | session | type | content | action | applied | prevents_recurrence |
 |------|------|------|------|------|------|------|------|
+| `uf-20260416-002` | `2026-04-16` | `feedback root skill` | `request` | `需要开发一个根 Skill，让用户能直接给项目提 feedback，而不是只能手动描述后再由 agent 临时整理。` | 新增顶级 `/feedback` Skill，专门处理用户反馈提交；同步将 `feedback-query` 收敛为查询入口，并更新 AGENTS、guide、规格和 feedback 文档，让反馈入口在导航中可发现。 | `true` | `false` |
 | `uf-20260416-001` | `2026-04-16` | `plan drift detection` | `complaint` | `在 .claude、skills、.codex 三处镜像不一致时，agent 误判可以直接运行 sync，把 .claude 中较旧的内容重新同步到其他目录，覆盖了用户之前只存在于 skills/.codex 的修改。以后遇到镜像漂移，必须先核实哪一侧是最新事实来源，不能为了通过检查直接 sync。` | 记录为镜像同步事故反馈；新增“镜像漂移时禁止未经核实直接 sync”的防再犯候选规则；后续处理镜像不一致时，先做差异归因，再决定是同步、手动合并，还是暂停并向用户确认。 | `true` | `true` |
 | `uf-20260415-002` | `2026-04-15` | `autonomous until final gate` | `request` | `实现让 claude code 持续运行，不需要用户确认，用户只在最后确认产物和总结报告；并解决 Claude Code 默认会询问用户的问题。` | 新增 autonomous-until-final-gate 设计与实施计划；将 workflow / feedback 语义改为中途自动推进、最终统一确认；补充 Claude Code `skipDangerousModePermissionPrompt` 设置示例与说明。 | `true` | `false` |
 | `uf-20260415-001` | `2026-04-15` | `claude marketplace install` | `complaint` | `/plugin marketplace add https://github.com/HumbleMaxiu/cc-harness.git` 时报错，`marketplace.json` 的 `plugins.0.homepage` 为非法 URL。 | 将 `.claude-plugin/plugin.json` 与 `.claude-plugin/marketplace.json` 中空字符串 URL 改为真实 GitHub 地址，并在 `scripts/checks/harness-consistency.js` 中新增 homepage/repository URL 校验。 | `true` | `true` |

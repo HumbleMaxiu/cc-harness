@@ -11,9 +11,15 @@
 ## 用户反馈处理流程
 
 1. **识别**：用户给出纠正、偏好、请求或投诉
-2. **记录**：写入 `docs/memory/feedback/user-feedback.md`
+2. **记录**：优先通过 `/feedback` 入口整理并写入 `docs/memory/feedback/user-feedback.md`
 3. **应用**：立即执行用户要求，无需确认
 4. **预防**：检查是否需要防止再犯，必要时更新规范
+
+### 推荐入口
+
+- 用户要“提 feedback”“记录意见”“反馈一个问题”时，优先使用 `/feedback`
+- 用户要查历史、看统计、找 recurrence 时，使用 `/feedback-query`
+- 不应要求用户先手动描述一整套字段，再由 agent 被动转写
 
 ## Agent 反馈处理流程
 

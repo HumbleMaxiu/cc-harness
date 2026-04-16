@@ -46,11 +46,22 @@ description: <一句话描述>
 |-------|------|
 | brainstorming | 创造性需求和设计探索 |
 | dev-workflow | A/Dev/R/T 角色开发流程 |
+| feedback | 用户反馈提交入口 |
+| feedback-query | feedback 历史查询与摘要 |
 | harness-setup | Harness 脚手架生成与更新 |
 | skill-creator | Skill 创作工具 |
 | writing-plans | 多步骤计划编写 |
 | exa-search | 神经搜索 |
 | using-brainstorming | brainstorming 前置引导 |
+
+### `/feedback` Skill
+
+用户运行 `/feedback` 时，应允许直接使用自然语言表达纠正、偏好、请求或投诉，并由 Skill：
+
+1. 将反馈分类为 `correction` / `preference` / `request` / `complaint`
+2. 生成 `user-feedback.md` 所需的结构化记录
+3. 立即推动当前任务按该反馈执行
+4. 在需要时提示是否应升级为 `prevents-recurrence`
 
 ## 相关文档
 

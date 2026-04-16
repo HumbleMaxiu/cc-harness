@@ -47,6 +47,8 @@ ls .claude/agents/
 | `/writing-plans` | 多步骤任务规格和需求（先于实现） |
 | `/dev-workflow` | A/Dev/R/T 四角色开发流程（Skill/Subagent/Team 模式） |
 | `/doc-sync` | 基于代码和流程变更同步相关文档、索引和导航 |
+| `/feedback` | 用自然语言提交用户反馈，并自动落到 feedback memory |
+| `/feedback-query` | 查询 feedback 历史、summary 和 recurrence 记录 |
 | `/skill-creator` | 创建、编辑和改进 AgentSkills |
 | `/harness-setup` | 为项目搭建或更新 agent harness |
 | `/exa-search` | 网络、代码和公司研究（神经搜索） |

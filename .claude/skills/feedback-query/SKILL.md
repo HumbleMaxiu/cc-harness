@@ -1,11 +1,13 @@
 ---
 name: feedback-query
-description: 查询反馈历史、记录新反馈、查看防止再犯条目
+description: 查询反馈历史、查看防止再犯条目、做摘要或审计；当用户想搜索 feedback、回看记录、做 summary 时使用，不作为主要的用户提反馈入口。
 ---
 
 # 反馈查询
 
 查询和管理用户反馈、Agent 反馈及防止再犯记录。
+
+`/feedback-query` 负责 **查**，`/feedback` 负责 **提**。
 
 ## 查询命令
 
@@ -34,25 +36,15 @@ description: 查询反馈历史、记录新反馈、查看防止再犯条目
 /feedback-query summary
 ```
 
-## 记录新反馈
+## 提交新反馈
 
-### 记录用户反馈
-```
-/feedback-query add-user
-  - 类型：correction / preference / request / complaint
-  - 内容：反馈内容
-  - 行动：采取的行动
-  - 是否防止再犯：true / false
+当用户想直接提交新的项目反馈时，优先使用：
+
+```text
+/feedback
 ```
 
-### 记录 Agent 反馈
-```
-/feedback-query add-agent
-  - 来源：reviewer / tester / self-check
-  - 类型：correction / improvement / issue
-  - 内容：反馈内容
-  - 建议：建议的处理方式
-```
+只有在已经明确知道结构和目标，并且需要做“带字段的手工维护”时，才考虑在查询流程里顺手编辑记录。
 
 ## 文件位置
 
