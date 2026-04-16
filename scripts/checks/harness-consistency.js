@@ -474,6 +474,11 @@ function assertPlanPersistDocs() {
   const agentsDoc = read('AGENTS.md');
   const guide = read('docs/guides/harness-guide.md');
   const skillSystem = read('docs/product-specs/skill-system.md');
+  const planPersist = read('skills/plan-persist/SKILL.md');
+  const planStatusHook = read('scripts/hooks/plan-status.js');
+  const planRefreshHook = read('scripts/hooks/plan-refresh.js');
+  const planWriteReminderHook = read('scripts/hooks/plan-write-reminder.js');
+  const planStopCheckHook = read('scripts/hooks/plan-stop-check.js');
 
   [
     '"UserPromptSubmit"',
@@ -508,6 +513,56 @@ function assertPlanPersistDocs() {
 
   if (!agentSpec.includes('/plan-persist')) {
     fail('docs/product-specs/agent-system.md: expected /plan-persist shared capability');
+  }
+
+  [
+    'drift_status',
+    'drift_signals',
+    'pending_operation_gate',
+  ].forEach((snippet) => {
+    if (!planPersist.includes(snippet)) {
+      fail(`skills/plan-persist/SKILL.md: expected ${snippet} in status contract`);
+    }
+  });
+
+  [
+    'missing-run-trace',
+    'missing-plan-path',
+    'pending-operation-gate',
+    'unresolved-plan-drift',
+  ].forEach((snippet) => {
+    if (!workflow.includes(snippet)) {
+      fail(`skills/dev-workflow/SKILL.md: expected plan drift signal ${snippet}`);
+    }
+
+    if (!runTraceProtocol.includes(snippet)) {
+      fail(`docs/references/run-trace-protocol.md: expected plan drift signal ${snippet}`);
+    }
+
+    if (!reliability.includes(snippet)) {
+      fail(`docs/RELIABILITY.md: expected plan drift signal ${snippet}`);
+    }
+  });
+
+  [
+    'drift_signals',
+    'pending_operation_gate',
+  ].forEach((snippet) => {
+    if (!planStatusHook.includes(snippet)) {
+      fail(`scripts/hooks/plan-status.js: expected ${snippet} output`);
+    }
+
+    if (!planRefreshHook.includes(snippet)) {
+      fail(`scripts/hooks/plan-refresh.js: expected ${snippet} output`);
+    }
+  });
+
+  if (!planWriteReminderHook.includes('drift signal')) {
+    fail('scripts/hooks/plan-write-reminder.js: expected drift signal reminder');
+  }
+
+  if (!planStopCheckHook.includes('unresolved drift')) {
+    fail('scripts/hooks/plan-stop-check.js: expected unresolved drift stop check');
   }
 
   ['UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'Stop'].forEach((snippet) => {
@@ -550,6 +605,22 @@ function assertChallengerDocs() {
     fail('skills/dev-workflow/SKILL.md: expected challenger integration');
   }
 
+  if (!workflow.includes('### Challenger Gate')) {
+    fail('skills/dev-workflow/SKILL.md: expected Challenger Gate section');
+  }
+
+  [
+    'trigger_reason:',
+    'challenge_required:',
+    'evidence_refs:',
+    'blocking_threshold:',
+    'completion-claim',
+  ].forEach((snippet) => {
+    if (!workflow.includes(snippet)) {
+      fail(`skills/dev-workflow/SKILL.md: expected challenger gate contract field ${snippet}`);
+    }
+  });
+
   if (!challengerDesign.includes('CLAIM:')) {
     fail('docs/design-docs/2026-04-16-challenger-agent-design.md: expected challenger output contract');
   }
@@ -560,6 +631,135 @@ function assertChallengerDocs() {
 
   if (!challengerAgent.includes('VERDICT: CONFIRMED / REFUTED / UNVERIFIED')) {
     fail('agents/challenger.md: expected challenger verdict contract');
+  }
+
+  [
+    'trigger_reason:',
+    'review_scope:',
+    'evidence_refs:',
+    'blocking_threshold:',
+    'recommended_gate:',
+  ].forEach((snippet) => {
+    if (!challengerDoc.includes(snippet)) {
+      fail(`docs/design-docs/challenger.md: expected challenger handoff field ${snippet}`);
+    }
+
+    if (!challengerAgent.includes(snippet)) {
+      fail(`agents/challenger.md: expected challenger handoff field ${snippet}`);
+    }
+  });
+
+  if (!agentSpec.includes('Challenger Gate')) {
+    fail('docs/product-specs/agent-system.md: expected Challenger Gate integration');
+  }
+}
+
+function assertSubagentFailureRecovery() {
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const reviewerAgent = read('agents/reviewer.md');
+  const testerAgent = read('agents/tester.md');
+  const reviewerDoc = read('docs/design-docs/reviewer.md');
+  const testerDoc = read('docs/design-docs/tester.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
+  const readme = read('README.md');
+
+  if (!workflow.includes('### Subagent Failure Handling')) {
+    fail('skills/dev-workflow/SKILL.md: expected Subagent Failure Handling section');
+  }
+
+  [
+    'empty-result',
+    'invalid-handoff',
+    'tool-execution-failure',
+    'reviewer-failure-retry',
+    'tester-stage-required',
+    'main-agent-fallback',
+  ].forEach((snippet) => {
+    if (!workflow.includes(snippet)) {
+      fail(`skills/dev-workflow/SKILL.md: expected subagent failure recovery signal ${snippet}`);
+    }
+  });
+
+  [
+    'failure_type:',
+    'failure_stage:',
+    'retry_recommended:',
+    'fallback_allowed:',
+  ].forEach((snippet) => {
+    if (!reviewerAgent.includes(snippet)) {
+      fail(`agents/reviewer.md: expected failure recovery field ${snippet}`);
+    }
+
+    if (!testerAgent.includes(snippet)) {
+      fail(`agents/tester.md: expected failure recovery field ${snippet}`);
+    }
+  });
+
+  if (!reviewerAgent.includes('无法产出完整交接文档时输出 `BLOCKED`')) {
+    fail('agents/reviewer.md: expected BLOCKED invalid-handoff rule');
+  }
+
+  if (!testerAgent.includes('不得把 build/dev server 成功当作 Tester handoff 的替代')) {
+    fail('agents/tester.md: expected no-silent-skip rule');
+  }
+
+  if (!reviewerDoc.includes('failure_type:') || !testerDoc.includes('failure_type:')) {
+    fail('docs/design-docs/reviewer.md or docs/design-docs/tester.md: expected failure recovery contract');
+  }
+
+  if (!agentSpec.includes('Subagent Failure Handling')) {
+    fail('docs/product-specs/agent-system.md: expected Subagent Failure Handling integration');
+  }
+
+  if (!agentSpec.includes('Tester 不得被静默跳过')) {
+    fail('docs/product-specs/agent-system.md: expected mandatory tester gate');
+  }
+
+  if (!readme.includes('空返回或无效 handoff 不能被当作通过')) {
+    fail('README.md: expected subagent failure guidance');
+  }
+}
+
+function assertSubagentPayloadGuardrails() {
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const reliability = read('docs/RELIABILITY.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
+  const readme = read('README.md');
+
+  if (!workflow.includes('### Subagent Payload Guardrails')) {
+    fail('skills/dev-workflow/SKILL.md: expected Subagent Payload Guardrails section');
+  }
+
+  [
+    'payload_mode:',
+    'changed_files_summary:',
+    'evidence_refs:',
+    'prompt-budget',
+    'do-not-inline-full-file-list',
+    'timeout-aware-retry',
+    'narrowed-payload-retry',
+  ].forEach((snippet) => {
+    if (!workflow.includes(snippet)) {
+      fail(`skills/dev-workflow/SKILL.md: expected payload guardrail ${snippet}`);
+    }
+  });
+
+  [
+    'payload_mode',
+    'timeout-aware-retry',
+    'narrowed-payload-retry',
+  ].forEach((snippet) => {
+    if (!reliability.includes(snippet)) {
+      fail(`docs/RELIABILITY.md: expected subagent reliability guidance ${snippet}`);
+    }
+
+    if (!agentSpec.includes(snippet)) {
+      fail(`docs/product-specs/agent-system.md: expected subagent payload guidance ${snippet}`);
+    }
+  });
+
+  if (!readme.includes('不要把全量文件列表和重复规则直接塞进 subagent prompt')) {
+    fail('README.md: expected subagent payload guidance');
   }
 }
 
@@ -1022,6 +1222,8 @@ function main() {
   assertHarnessEntrySkills();
   assertPlanPersistDocs();
   assertChallengerDocs();
+  assertSubagentFailureRecovery();
+  assertSubagentPayloadGuardrails();
   assertHarnessAuditDocs();
   assertMemoryToSkillDocs();
   assertPainPointDocs();

@@ -2,16 +2,19 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
-
 const raw = fs.readFileSync(0, 'utf8');
-const activeDir = path.join(process.cwd(), 'docs', 'exec-plans', 'active');
+const { readLatestPlan } = require('./plan-persist-common');
 
-if (fs.existsSync(activeDir)) {
-  const activePlans = fs.readdirSync(activeDir).filter((name) => name.endsWith('.md') && name !== 'index.md');
-  if (activePlans.length > 0) {
-    process.stderr.write('[PlanPersist] Write detected. If phase, scope, blockers, or touched files changed, update Run Trace / Skill Workflow Record.\n');
-  }
+const latest = readLatestPlan(process.cwd());
+if (latest) {
+  const signalSummary = latest.driftSignals.length > 0
+    ? ` Current drift signals: ${latest.driftSignals.join(', ')}.`
+    : '';
+  process.stderr.write(
+    '[PlanPersist] Write detected. If phase, scope, blockers, touched files, or drift signal status changed, update Run Trace / Skill Workflow Record.' +
+      signalSummary +
+      '\n'
+  );
 }
 
 process.stdout.write(raw);

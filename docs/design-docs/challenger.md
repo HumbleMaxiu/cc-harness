@@ -21,6 +21,28 @@
 
 - 计划形成后、实现前
 - Agent 声称完成，但结论依赖外部 claim 或复杂推断时
+- 检测到 `unresolved-plan-drift`，且是否继续推进依赖额外证据判断时
+
+## Challenger Gate
+
+为了避免 `challenger` 只在“主 agent 想起来了”时才出现，`dev-workflow` 现在应先产出一个稳定的 `Challenger Gate`：
+
+```markdown
+### Challenger Gate
+- challenge_required:
+- trigger_reason:
+- review_scope:
+- evidence_refs:
+- blocking_threshold:
+- handoff_target:
+```
+
+其中：
+
+- `trigger_reason:` 使用固定枚举：`plan-claim / api-assumption / completion-claim / drift-verification-gap`
+- `review_scope:` 说明这次挑战聚焦计划、API 假设、完成声明还是偏移是否可接受
+- `evidence_refs:` 至少指向 plan、spec、handoff、验证记录或代码证据之一
+- `blocking_threshold:` 说明什么 verdict 会阻塞主流程
 
 ## 工具
 
@@ -46,6 +68,13 @@ Read、Grep、Glob、Bash
 - blocking: true / false
 - rationale: ...
 - required_followup: ...
+- recommended_gate: continue / gather-more-evidence / revise-plan / block
+
+### Inputs Echo
+- trigger_reason: ...
+- review_scope: ...
+- evidence_refs: ...
+- blocking_threshold: ...
 
 ### 状态
 APPROVED / REJECTED / BLOCKED

@@ -22,6 +22,7 @@
 
 - **不通过** → 输出 `REJECTED` + 问题列表 → 由主 agent 记录并自动回流修复
 - **通过** → 输出 APPROVED → 进入测试阶段
+- **执行失败** → 输出 `BLOCKED`，并明确失败原因；主 agent 先重试同角色，再决定是否走同角色 fallback
 
 ## 工具
 
@@ -68,6 +69,13 @@ Read、Grep、Glob、Bash
 
 ### Open Questions
 - ...
+
+### Failure Handling
+- failure_type: none | empty-result | invalid-handoff | tool-execution-failure
+- failure_stage: none | context-read | diff-review | handoff-write
+- retry_recommended: true | false
+- fallback_allowed: true | false
+- fallback_source: subagent | main-agent | none
 
 ### Feedback Record
 source: reviewer | none

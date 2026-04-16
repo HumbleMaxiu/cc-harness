@@ -50,6 +50,20 @@ Skill 模式的默认状态机为：
 
 当计划、claim 或完成声明依赖未经验证的外部事实、API 假设或复杂推断时，应触发 `challenger` 做对抗式验证。
 
+为了让接入更稳定，`dev-workflow` 应先产出一个结构化 `Challenger Gate`，再决定是否真正进入 `challenger`：
+
+```markdown
+### Challenger Gate
+- challenge_required:
+- trigger_reason:
+- review_scope:
+- evidence_refs:
+- blocking_threshold:
+- handoff_target:
+```
+
+触发原因使用固定枚举：`plan-claim / api-assumption / completion-claim / drift-verification-gap`。
+
 ### 统一风险语言
 
 Agent System 使用两套互补字段：
@@ -72,6 +86,49 @@ Agent System 使用两套互补字段：
 - `APPROVED` 下的建议属于非阻塞反馈：主 agent 先记录，允许主流程继续，并在最终交付前统一向用户汇总
 - 反馈记录和汇总由 `feedback-curator` 承担；用户只在最终交付时统一确认产物、风险和待执行建议
 - Tester 先探测项目当前可用的 test / lint / typecheck / build 入口；无法可靠判断时向用户确认，而不是假定固定脚本
+
+### Subagent Failure Handling
+
+`Subagent` 模式除了角色结论，还必须识别角色执行失败。空返回或无效 handoff 不能被当作通过。
+
+最小失败类型：
+
+- `empty-result`
+- `invalid-handoff`
+- `tool-execution-failure`
+
+恢复顺序：
+
+1. 记录失败到 `Run Trace`
+2. 同角色自动重试一次
+3. 若仍失败，可使用同角色等价 `main-agent-fallback`
+4. 若无有效 handoff，则流程 `BLOCKED`
+
+Tester 不得被静默跳过：
+
+- 只有有效 `Reviewer APPROVED` 或合法 Reviewer fallback handoff 后才能进入 Tester
+- `npm run build`、dev server 成功、人工 spot-check 都只能作为证据，不能替代 Tester handoff
+
+### Subagent Payload Guardrails
+
+为了降低 `Reviewer` / `Tester` 因 prompt 过长、上下文打包过重而超时或空返回的概率，主 agent 应默认使用 `payload_mode: compact-summary`。
+
+最小输入字段：
+
+- `payload_mode`
+- `plan_path`
+- `task_id`
+- `step_scope`
+- `changed_files_summary`
+- `evidence_refs`
+- `required_output_contract`
+
+执行约束：
+
+- `prompt-budget`：优先传摘要和引用，不传全量展开内容
+- `do-not-inline-full-file-list`：不要把全量文件列表和重复规则直接塞进 subagent prompt
+- `timeout-aware-retry`：若首次失败，先判断是否为 payload 过重或超时
+- `narrowed-payload-retry`：重试时收窄 payload，而不是原样重放更长 prompt
 
 ### 完整流程
 
@@ -121,6 +178,14 @@ Feedback Curator（如产生 `Feedback Record`）
 - Reviewer 输出 severity / confidence / violates / recurrence candidate
 - Tester 输出验证入口探测、测试矩阵、环境假设和未覆盖风险
 
+如果角色因执行失败而未完成结论，handoff 还必须包含：
+
+- `failure_type`
+- `failure_stage`
+- `retry_recommended`
+- `fallback_allowed`
+- `fallback_source`
+
 Skill 模式下不要求多角色 handoff，但必须至少输出一份包含 `Context`、`Mode Decision`、`Execution`、`Plan Drift`、`Self Review`、`Verification`、`Doc Sync`、`Final Summary` 的 `Skill Workflow Record`。
 
 `Mode Decision` 应至少包含：
@@ -134,8 +199,10 @@ Skill 模式下不要求多角色 handoff，但必须至少输出一份包含 `C
 - `drift_detected`
 - `drift_type`
 - `evidence`
+- `detection_basis`
 - `impact_on_plan`
 - `required_action`
+- `next_plan_update`
 - `resolved_by`
 
 如果计划动作属于 `irreversible-write` 或 `external-side-effect`，交接文档或 `Skill Workflow Record` 中还必须包含一段 `Operation Gate`，明确目标、影响范围、可回滚性与确认状态。
@@ -145,6 +212,13 @@ Skill 模式下不要求多角色 handoff，但必须至少输出一份包含 `C
 - `missing-plan`：阻塞，不应继续执行实质性改动
 - `risk-expanded` 且升级到 `irreversible-write` / `external-side-effect`：阻塞，先进入 `Operation Gate`
 - 其他偏移：允许继续，但必须记录并在最终总结说明
+
+第一阶段的最小 drift signals：
+
+- `missing-run-trace`
+- `missing-plan-path`
+- `pending-operation-gate`
+- `unresolved-plan-drift`
 
 ## 相关文档
 

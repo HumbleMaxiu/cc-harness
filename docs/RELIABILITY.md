@@ -41,6 +41,25 @@ cc-harness 是一个 **无状态文档框架**，运行在 Claude Code 的会话
 
 这些 hooks 的目标是增强恢复与连续性，而不是替代正式的计划文档。
 
+第一阶段 hooks 只做最小硬信号检测，当前要求至少能提示：
+
+- `missing-run-trace`
+- `missing-plan-path`
+- `pending-operation-gate`
+- `unresolved-plan-drift`
+
+这些信号用于提醒“当前事实链可能已漂移”，而不是创建新的计划事实源。
+
+### Subagent Reliability
+
+`Subagent` 模式的可靠性还依赖主 agent 的输入打包方式。
+
+- `payload_mode`：默认使用 `compact-summary`，优先传 plan / handoff / file refs，而不是大段内联内容
+- `timeout-aware-retry`：subagent 首次失败后，先判断是否属于 payload 过重、工具超时或空结果
+- `narrowed-payload-retry`：第二次重试必须收窄 payload，只保留最关键的 `step_scope`、`changed_files_summary` 和少量 `evidence_refs`
+
+如果主 agent 已经观察到空输出、只有 1 行占位内容或明显超时，不应原样重放同一大 prompt。
+
 ### Resume Protocol
 
 恢复顺序：

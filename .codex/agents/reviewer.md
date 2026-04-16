@@ -74,6 +74,7 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 - 只审查，不修改代码
 - 发现问题必须记录
 - 审查通过才能进入测试；审查不通过时 Reviewer 不直接改代码，但主 agent 可基于反馈自动回流修复
+- 无法产出完整交接文档时输出 `BLOCKED`，不要返回空结果或只有一句错误摘要
 
 ## 交接文档格式
 
@@ -109,6 +110,13 @@ tools: ["Read", "Write", "Grep", "Glob", "Bash"]
 
 ### Open Questions
 - ...
+
+### Failure Handling
+- failure_type: none | empty-result | invalid-handoff | tool-execution-failure
+- failure_stage: none | context-read | diff-review | handoff-write
+- retry_recommended: true | false
+- fallback_allowed: true | false
+- fallback_source: subagent | main-agent | none
 
 ### Feedback Record
 source: reviewer | none

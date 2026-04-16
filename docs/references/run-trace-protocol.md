@@ -75,6 +75,19 @@
 
 这些 hook 只做“提醒与回注”，不应替代结构化 `Run Trace` 本身。
 
+第一阶段 hook 最小 drift signals：
+
+- `missing-run-trace`
+- `missing-plan-path`
+- `pending-operation-gate`
+- `unresolved-plan-drift`
+
+推荐在回注中至少附带：
+
+- `drift_status`
+- `drift_signals`
+- `pending_operation_gate`
+
 ### 中断恢复
 
 1. 找到最近一次写入的结构化记录

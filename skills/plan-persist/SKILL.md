@@ -33,7 +33,19 @@ description: 为当前任务提供轻量 planning 持续化，围绕 active exec
 2. 读取 `docs/references/run-trace-protocol.md` 与 `docs/RELIABILITY.md`
 3. 读取最近一次 `Run Trace` 或 `Skill Workflow Record`
 4. 当发现缺少 `plan_path`、存在未决 blocker 或高风险 gate 时，先提示恢复或补记录
-5. 依赖 hooks 在用户输入、工具调用前后和停止时持续回注当前状态
+5. 用最小硬信号检查 planning drift，而不是自由发挥猜测
+6. 依赖 hooks 在用户输入、工具调用前后和停止时持续回注当前状态
+
+## 最小 drift signals
+
+`plan-persist` 第一阶段只检测硬信号，不创建新的计划事实源。优先识别：
+
+- `missing-run-trace`：active plan 缺少最小 `Run Trace`
+- `missing-plan-path`：存在 `Run Trace` 但没有可恢复的 `plan_path`
+- `pending-operation-gate`：存在 `confirmation_status: pending` 的 `Operation Gate`
+- `unresolved-plan-drift`：已记录 `drift_detected: true`，但未写明 `resolved_by` 或最终状态仍未关闭
+
+这些信号的目标是帮助 agent 在恢复、继续执行和结束前显式发现漂移，而不是自动替用户推断语义范围。
 
 ## 输出格式
 
@@ -41,6 +53,9 @@ description: 为当前任务提供轻量 planning 持续化，围绕 active exec
 ### Plan Persist Status
 - active_plan:
 - latest_run_trace:
+- drift_status:
+- drift_signals:
+- pending_operation_gate:
 - blockers:
 - next_update_point:
 ```

@@ -19,7 +19,7 @@
 | 痛点 | 当前解法 | 当前强度 |
 |------|----------|----------|
 | 先写代码后思考 | `/brainstorming` + `/writing-plans` + `AGENTS.md` hard gate | 强 |
-| 计划漂移 | `docs/exec-plans/active/` + Run Trace + `/plan-persist` + planning hooks | 中强 |
+| 计划漂移 | `docs/exec-plans/active/` + Run Trace + `/plan-persist` + planning hooks + drift signals | 强 |
 | 验证缺失 | `/dev-workflow` + Reviewer / Tester / Challenger + `/harness-quality-gate` | 中强 |
 | 文档腐坏 | `/doc-sync` + index + consistency checks | 强 |
 | 反馈无法沉淀 | `/feedback` + feedback memory + recurrence + skill promotion path | 中强 |
@@ -86,9 +86,9 @@
 
 - `SessionStart`：注入 `using-brainstorming` 和项目 memory
 - `UserPromptSubmit`：显示当前 active plan 与最近 trace
-- `PreToolUse`：回注当前 plan，减少执行漂移
-- `PostToolUse`：提醒更新 Run Trace / Skill Workflow Record
-- `Stop`：提示未关闭的计划步骤或 phase
+- `PreToolUse`：回注当前 plan 与 drift signals，减少执行漂移
+- `PostToolUse`：提醒更新 Run Trace / Skill Workflow Record，并检查 drift signal 变化
+- `Stop`：提示未关闭的计划步骤、phase 或 unresolved drift
 
 这样不只减少“新会话忘记规则”，也降低长任务中途偏航的概率。
 
@@ -164,6 +164,12 @@
 - `Team`：多 reviewer 并行，适合复杂或多视角审查
 
 如果任务开始时看起来适合 `Skill`，但执行中出现循环审查、高风险工具操作或强状态追踪需求，应升级到 `Subagent` 或 `Team`。
+
+当计划、API 假设或完成声明依赖未经验证的复杂 claim 时，`/dev-workflow` 应通过 `Challenger Gate` 稳定决定是否插入 `Challenger`，而不是只靠主 agent 临场判断。
+
+在 `Subagent` 模式里，空返回或无效 handoff 不能被当作通过。遇到 `Reviewer` / `Tester` subagent 内部失败时，应先重试同角色；仍失败时只允许做角色等价 fallback，并且 `Tester` 不能被静默跳过。
+
+同时，不要把全量文件列表和重复规则直接塞进 subagent prompt。`Subagent` 默认应走 `compact-summary` 输入，失败重试时也应先收窄 payload，而不是原样重放更长 prompt。
 
 最小示例：
 
