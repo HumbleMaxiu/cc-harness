@@ -30,10 +30,18 @@
 ### `ARCHITECTURE.md`
 
 - **Purpose：** 对人类和 agents 的顶层**技术地图**。
-- **Include：** ASCII 或文本图（services、data flow）；模块/包边界；如果是分层架构则包括依赖方向；链接到 `docs/DESIGN.md`、`docs/SECURITY.md`、`docs/design-docs/`。
+- **Positioning：** 根目录入口地图，不是详细设计文档；它的职责是帮助 agent 快速定位系统边界和后续该读哪里。
+- **Include：** 仅基于可观察仓库信号或用户明确输入写内容；ASCII 或文本图（services、data flow）；模块/包边界；如果是分层架构则包括依赖方向；链接到 `docs/DESIGN.md`、`docs/SECURITY.md`、`docs/design-docs/`。
+- **Preferred scaffold sections：** `当前已知`、`仓库结构 / 模块边界`、`高层数据流（如未知则写 TBD）`、`待确认项`、`如何补全本文件`。
 - **Avoid：** 完整的 endpoint 目录 — 放到 `docs/product-specs/` 或 `docs/generated/`。
 - **Relationship：** 项目级长期地图；不替代 `docs/design-docs/*.md` 的具体设计细节。
 - **Scaffold mode：** 只生成结构骨架、模块占位和“如何迭代补全”的说明，不要在初始化时假装架构已经成熟。
+- **Scaffold hard rules：**
+  - 只能陈述用户明确提供的信息、仓库真实目录结构、配置文件、脚本入口和已存在文档能支持的事实。
+  - 如果真实服务边界、依赖方向、数据流或部署拓扑无法从仓库中可靠确认，必须写 `TBD` / `待确认`，不要脑补。
+  - 不要写“请求从 A 流到 B 再进入 C”这类流程，除非仓库中存在可验证的代码、配置或用户明确说明。
+  - 不要把推测包装成既定事实；如有必要，使用 `推测` 或 `待确认` 标签显式标注。
+  - 初始化输出默认偏保守和简短，宁可留白，也不要生成看起来完整但未经验证的架构叙述。
 - **Promote from：** `docs/design-docs/*.md`、真实目录结构、已稳定的模块边界。
 
 ## `docs/` top-level
