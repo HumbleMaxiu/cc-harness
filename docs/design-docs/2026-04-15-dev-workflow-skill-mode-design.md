@@ -260,14 +260,26 @@ Done
 - 检查计划是否存在
 - 检查范围是否过大
 - 判断是否适合继续停留在 Skill 模式
+- 标记执行阶段最可能出现的 `plan_drift_watchpoints`
 
 输出：`Mode Decision Block`
+
+如果即将进行实质性改动却没有可接受的 `plan_path` 或等价计划来源，应直接视为 `missing-plan`，不要继续进入 `Execute`。
 
 #### 3. Execute
 
 主 agent 进行实现或文档修改。
 
-输出：`Execution Block`
+在 `Execute` 结束时，必须追加一次轻量 `Plan Drift` 检查。
+
+第一阶段只做 workflow 级检测，不依赖 hook，也不尝试做复杂自然语言比对；优先使用以下硬信号：
+
+- 是否存在 `plan_path`
+- `files_touched` 是否明显超出当前 `task_scope`
+- `operation_risk` 是否高于原计划假设
+- 是否出现未回写的 follow-up
+
+输出：`Execution Block` + `Plan Drift Block`
 
 #### 4. Self Review
 
@@ -308,6 +320,7 @@ Done
 - 剩余风险
 - 未自动执行建议
 - 是否建议下次升级模式
+- 是否仍有未解决的 `Plan Drift`
 
 输出：`Final Summary Block`
 
@@ -326,11 +339,20 @@ Skill 模式不要求像 Subagent 模式那样为每个角色生成独立 handof
 ### Mode Decision
 - fit_for_skill_mode:
 - escalation_reason:
+- plan_drift_watchpoints:
 
 ### Execution
 - files_touched:
 - commands_run:
 - artifacts:
+
+### Plan Drift
+- drift_detected:
+- drift_type:
+- evidence:
+- impact_on_plan:
+- required_action:
+- resolved_by:
 
 ### Self Review
 - checklist:
@@ -354,6 +376,7 @@ Skill 模式不要求像 Subagent 模式那样为每个角色生成独立 handof
 - outcome:
 - remaining_risks:
 - followups:
+- plan_drift_status:
 ```
 
 这个记录的作用是：

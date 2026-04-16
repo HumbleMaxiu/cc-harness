@@ -17,8 +17,8 @@
 | `memory-feedback-recovery` | `/compact` 或新会话恢复 | 继续进行中任务 | 从 memory / feedback 恢复上下文 | 优先读取 memory index 与 recurrence 约束 | 忽略 memory、丢失阻塞反馈、重复再犯 |
 | `feedback-curator-memory-sync` | Feedback memory 落账 | Reviewer / Tester 交接包含 `Feedback Record` | 由 Feedback Curator 写入 memory 并输出摘要 | 新 `af-*` 记录、自动处理摘要、待最终汇总项 | 未写入 memory、无编号、未输出自动处理摘要 |
 | `bridge-file-merge` | 多来源事实需要汇总 | 汇总计划、实现、反馈与验证 | 生成/合并桥接材料 | 结构化记录一致，可支撑审计与恢复 | 事实来源冲突、遗漏关键阶段、输出不可追踪 |
-| `skill-success-loop` | 边界清楚的小任务 | 用 `dev-workflow` 以 Skill 模式完成任务 | 完整执行单 agent workflow | 产出完整 `Skill Workflow Record`，包括 `Mode Decision`、`Self Review`、`Verification`、`Doc Sync`、`Final Summary` | 缺失结构化区块、未执行自检/验证、Skill 模式无闭环 |
-| `skill-plan-check-escalation` | 任务跨模块、风险高或边界不清 | 以 Skill 模式启动复杂任务 | `plan-check-skill` 判定升级到 `Subagent` | `Mode Decision.fit_for_skill_mode=false`，包含明确 `escalation_reason`、`plan_gaps`、`scope_risks` | 复杂任务被错误留在 Skill 模式、升级理由空泛 |
+| `skill-success-loop` | 边界清楚的小任务 | 用 `dev-workflow` 以 Skill 模式完成任务 | 完整执行单 agent workflow | 产出完整 `Skill Workflow Record`，包括 `Mode Decision`、`Plan Drift`、`Self Review`、`Verification`、`Doc Sync`、`Final Summary` | 缺失结构化区块、未执行自检/验证、Skill 模式无闭环 |
+| `skill-plan-check-escalation` | 任务跨模块、风险高、或缺少计划来源 | 以 Skill 模式启动复杂任务 | `plan-check-skill` 判定升级到 `Subagent` 或阻塞 | `Mode Decision.fit_for_skill_mode=false`，包含明确 `escalation_reason`、`plan_gaps`、`scope_risks`、`plan_drift_watchpoints` | 复杂任务被错误留在 Skill 模式、缺少 `missing-plan` 阻塞、升级理由空泛 |
 | `skill-self-review-feedback-record` | Skill 模式已完成 Execute | 进入自检阶段 | `self-review-skill` 结构化审查变更 | `Self Review` 包含 checklist、issues、`feedback_record`、`escalate_to_subagent` | 只有口头结论、无 `feedback_record` 字段、问题不可复用 |
 | `skill-verification-uncertainty` | Repo 验证面不完整或信号冲突 | 进入 Verify 阶段 | `verification-skill` 选择最佳验证并记录不确定性 | `Verification` 包含 detected entrypoints、executed checks、assumptions、uncovered risks、必要时 `feedback_record` | 假装验证充分、未记录未覆盖风险、无升级建议 |
 | `brainstorming-dev-workflow-e2e` | 小任务端到端 | 任务先从问题探索开始，再进入计划与实现 | 从 `brainstorming` 进入 `dev-workflow` 并在关键节点闭环 | brainstorming 产物、exec plan、`Skill Workflow Record`、完成状态 run trace | 跳过计划、缺少验证、workflow 未到 Done |
@@ -30,10 +30,11 @@
 
 1. `dev-workflow` 必须定义 Skill 模式状态机与 `Skill Workflow Record`。
 2. `plan-check-skill` 必须能输出可直接并入 `Mode Decision` 的结构化字段。
-3. `self-review-skill` 必须能输出可复用的 `feedback_record`。
-4. `verification-skill` 必须在验证不确定时显式记录 `assumptions` 与 `uncovered_risks`。
-5. `/doc-sync` 必须能输出跨模式复用的 `Doc Sync Result`。
-6. Eval 结论必须覆盖“继续 Skill 模式”与“升级到 Subagent/Team”两类路径。
+3. `Plan Drift` 必须在 `Execute` 后和 `Final Summary` 前被检查，并记录偏移状态。
+4. `self-review-skill` 必须能输出可复用的 `feedback_record`。
+5. `verification-skill` 必须在验证不确定时显式记录 `assumptions` 与 `uncovered_risks`。
+6. `/doc-sync` 必须能输出跨模式复用的 `Doc Sync Result`。
+7. Eval 结论必须覆盖“继续 Skill 模式”与“升级到 Subagent/Team”两类路径。
 
 ## 行为级 eval 基线
 

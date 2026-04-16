@@ -18,7 +18,7 @@ description: 为任何软件项目搭建或更新 OpenAI 规范的 agent harness
 
 Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**，使 agent 能高效地在项目中导航、理解和工作。
 
-对于 `ARCHITECTURE.md`、`docs/DESIGN.md`、`docs/PLANS.md`、`docs/PRODUCT_SENSE.md`、`docs/RELIABILITY.md`、`docs/SECURITY.md`、`docs/FRONTEND.md` 这类项目级文档，scaffold 默认只生成 **skeleton-first** 骨架与占位说明；详细内容应在后续任务、设计和归档中逐步沉淀。尤其 `ARCHITECTURE.md` 必须保持保守：只写仓库中可观察的边界、用户已确认事实和明确的 `TBD`，不允许把推测写成成熟架构。
+对于 `ARCHITECTURE.md`、`docs/DESIGN.md`、`docs/PLANS.md`、`docs/PRODUCT_SENSE.md`、`docs/RELIABILITY.md`、`docs/SECURITY.md`、`docs/FRONTEND.md` 这类项目级文档，scaffold 默认只生成 **skeleton-first** 骨架与占位说明；详细内容应在后续任务、设计和归档中逐步沉淀。
 
 ## Scaffold profiles
 
@@ -91,12 +91,12 @@ Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**
 
 ### Phase 2 — 创建目录结构
 
-7. **创建核心目录** — `docs/`、子目录包括 `docs/design-docs/`、`docs/exec-plans/active/`、`docs/exec-plans/completed/`、`docs/generated/`、`docs/memory/feedback/`、`docs/memory/feedback/archive/`、`docs/feedback/`、`docs/product-specs/`、`docs/references/`
+7. **创建核心目录** — `docs/`、子目录包括 `design-docs/`、`exec-plans/active/`、`exec-plans/completed/`、`generated/`、`memory/feedback/`、`memory/feedback/archive/`、`feedback/`、`product-specs/`、`references/`
 
 ### Phase 3 — 填充文件
 
 8. **填充根目录** — `AGENTS.md`、`ARCHITECTURE.md`（每个文件按 file-specs 包含 **How to use this harness**）
-9. **填充顶层 docs** — DESIGN、PLANS、PRODUCT_SENSE、QUALITY_SCORE、RELIABILITY、SECURITY、FRONTEND（如适用）、`docs/memory/index.md`、`docs/feedback/feedback-collection.md`
+9. **填充顶层 docs** — DESIGN、PLANS、PRODUCT_SENSE、QUALITY_SCORE、RELIABILITY、SECURITY、FRONTEND（如适用）、`memory/index.md`、`feedback/feedback-collection.md`
 10. **填充 design docs** — `design-docs/index.md`、`core-beliefs.md`
 11. **填充 exec plans** — tech-debt-tracker、`active/`、`completed/`
 12. **填充 generated** — schema 占位符
@@ -198,7 +198,7 @@ digraph harness {
 
 ## Phase 2 — 创建目录结构
 
-只创建缺失的目录（不删除用户文件）。树结构：`docs/design-docs/`、`docs/exec-plans/active/`、`docs/exec-plans/completed/`、`docs/generated/`、`docs/memory/feedback/`、`docs/memory/feedback/archive/`、`docs/feedback/`、`docs/product-specs/`、`docs/references/`。
+只创建缺失的目录（不删除用户文件）。树结构：`docs/design-docs/`、`exec-plans/active|`completed/`、`generated/`、`memory/feedback/`、`memory/feedback/archive/`、`feedback/`、`product-specs/`、`references/`。
 
 **无目录树检查点** — 继续阶段 3。
 

@@ -44,6 +44,7 @@ function checkEvalScenarioCoverage() {
   [
     'Skill Workflow Record',
     'Mode Decision',
+    'Plan Drift',
     'feedback_record',
     'uncovered risks',
     'Doc Sync Result',
@@ -62,6 +63,7 @@ function checkSkillContracts() {
   const agentSpec = read('docs/product-specs/agent-system.md');
 
   expectIncludes(workflow, 'Plan Check', 'skills/dev-workflow/SKILL.md');
+  expectIncludes(workflow, 'Plan Drift', 'skills/dev-workflow/SKILL.md');
   expectIncludes(workflow, 'Self Review', 'skills/dev-workflow/SKILL.md');
   expectIncludes(workflow, 'Verify', 'skills/dev-workflow/SKILL.md');
   expectIncludes(workflow, '内部子 Skill 调用模式', 'skills/dev-workflow/SKILL.md');
@@ -69,6 +71,7 @@ function checkSkillContracts() {
 
   expectIncludes(specialized, '最小调用模式', 'skills/dev-workflow/references/skill-mode-specialized-skills.md');
   expectIncludes(planCheck, '### Mode Decision', 'plan-check-skill');
+  expectIncludes(planCheck, 'plan_drift_watchpoints', 'plan-check-skill');
   expectIncludes(selfReview, 'feedback_record', 'self-review-skill');
   expectIncludes(verification, 'uncovered_risks', 'verification-skill');
   expectIncludes(docSync, '### Doc Sync Result', 'doc-sync');

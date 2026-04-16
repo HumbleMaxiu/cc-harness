@@ -35,6 +35,8 @@ Evaluate at least:
 - does the task look likely to require independent reviewer / tester gates?
 - is there obvious high-risk or irreversible work?
 - is the task likely to loop through multiple review/fix rounds?
+- if substantive edits are expected, is there an acceptable `plan_path` or equivalent plan source?
+- what are the most likely plan drift watchpoints once execution begins?
 
 ## Output contract
 
@@ -47,12 +49,14 @@ Return output that can be copied directly into the parent `Skill Workflow Record
 - plan_gaps:
 - scope_risks:
 - required_inputs:
+- plan_drift_watchpoints:
 ```
 
 ## Escalation rules
 
 Recommend escalation to `Subagent` when any of the following is true:
 
+- substantive edits are requested but no acceptable `plan_path` or equivalent plan source exists
 - scope crosses multiple modules and boundaries are unclear
 - independent reviewer / tester gates are obviously needed
 - multiple feedback loops are likely
@@ -72,3 +76,4 @@ Recommend escalation to `Team` only if parallel multi-angle review is already cl
 - This sub skill is designed for internal use from `dev-workflow`
 - Keep output concise and decision-oriented
 - Prefer explicit missing inputs over vague caution
+- If substantive edits would proceed without a plan, return `fit_for_skill_mode: false` and treat it as `missing-plan`

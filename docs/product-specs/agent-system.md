@@ -32,6 +32,19 @@ Skill 模式的默认状态机为：
 
 其中 `Doc Sync` 阶段应复用顶级 `/doc-sync` Skill 的契约，而不是由主 agent 临场决定文档维护方式。
 
+其中 `Plan Drift` 不作为独立顶层阶段存在，而是作为跨 `Execute` 和 `Final Summary` 的执行期守卫：
+
+- `Plan Check` 先识别 `plan_drift_watchpoints`
+- `Execute` 结束后检查本轮是否发生计划偏移
+- `Final Summary` 前再次确认偏移是否已解决、升级或记录
+
+第一阶段只做 workflow 级检测，不依赖 hook。优先关注：
+
+- 是否缺少可接受的 `plan_path`
+- 是否触碰明显超出 `task_scope` 的文件
+- 是否出现比原计划更高的 `operation_risk`
+- 是否产生了未记录的 follow-up
+
 当任务出现循环审查、强状态追踪、高风险工具操作或需要独立 reviewer / tester 视角时，应从 Skill 模式升级到 Subagent 或 Team 模式。
 
 ### 统一风险语言
@@ -104,9 +117,30 @@ Feedback Curator（如产生 `Feedback Record`）
 - Reviewer 输出 severity / confidence / violates / recurrence candidate
 - Tester 输出验证入口探测、测试矩阵、环境假设和未覆盖风险
 
-Skill 模式下不要求多角色 handoff，但必须至少输出一份包含 `Context`、`Mode Decision`、`Execution`、`Self Review`、`Verification`、`Doc Sync`、`Final Summary` 的 `Skill Workflow Record`。
+Skill 模式下不要求多角色 handoff，但必须至少输出一份包含 `Context`、`Mode Decision`、`Execution`、`Plan Drift`、`Self Review`、`Verification`、`Doc Sync`、`Final Summary` 的 `Skill Workflow Record`。
+
+`Mode Decision` 应至少包含：
+
+- `fit_for_skill_mode`
+- `escalation_reason`
+- `plan_drift_watchpoints`
+
+`Plan Drift` 应至少包含：
+
+- `drift_detected`
+- `drift_type`
+- `evidence`
+- `impact_on_plan`
+- `required_action`
+- `resolved_by`
 
 如果计划动作属于 `irreversible-write` 或 `external-side-effect`，交接文档或 `Skill Workflow Record` 中还必须包含一段 `Operation Gate`，明确目标、影响范围、可回滚性与确认状态。
+
+第一阶段的处理规则：
+
+- `missing-plan`：阻塞，不应继续执行实质性改动
+- `risk-expanded` 且升级到 `irreversible-write` / `external-side-effect`：阻塞，先进入 `Operation Gate`
+- 其他偏移：允许继续，但必须记录并在最终总结说明
 
 ## 相关文档
 

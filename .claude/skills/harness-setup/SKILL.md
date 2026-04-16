@@ -80,13 +80,13 @@ Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**
 
 你必须为每个项目创建一个 task，并按顺序完成：
 
-### Phase 1 — 收集上下文（可批量时批量处理）
+### Phase 1 — 收集上下文（向导式逐步询问）
 
 1. **自动检测** — 扫描仓库：目标路径、baseline（greenfield vs existing）、技术栈
 2. **Identity + 检测表** — 显示检测结果；询问项目名称和一句话目的（自由格式）
-3. **Shape + architecture** — 一次交互：项目类型 + 架构风格（结构化选项）
+3. **Shape + architecture** — 单独一次交互：项目类型 + 架构风格（结构化选项）
 4. **Domains** — 主要产品领域，用于 `docs/product-specs/*.md`（自由格式）
-5. **Agent platforms + profile** — 一次交互：团队使用的 agent 工具 + 推荐 scaffold profile
+5. **Agent platforms + profile** — 单独一次交互：团队使用的 agent 工具 + 推荐 scaffold profile
 6. **确认汇总** — 紧凑表格，用户批准 ⛔ 门槛：批准前不创建文件
 
 ### Phase 2 — 创建目录结构
@@ -123,7 +123,7 @@ digraph harness {
     node [fontsize=10];
 
     detect [label="1. Auto-detect" shape=box];
-    p1 [label="2-6. Context\n(batched)" shape=box];
+    p1 [label="2-5. Context\n(step-by-step)" shape=box];
     gate1 [label="6. ⛔ GATE\nConfirm summary" shape=diamond style=filled fillcolor="#ffcccc"];
     create_dirs [label="7. Create dirs" shape=box];
     populate [label="8-15. Populate files" shape=box];
@@ -157,23 +157,25 @@ digraph harness {
 
 **交互规则：**
 
-- **批量相关选择** — 合并 shape + architecture。保持 **identity** 和 **domains** 为独立步骤（自由格式）。
-- **不要过度拆分：** 如果两个问题都是结构化选择且密切相关，一起呈现。
+- **必须逐步询问：** Step 2、Step 3、Step 4、Step 5 必须按顺序分别提问；不要在同一条消息里让用户一次性回答 Step 2–5。
+- **当前 step 完成后再进入下一步：** 收到当前 step 的回答后，先简短确认已记录，再提出下一个 step。
+- **Step 3 内允许合并：** shape 和 architecture 仍然作为同一步一起问，但不得和其他 step 合并。
 - 尽可能使用结构化多选；适当包含 **Other (I'll describe)**。
 - 提问前**先扫描**仓库：推断技术栈、路径、baseline — 在第 2 步的**检测表**中展示。
+- **Step 6 前不做汇总式追问：** 在进入 Step 6 之前，不要要求用户“依次回答 Step 2-5”或一次性提供所有剩余信息。
 
 **Step 1（自动）** — 扫描：仓库根信号（`.git/`、`package.json` 等）、现有 `AGENTS.md` / `docs/`、技术栈文件（`package.json`、`go.mod`、`pyproject.toml` …）。
 
-**Step 2** — 呈现：目标路径、baseline 摘要、技术栈摘要。询问：项目名称 + 一句话目的。
+**Step 2** — 呈现：目标路径、baseline 摘要、技术栈摘要。只询问：项目名称 + 一句话目的。不要在这一轮提前展示 Step 3–5 的问题。
 
-**Step 3** — 一次呈现 Shape + architecture：
+**Step 3** — 在 Step 2 回答后，再单独呈现 Shape + architecture：
 
 - Shape：Frontend / Backend / Fullstack / CLI / Library / Other
 - Architecture：Layered / Hexagonal / Microservices / Monolith / Other
 
-**Step 4** — Domains（自由格式）：列出主要产品领域；每个领域生成 `docs/product-specs/<domain>.md`。
+**Step 4** — 在 Step 3 回答后，再单独询问 Domains（自由格式）：列出主要产品领域；每个领域生成 `docs/product-specs/<domain>.md`。
 
-**Step 5** — Agent platforms + profile：
+**Step 5** — 在 Step 4 回答后，再单独询问 Agent platforms + profile：
 
 - Agent platforms（多选）：**Cursor**、**Claude Code**、**Codex**、**Windsurf**、**GitHub Copilot**、**Cline**、**Other**
 - Scaffold profile：推荐 `light` / `standard` / `strict`，并给出 1 句推荐理由
@@ -192,7 +194,7 @@ digraph harness {
 | Agent platforms | 哪些工具（用于阶段 5 bridges） |
 | Profile | `light` / `standard` / `strict` + 推荐理由 |
 
-用户批准 → Phase 2。
+只有在 Step 2–5 都已完成后，才能进入 Step 6。用户批准 → Phase 2。
 
 ## Phase 2 — 创建目录结构
 
