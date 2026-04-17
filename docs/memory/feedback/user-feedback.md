@@ -1,6 +1,6 @@
 # 用户反馈记录
 
-> 用户反馈优先级最高，无需询问，直接记录并应用。
+> 用户反馈优先级最高，无需询问，直接记录并应用。长期 memory 应优先沉淀可复用经验、规则和 workflow 改进，而不是只保存一次性问题原话。
 
 ## 记录规范
 
@@ -12,8 +12,8 @@
 | `date` | 反馈日期 (ISO 8601) |
 | `session` | 会话上下文（项目/功能名称） |
 | `type` | `correction` / `preference` / `request` / `complaint` |
-| `content` | 原始反馈内容 |
-| `action` | 采取的行动 |
+| `content` | 反馈核心内容；保留用户为什么在意这件事，并尽量抽象为可复用经验 |
+| `action` | 采取的行动；优先写成已经落地的改法、规则或 workflow 调整 |
 | `applied` | 是否已应用 (`true` / `false`) |
 | `prevents_recurrence` | 是否需要写入规范防止再犯 |
 
@@ -23,6 +23,7 @@
 
 | id | date | session | type | content | action | applied | prevents_recurrence |
 |------|------|------|------|------|------|------|------|
+| `uf-20260417-001` | `2026-04-17` | `feedback skill reusable memory` | `correction` | `feedback skill 在记录用户反馈时，不应该只把问题记下来，而要尽可能沉淀成可复用经验、规则或 workflow 改进；否则 feedback memory 会退化成问题日志，难以指导后续执行。` | 核对 `feedback` skill、feedback 规范和 memory 文档中的现有要求；补强 `/feedback` 的记录原则，明确用户反馈也应优先抽象为可复用经验，并同步更新 user-feedback 与 feedback-collection 文档，避免后续再次退化成纯问题记录。 | `true` | `true` |
 | `uf-20260416-002` | `2026-04-16` | `feedback root skill` | `request` | `需要开发一个根 Skill，让用户能直接给项目提 feedback，而不是只能手动描述后再由 agent 临时整理。` | 新增顶级 `/feedback` Skill，专门处理用户反馈提交；同步将 `feedback-query` 收敛为查询入口，并更新 AGENTS、guide、规格和 feedback 文档，让反馈入口在导航中可发现。 | `true` | `false` |
 | `uf-20260416-001` | `2026-04-16` | `plan drift detection` | `complaint` | `在 .claude、skills、.codex 三处镜像不一致时，agent 误判可以直接运行 sync，把 .claude 中较旧的内容重新同步到其他目录，覆盖了用户之前只存在于 skills/.codex 的修改。以后遇到镜像漂移，必须先核实哪一侧是最新事实来源，不能为了通过检查直接 sync。` | 记录为镜像同步事故反馈；新增“镜像漂移时禁止未经核实直接 sync”的防再犯候选规则；后续处理镜像不一致时，先做差异归因，再决定是同步、手动合并，还是暂停并向用户确认。 | `true` | `true` |
 | `uf-20260415-002` | `2026-04-15` | `autonomous until final gate` | `request` | `实现让 claude code 持续运行，不需要用户确认，用户只在最后确认产物和总结报告；并解决 Claude Code 默认会询问用户的问题。` | 新增 autonomous-until-final-gate 设计与实施计划；将 workflow / feedback 语义改为中途自动推进、最终统一确认；补充 Claude Code `skipDangerousModePermissionPrompt` 设置示例与说明。 | `true` | `false` |
