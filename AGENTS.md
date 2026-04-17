@@ -2,6 +2,16 @@
 
 Claude Code 插件，帮助用户在项目中生成 harness 约束下的 AI 协作环境。提供预设的 skills、agents、MCPs、workflows、hooks，实现 harness engineering 最佳实践。
 
+## 项目目标锚点
+
+`cc-harness` 的核心目标是构建一个**以文档为核心的 harness 系统**：
+
+- skills、agents、hooks、MCPs、commands、rules 都应围绕文档工作
+- 它们要么读取文档、写入文档、完善文档，要么负责把流程自动收口到文档
+- 每一类关键 docs 最终都应有明确的读取入口、维护入口和使用/收口场景
+
+当前阶段优先补齐这些基础能力；在基础收口稳定后，再逐步接入 UI 还原检测、e2e 测试生成、测试工具等外部工具型能力，补全整个 harness。
+
 ## 文档导航
 
 | 类别 | 路径 | 内容 |
