@@ -2,6 +2,8 @@
 
 > 面向最终用户的简明指南：什么时候开始、用哪条 workflow、什么时候需要更强约束。
 
+如果你想先建立对整个仓库的整体认识，再回来选 workflow，可以先看 [Project Overview](./project-overview.md)。
+
 ## 什么时候从 `/harness-setup` 开始
 
 从 `/harness-setup` 开始的典型场景：

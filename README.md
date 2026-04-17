@@ -12,6 +12,8 @@
 
 目标不是做一个新的执行引擎，而是把“AI 如何在仓库里协作”这件事产品化、版本化、可审查化。
 
+如果你想先快速理解这个仓库的定位、结构、典型流程和后续方向，可以先读 [docs/guides/project-overview.md](docs/guides/project-overview.md)。
+
 ## 核心痛点与当前解法
 
 `cc-harness` 不是单纯往项目里塞一批 prompt，而是针对 AI 协作里最常见的失败模式给出固定入口。
@@ -148,6 +150,8 @@
 如果你是在一个新项目里引入这套体系，通常从 `/harness-setup` 开始。
 
 如果你想先看一份面向最终用户的入口说明，可以直接读 [docs/guides/harness-guide.md](docs/guides/harness-guide.md)。
+
+如果你想先看一份覆盖项目介绍、流程图、能力地图和 roadmap 的总览文档，可以直接读 [docs/guides/project-overview.md](docs/guides/project-overview.md)。
 
 `/harness-setup` 现在支持三种 scaffold profile：
 
