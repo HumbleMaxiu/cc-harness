@@ -6,6 +6,14 @@ const path = require('path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const failures = [];
+const codexAgentProfiles = {
+  architect: { model: 'gpt-5.4', reasoning: 'high', sandbox: 'workspace-write' },
+  challenger: { model: 'gpt-5.4', reasoning: 'high', sandbox: 'read-only' },
+  developer: { model: 'gpt-5.4', reasoning: 'medium', sandbox: 'workspace-write' },
+  'feedback-curator': { model: 'gpt-5.4', reasoning: 'medium', sandbox: 'workspace-write' },
+  reviewer: { model: 'gpt-5.4', reasoning: 'high', sandbox: 'read-only' },
+  tester: { model: 'gpt-5.4', reasoning: 'medium', sandbox: 'workspace-write' },
+};
 
 function read(relPath) {
   return fs.readFileSync(path.join(repoRoot, relPath), 'utf8');
@@ -56,6 +64,37 @@ function parseMarkdownLinks(content) {
     links.push(match[1]);
   }
   return links;
+}
+
+function parseFrontmatter(markdown) {
+  const match = markdown.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!match) {
+    return { body: markdown.trim() };
+  }
+
+  return { body: match[2].trim() };
+}
+
+function renderCodexAgentToml(agentName, sourceContent) {
+  const profile = codexAgentProfiles[agentName];
+  if (!profile) {
+    fail(`missing codex profile for agent ${agentName}`);
+    return '';
+  }
+
+  const { body } = parseFrontmatter(sourceContent);
+  const instructions = body.replace(/\r\n/g, '\n').replace(/"""/g, '\\"""');
+
+  return [
+    `model = "${profile.model}"`,
+    `model_reasoning_effort = "${profile.reasoning}"`,
+    `sandbox_mode = "${profile.sandbox}"`,
+    '',
+    'developer_instructions = """',
+    instructions,
+    '"""',
+    '',
+  ].join('\n');
 }
 
 function assertRelativeLinksExist(relPath) {
@@ -941,7 +980,7 @@ function assertDocSyncContracts() {
   const workflow = read('skills/dev-workflow/SKILL.md');
   const architect = read('docs/design-docs/architect.md');
   const claudeArchitect = read('.claude/agents/architect.md');
-  const codexArchitect = read('.codex/agents/architect.md');
+  const codexArchitect = read('.codex/agents/architect.toml');
   const agentSpec = read('docs/product-specs/agent-system.md');
   const docSync = read('skills/doc-sync/SKILL.md');
   const docSyncYaml = read('skills/doc-sync/agents/openai.yaml');
@@ -963,7 +1002,7 @@ function assertDocSyncContracts() {
   }
 
   if (!codexArchitect.includes('/doc-sync')) {
-    fail('.codex/agents/architect.md: expected /doc-sync integration');
+    fail('.codex/agents/architect.toml: expected /doc-sync integration');
   }
 
   if (!agentSpec.includes('/doc-sync')) {
@@ -1133,6 +1172,39 @@ function assertMirrorDirectory(sourceDir, mirrorDir) {
   }
 }
 
+function assertCodexAgentDirectory() {
+  const sourceFiles = listFilesRecursive('.claude/agents').filter((relPath) => relPath.endsWith('.md'));
+  const codexFiles = listFilesRecursive('.codex/agents');
+  const expectedFiles = new Set(sourceFiles.map((relPath) => relPath.replace(/\.md$/, '.toml')));
+
+  for (const relPath of sourceFiles) {
+    const agentName = path.basename(relPath, '.md');
+    const targetRelPath = relPath.replace(/\.md$/, '.toml');
+
+    if (!expectedFiles.has(targetRelPath)) {
+      fail(`.codex/agents: unable to derive expected Codex agent path for ${relPath}`);
+      continue;
+    }
+
+    if (!codexFiles.includes(targetRelPath)) {
+      fail(`.codex/agents: missing generated file ${targetRelPath} from .claude/agents/${relPath}`);
+      continue;
+    }
+
+    const expectedToml = renderCodexAgentToml(agentName, read(path.join('.claude/agents', relPath)));
+    const actualToml = read(path.join('.codex/agents', targetRelPath));
+    if (expectedToml !== actualToml) {
+      fail(`.codex/agents: content drift for ${targetRelPath} (expected generated Codex TOML from .claude/agents/${relPath})`);
+    }
+  }
+
+  for (const relPath of codexFiles) {
+    if (!expectedFiles.has(relPath)) {
+      fail(`.codex/agents: unexpected extra file ${relPath} not generated from .claude/agents`);
+    }
+  }
+}
+
 function main() {
   const requiredPaths = [
     'AGENTS.md',
@@ -1152,8 +1224,8 @@ function main() {
     '.claude-plugin/marketplace.json',
     '.claude/hooks/hooks.json',
     '.codex/hooks/hooks.json',
-    '.codex/agents/feedback-curator.md',
-    '.codex/agents/challenger.md',
+    '.codex/agents/feedback-curator.toml',
+    '.codex/agents/challenger.toml',
     'skills/doc-sync/SKILL.md',
     'skills/plan-persist/SKILL.md',
     'skills/harness-help/SKILL.md',
@@ -1236,7 +1308,7 @@ function main() {
   assertMirrorDirectory('.claude/skills', 'skills');
   assertMirrorDirectory('.claude/skills', '.codex/skills');
   assertMirrorDirectory('.claude/agents', 'agents');
-  assertMirrorDirectory('.claude/agents', '.codex/agents');
+  assertCodexAgentDirectory();
   assertMirrorDirectory('.claude/scripts/hooks', 'scripts/hooks');
   assertMirrorDirectory('.claude/scripts/hooks', '.codex/scripts/hooks');
   assertMirrorDirectory('hooks', '.claude/hooks');

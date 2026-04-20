@@ -6,12 +6,19 @@ const path = require('path');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const ignoredNames = new Set(['.DS_Store']);
+const codexAgentProfiles = {
+  architect: { model: 'gpt-5.4', reasoning: 'high', sandbox: 'workspace-write' },
+  challenger: { model: 'gpt-5.4', reasoning: 'high', sandbox: 'read-only' },
+  developer: { model: 'gpt-5.4', reasoning: 'medium', sandbox: 'workspace-write' },
+  'feedback-curator': { model: 'gpt-5.4', reasoning: 'medium', sandbox: 'workspace-write' },
+  reviewer: { model: 'gpt-5.4', reasoning: 'high', sandbox: 'read-only' },
+  tester: { model: 'gpt-5.4', reasoning: 'medium', sandbox: 'workspace-write' },
+};
 
 const mirrorPairs = [
   ['.claude/skills', 'skills'],
   ['.claude/skills', '.codex/skills'],
   ['.claude/agents', 'agents'],
-  ['.claude/agents', '.codex/agents'],
   ['.claude/scripts/hooks', 'scripts/hooks'],
   ['.claude/scripts/hooks', '.codex/scripts/hooks'],
   ['hooks', '.claude/hooks'],
@@ -31,6 +38,36 @@ function listEntries(dirPath) {
   return fs.readdirSync(dirPath, { withFileTypes: true })
     .filter((entry) => !ignoredNames.has(entry.name))
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function parseFrontmatter(markdown) {
+  const match = markdown.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!match) {
+    return { body: markdown.trim() };
+  }
+
+  return { body: match[2].trim() };
+}
+
+function renderCodexAgentToml(agentName, sourceContent) {
+  const profile = codexAgentProfiles[agentName];
+  if (!profile) {
+    throw new Error(`Missing Codex agent profile for ${agentName}`);
+  }
+
+  const { body } = parseFrontmatter(sourceContent);
+  const instructions = body.replace(/\r\n/g, '\n').replace(/"""/g, '\\"""');
+
+  return [
+    `model = "${profile.model}"`,
+    `model_reasoning_effort = "${profile.reasoning}"`,
+    `sandbox_mode = "${profile.sandbox}"`,
+    '',
+    'developer_instructions = """',
+    instructions,
+    '"""',
+    '',
+  ].join('\n');
 }
 
 function removeExtraEntries(sourceDir, targetDir, actions) {
@@ -70,12 +107,43 @@ function syncDirectory(sourceDir, targetDir, actions) {
   }
 }
 
+function syncCodexAgents(sourceDir, targetDir, actions) {
+  ensureDir(targetDir);
+
+  const sourceEntries = listEntries(sourceDir).filter((entry) => entry.isFile() && entry.name.endsWith('.md'));
+  const expectedTargetNames = new Set(sourceEntries.map((entry) => entry.name.replace(/\.md$/, '.toml')));
+
+  for (const entry of listEntries(targetDir)) {
+    const targetPath = path.join(targetDir, entry.name);
+    if (expectedTargetNames.has(entry.name)) continue;
+
+    fs.rmSync(targetPath, { recursive: true, force: true });
+    actions.push(`removed ${path.relative(repoRoot, targetPath)}`);
+  }
+
+  for (const entry of sourceEntries) {
+    const sourcePath = path.join(sourceDir, entry.name);
+    const agentName = path.basename(entry.name, '.md');
+    const targetPath = path.join(targetDir, `${agentName}.toml`);
+    const rendered = Buffer.from(renderCodexAgentToml(agentName, fs.readFileSync(sourcePath, 'utf8')));
+    const targetExists = fs.existsSync(targetPath);
+    const targetContent = targetExists ? fs.readFileSync(targetPath) : null;
+
+    if (!targetExists || !rendered.equals(targetContent)) {
+      fs.writeFileSync(targetPath, rendered);
+      actions.push(`${targetExists ? 'updated' : 'created'} ${path.relative(repoRoot, targetPath)}`);
+    }
+  }
+}
+
 function main() {
   const actions = [];
 
   for (const [sourceRel, targetRel] of mirrorPairs) {
     syncDirectory(rel(sourceRel), rel(targetRel), actions);
   }
+
+  syncCodexAgents(rel('.claude/agents'), rel('.codex/agents'), actions);
 
   if (actions.length === 0) {
     console.log('Mirror sync: already up to date.');

@@ -1,9 +1,8 @@
----
-name: architect
-description: 架构师。负责任务开始前检查计划文档，开发完成后识别 docs impact，并触发统一的文档同步能力。
-tools: ["Read", "Grep", "Glob", "WebSearch", "Write", "Bash"]
----
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
 
+developer_instructions = """
 # 架构师 (Architect)
 
 您是一位架构专家，负责计划检查、范围确认和文档同步 gatekeeping。
@@ -104,3 +103,4 @@ APPROVED / BLOCKED
 优先复用的顶级 Skill：
 
 - `/doc-sync`：统一的文档检查、同步与结果落账能力
+"""

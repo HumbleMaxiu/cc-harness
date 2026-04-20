@@ -22,7 +22,7 @@
 - 想在自己的项目里初始化 harness 文档和 workflow 的用户
 - 已经在使用 `cc-harness`，想知道该调用哪个 skill、自动化会做什么、出错时怎么处理的用户
 
-## 你能得到什么
+## 核心痛点与当前解法
 
 `cc-harness` 主要解决下面这些高频问题：
 
@@ -34,6 +34,8 @@
 | 文档腐坏 | `/doc-sync` + index + consistency checks |
 | 反馈无法沉淀 | `/feedback` + feedback memory + recurrence + skill promotion path |
 | 恢复困难 | SessionStart memory 注入 + memory / plan / trace 回注 |
+
+`/harness-setup` 现在支持三种 scaffold profile，分别面向轻量起步、默认标准和高约束场景。
 
 ## 安装与启用
 
@@ -122,6 +124,8 @@
 5. 如有文档影响，用 `/doc-sync`
 6. 交付前运行 `/harness-quality-gate`
 7. 过程中如果对体验、流程或规范有意见，用 `/feedback`
+
+进入 `Subagent` 模式时，空返回或无效 handoff 不能被当作通过；同时不要把全量文件列表和重复规则直接塞进 subagent prompt。
 
 ## 详细使用步骤
 
@@ -518,6 +522,12 @@ npm test
 - [scripts/hooks](scripts/hooks/)
 - [.codex](.codex/)
 
+其中 `agents` 有一个格式例外：
+
+- `.claude/agents/*.md` 是事实来源
+- `agents/*.md` 是根目录 Markdown 镜像
+- `.codex/agents/*.toml` 是由 `npm run sync:mirrors` 生成的 Codex 原生 subagent 配置，不再镜像 `.md`
+
 另外，hook 声明文件也做三边镜像：
 
 - [hooks/hooks.json](hooks/hooks.json)
@@ -527,7 +537,7 @@ npm test
 ### 主要目录
 
 - [`.claude/`](.claude/)：Claude Code 事实来源
-- [`.codex/`](.codex/)：Codex 兼容镜像
+- [`.codex/`](.codex/)：Codex 运行层镜像；其中 agents 使用 `.toml`
 - [`skills/`](skills/)：根目录 skills 镜像
 - [`agents/`](agents/)：根目录 agents 镜像
 - [`scripts/hooks/`](scripts/hooks/)：hook 实现

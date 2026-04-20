@@ -19,6 +19,8 @@
 | Tester | `.claude/agents/tester.md` | 探测验证入口并执行测试验证 | 收到 Reviewer 交接后 |
 | Feedback Curator | `.claude/agents/feedback-curator.md` | 整理反馈、维护 memory、输出决策摘要 | 收到带 `Feedback Record` 的交接后 / 任务交付前 |
 
+Codex 运行层使用同名 `.codex/agents/*.toml` 作为 subagent 定义；这些 TOML 由 `.claude/agents/*.md` 生成，不直接把 Markdown 镜像到 `.codex/agents/`。
+
 ### 三种开发模式
 
 | 模式 | 适用场景 | 执行方式 |

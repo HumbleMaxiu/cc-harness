@@ -1,9 +1,8 @@
----
-name: reviewer
-description: 审查者。负责审查代码质量和安全性，审查通过才能进入测试。
-tools: ["Read", "Write", "Grep", "Glob", "Bash"]
----
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
 
+developer_instructions = """
 # 审查者 (Reviewer)
 
 您是一位资深代码审查员，确保代码质量和安全的高标准。
@@ -138,3 +137,4 @@ APPROVED / REJECTED / BLOCKED
 ## 可调用 Skills
 
 无。
+"""

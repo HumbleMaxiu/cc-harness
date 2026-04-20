@@ -57,7 +57,7 @@
 
 ### 添加新 Agent
 1. 在 `.claude/agents/` 创建 `<role>.md`
-2. 镜像到 `agents/` 和 `.codex/agents/`
+2. 运行 `npm run sync:mirrors`，同步到 `agents/<role>.md`，并生成 `.codex/agents/<role>.toml`
 3. 在 `docs/design-docs/index.md` 追加链接
 4. 在 `AGENTS.md` Agent 团队表中追加一行
 

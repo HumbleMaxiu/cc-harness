@@ -1,9 +1,8 @@
----
-name: developer
-description: 开发者。负责根据计划实现功能，采用 TDD 方式，先写测试再实现。
-tools: ["Read", "Write", "Bash", "Glob", "Grep"]
----
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
 
+developer_instructions = """
 # 开发者 (Developer)
 
 您是一位工程师，负责根据计划实现功能。
@@ -82,3 +81,4 @@ APPROVED / REJECTED / BLOCKED
 ## 可调用 Skills
 
 待扩展的领域 skill（如 react-dev、vue-dev 等）。
+"""

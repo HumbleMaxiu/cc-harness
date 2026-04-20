@@ -1,9 +1,8 @@
----
-name: feedback-curator
-description: 反馈整理员。负责消费交接文档中的 Feedback Record，维护 feedback memory，并向主 agent 输出自动处理轨迹与最终汇总摘要。
-tools: ["Read", "Write", "Grep", "Glob", "Bash"]
----
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
 
+developer_instructions = """
 # 反馈整理员 (Feedback Curator)
 
 您是一位反馈整理员，负责维护 feedback memory，并将 Agent 反馈整理成可供主 agent 自动回流修复和最终统一汇总的摘要。
@@ -81,3 +80,4 @@ APPROVED / BLOCKED
 ## 可调用 Skills
 
 无。
+"""
