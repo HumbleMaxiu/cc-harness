@@ -528,11 +528,13 @@ npm test
 - `agents/*.md` 是根目录 Markdown 镜像
 - `.codex/agents/*.toml` 是由 `npm run sync:mirrors` 生成的 Codex 原生 subagent 配置，不再镜像 `.md`
 
-另外，hook 声明文件也做三边镜像：
+另外，hook 声明文件分两种运行层表示：
 
 - [hooks/hooks.json](hooks/hooks.json)
 - [.claude/hooks/hooks.json](.claude/hooks/hooks.json)
-- [.codex/hooks/hooks.json](.codex/hooks/hooks.json)
+- [.codex/hooks.json](.codex/hooks.json)
+
+其中 Codex 还需要项目级 [`.codex/config.toml`](.codex/config.toml) 显式打开 `codex_hooks = true`。
 
 ### 主要目录
 

@@ -10,7 +10,7 @@
  *
  * Arguments:
  *   event       - The hook event name (e.g., "session:start", "pre:bash:block-no-verify")
- *   hook-script - Relative path to the hook script from the plugin root
+ *   hook-script - Path to the hook script (repo-local, mirrored, or plugin-relative)
  *   flags       - Comma-separated list of hook profiles this hook belongs to
  *                 (e.g., "minimal,standard,strict")
  *
@@ -80,9 +80,28 @@ function parseArgs() {
 }
 
 /**
- * Resolve the plugin root directory
+ * Resolve the hook script path across repo-local Codex mirrors and Claude plugin installs.
  */
-function resolvePluginRoot() {
+function resolveHookScriptPath(hookScript) {
+  const normalized = String(hookScript || '').trim();
+  if (!normalized) {
+    return '';
+  }
+
+  if (path.isAbsolute(normalized) && fs.existsSync(normalized)) {
+    return normalized;
+  }
+
+  const cwdPath = path.resolve(process.cwd(), normalized);
+  if (fs.existsSync(cwdPath)) {
+    return cwdPath;
+  }
+
+  const mirroredRootPath = path.resolve(__dirname, '..', '..', normalized);
+  if (fs.existsSync(mirroredRootPath)) {
+    return mirroredRootPath;
+  }
+
   const CURRENT_PLUGIN_SLUG = 'cc-harness';
   const LEGACY_PLUGIN_SLUGS = ['ecc', 'everything-claude-code'];
   const KNOWN_PLUGIN_PATHS = [
@@ -97,23 +116,21 @@ function resolvePluginRoot() {
   ];
   const CACHE_PLUGIN_SLUGS = [CURRENT_PLUGIN_SLUG, ...LEGACY_PLUGIN_SLUGS];
 
-  const rel = path.join('scripts', 'hooks', 'run-with-flags.js');
-
   function hasRunnerRoot(candidate) {
     const value = typeof candidate === 'string' ? candidate.trim() : '';
-    return value.length > 0 && fs.existsSync(path.join(path.resolve(value), rel));
+    return value.length > 0 && fs.existsSync(path.join(path.resolve(value), normalized));
   }
 
   const envRoot = process.env.CLAUDE_PLUGIN_ROOT || '';
   if (hasRunnerRoot(envRoot)) {
-    return path.resolve(envRoot.trim());
+    return path.join(path.resolve(envRoot.trim()), normalized);
   }
 
   const home = require('os').homedir();
   const claudeDir = path.join(home, '.claude');
 
   if (hasRunnerRoot(claudeDir)) {
-    return claudeDir;
+    return path.join(claudeDir, normalized);
   }
 
   const knownPaths = KNOWN_PLUGIN_PATHS.map((segments) =>
@@ -122,7 +139,7 @@ function resolvePluginRoot() {
 
   for (const candidate of knownPaths) {
     if (hasRunnerRoot(candidate)) {
-      return candidate;
+      return path.join(candidate, normalized);
     }
   }
 
@@ -136,7 +153,7 @@ function resolvePluginRoot() {
           if (!version.isDirectory()) continue;
           const candidate = path.join(cacheBase, org.name, version.name);
           if (hasRunnerRoot(candidate)) {
-            return candidate;
+            return path.join(candidate, normalized);
           }
         }
       }
@@ -145,7 +162,7 @@ function resolvePluginRoot() {
     // cache directory may not exist
   }
 
-  return claudeDir;
+  return '';
 }
 
 // Main execution
@@ -160,10 +177,9 @@ if (!shouldRunHook(flags)) {
 }
 
 // Resolve plugin root and hook script path
-const root = resolvePluginRoot();
-const scriptPath = path.join(root, hookScript);
+const scriptPath = resolveHookScriptPath(hookScript);
 
-if (!fs.existsSync(scriptPath)) {
+if (!scriptPath || !fs.existsSync(scriptPath)) {
   console.error(`[run-with-flags] ERROR: Hook script not found: ${scriptPath}`);
   const raw = fs.readFileSync(0, 'utf8');
   process.stdout.write(raw);

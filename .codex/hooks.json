@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "hooks": {
     "SessionStart": [
       {
@@ -7,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-start-bootstrap.js\""
+            "command": "node \".codex/scripts/hooks/session-start-bootstrap.js\""
           }
         ],
         "description": "Inject using-brainstorming skill on session start",
@@ -20,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"user-prompt-submit:plan-status\" \"scripts/hooks/plan-status.js\" \"standard,strict\""
+            "command": "node \".codex/scripts/hooks/run-with-flags.js\" \"user-prompt-submit:plan-status\" \".codex/scripts/hooks/plan-status.js\" \"standard,strict\""
           }
         ],
         "description": "Inject current active plan status on every user prompt",
@@ -33,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"pre-tool-use:plan-refresh\" \"scripts/hooks/plan-refresh.js\" \"standard,strict\""
+            "command": "node \".codex/scripts/hooks/run-with-flags.js\" \"pre-tool-use:plan-refresh\" \".codex/scripts/hooks/plan-refresh.js\" \"standard,strict\""
           }
         ],
         "description": "Refresh active plan and run trace before tool execution",
@@ -46,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"post-tool-use:plan-write-reminder\" \"scripts/hooks/plan-write-reminder.js\" \"standard,strict\""
+            "command": "node \".codex/scripts/hooks/run-with-flags.js\" \"post-tool-use:plan-write-reminder\" \".codex/scripts/hooks/plan-write-reminder.js\" \"standard,strict\""
           }
         ],
         "description": "Remind the agent to update Run Trace after writes",
@@ -59,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/hooks/run-with-flags.js\" \"stop:plan-stop-check\" \"scripts/hooks/plan-stop-check.js\" \"standard,strict\""
+            "command": "node \".codex/scripts/hooks/run-with-flags.js\" \"stop:plan-stop-check\" \".codex/scripts/hooks/plan-stop-check.js\" \"standard,strict\""
           }
         ],
         "description": "Check active plan completeness before stop",

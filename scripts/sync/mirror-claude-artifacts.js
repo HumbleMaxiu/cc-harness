@@ -22,7 +22,6 @@ const mirrorPairs = [
   ['.claude/scripts/hooks', 'scripts/hooks'],
   ['.claude/scripts/hooks', '.codex/scripts/hooks'],
   ['hooks', '.claude/hooks'],
-  ['hooks', '.codex/hooks'],
 ];
 
 function rel(...segments) {
@@ -68,6 +67,25 @@ function renderCodexAgentToml(agentName, sourceContent) {
     '"""',
     '',
   ].join('\n');
+}
+
+function renderCodexHooksJson(sourceContent) {
+  const parsed = JSON.parse(sourceContent);
+  const codexHooks = { hooks: {} };
+
+  for (const [eventName, entries] of Object.entries(parsed.hooks || {})) {
+    codexHooks.hooks[eventName] = entries.map((entry) => ({
+      ...entry,
+      hooks: (entry.hooks || []).map((hook) => ({
+        ...hook,
+        command: String(hook.command || '')
+          .replace(/\$\{CLAUDE_PLUGIN_ROOT\}\/scripts\/hooks\//g, '.codex/scripts/hooks/')
+          .replace(/"scripts\/hooks\//g, '".codex/scripts/hooks/'),
+      })),
+    }));
+  }
+
+  return JSON.stringify(codexHooks, null, 2) + '\n';
 }
 
 function removeExtraEntries(sourceDir, targetDir, actions) {
@@ -136,6 +154,18 @@ function syncCodexAgents(sourceDir, targetDir, actions) {
   }
 }
 
+function syncCodexHooks(sourcePath, targetPath, actions) {
+  const rendered = Buffer.from(renderCodexHooksJson(fs.readFileSync(sourcePath, 'utf8')));
+  const targetExists = fs.existsSync(targetPath);
+  const targetContent = targetExists ? fs.readFileSync(targetPath) : null;
+
+  if (!targetExists || !rendered.equals(targetContent)) {
+    ensureDir(path.dirname(targetPath));
+    fs.writeFileSync(targetPath, rendered);
+    actions.push(`${targetExists ? 'updated' : 'created'} ${path.relative(repoRoot, targetPath)}`);
+  }
+}
+
 function main() {
   const actions = [];
 
@@ -144,6 +174,7 @@ function main() {
   }
 
   syncCodexAgents(rel('.claude/agents'), rel('.codex/agents'), actions);
+  syncCodexHooks(rel('hooks/hooks.json'), rel('.codex/hooks.json'), actions);
 
   if (actions.length === 0) {
     console.log('Mirror sync: already up to date.');

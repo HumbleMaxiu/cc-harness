@@ -17,9 +17,9 @@
  *
  * How it works:
  *   1. Reads the raw JSON event from stdin (passed by Claude Code).
- *   2. Resolves the cc-harness plugin root directory (via CLAUDE_PLUGIN_ROOT env var
- *      or a set of well-known fallback paths).
- *   3. Runs `scripts/hooks/session-start.js` which injects the using-brainstorming skill.
+ *   2. Resolves the hook runner script from the current mirrored directory first,
+ *      then falls back to known plugin locations for Claude installs.
+ *   3. Runs `session-start.js` which injects the using-brainstorming skill.
  *   4. Passes stdout/stderr through and forwards the child exit code.
  *   5. If the plugin root cannot be found, emits a warning and passes stdin
  *      through unchanged so Claude Code can continue normally.
@@ -29,97 +29,94 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const CURRENT_PLUGIN_SLUG = 'cc-harness';
-const LEGACY_PLUGIN_SLUGS = ['ecc', 'everything-claude-code'];
-const KNOWN_PLUGIN_PATHS = [
-  [CURRENT_PLUGIN_SLUG],
-  [`${CURRENT_PLUGIN_SLUG}@${CURRENT_PLUGIN_SLUG}`],
-  ['marketplace', CURRENT_PLUGIN_SLUG],
-  ...LEGACY_PLUGIN_SLUGS.flatMap((slug) => [
-    [slug],
-    [`${slug}@${slug}`],
-    ['marketplace', slug],
-  ]),
-];
-const CACHE_PLUGIN_SLUGS = [CURRENT_PLUGIN_SLUG, ...LEGACY_PLUGIN_SLUGS];
-
 // Read the raw JSON event from stdin
 const raw = fs.readFileSync(0, 'utf8');
 
-// Path (relative to plugin root) to the session-start hook
-const rel = path.join('scripts', 'hooks', 'session-start.js');
+const CURRENT_PLUGIN_SLUG = 'cc-harness';
+const LEGACY_PLUGIN_SLUGS = ['ecc', 'everything-claude-code'];
+const REL_HOOK_PATH = path.join('scripts', 'hooks', 'session-start.js');
 
 /**
- * Returns true when `candidate` looks like a valid cc-harness plugin root, i.e. the
- * session-start.js hook exists inside it.
+ * Returns true when `candidate` looks like a valid root containing the hook runner.
  *
  * @param {unknown} candidate
  * @returns {boolean}
  */
-function hasRunnerRoot(candidate) {
+function hasHookScript(candidate) {
   const value = typeof candidate === 'string' ? candidate.trim() : '';
-  return value.length > 0 && fs.existsSync(path.join(path.resolve(value), rel));
+  return value.length > 0 && fs.existsSync(path.resolve(value));
 }
 
 /**
- * Resolves the ECC plugin root using the following priority order:
- *   1. CLAUDE_PLUGIN_ROOT environment variable
- *   2. ~/.claude (direct install)
- *   3. Several well-known plugin sub-paths under ~/.claude/plugins/ (current + legacy)
- *   4. Versioned cache directories under ~/.claude/plugins/cache/{cc-harness,ecc,everything-claude-code}/
- *   5. Falls back to ~/.claude if nothing else matches
+ * Resolve the runner script path across repo-local Codex mirrors and Claude plugin installs.
  *
  * @returns {string}
  */
-function resolvePluginRoot() {
+function resolveScriptPath() {
+  const directLocal = path.join(__dirname, 'session-start.js');
+  if (hasHookScript(directLocal)) {
+    return directLocal;
+  }
+
+  const repoLocal = path.join(process.cwd(), '.codex', REL_HOOK_PATH);
+  if (hasHookScript(repoLocal)) {
+    return repoLocal;
+  }
+
   const envRoot = process.env.CLAUDE_PLUGIN_ROOT || '';
-  if (hasRunnerRoot(envRoot)) {
-    return path.resolve(envRoot.trim());
+  const envScript = envRoot ? path.join(path.resolve(envRoot.trim()), REL_HOOK_PATH) : '';
+  if (hasHookScript(envScript)) {
+    return envScript;
   }
 
   const home = require('os').homedir();
   const claudeDir = path.join(home, '.claude');
-
-  if (hasRunnerRoot(claudeDir)) {
-    return claudeDir;
+  const directClaude = path.join(claudeDir, REL_HOOK_PATH);
+  if (hasHookScript(directClaude)) {
+    return directClaude;
   }
 
-  const knownPaths = KNOWN_PLUGIN_PATHS.map((segments) =>
-    path.join(claudeDir, 'plugins', ...segments)
-  );
+  const pluginRoots = [
+    [CURRENT_PLUGIN_SLUG],
+    [`${CURRENT_PLUGIN_SLUG}@${CURRENT_PLUGIN_SLUG}`],
+    ['marketplace', CURRENT_PLUGIN_SLUG],
+    ...LEGACY_PLUGIN_SLUGS.flatMap((slug) => [
+      [slug],
+      [`${slug}@${slug}`],
+      ['marketplace', slug],
+    ]),
+  ].map((segments) => path.join(claudeDir, 'plugins', ...segments, REL_HOOK_PATH));
 
-  for (const candidate of knownPaths) {
-    if (hasRunnerRoot(candidate)) {
+  for (const candidate of pluginRoots) {
+    if (hasHookScript(candidate)) {
       return candidate;
     }
   }
 
-  // Walk versioned cache: ~/.claude/plugins/cache/{cc-harness,ecc,everything-claude-code}/<org>/<version>/
-  try {
-    for (const slug of CACHE_PLUGIN_SLUGS) {
-      const cacheBase = path.join(claudeDir, 'plugins', 'cache', slug);
+  for (const slug of [CURRENT_PLUGIN_SLUG, ...LEGACY_PLUGIN_SLUGS]) {
+    const cacheBase = path.join(claudeDir, 'plugins', 'cache', slug);
+    try {
       for (const org of fs.readdirSync(cacheBase, { withFileTypes: true })) {
         if (!org.isDirectory()) continue;
         for (const version of fs.readdirSync(path.join(cacheBase, org.name), { withFileTypes: true })) {
           if (!version.isDirectory()) continue;
-          const candidate = path.join(cacheBase, org.name, version.name);
-          if (hasRunnerRoot(candidate)) {
+          const candidate = path.join(cacheBase, org.name, version.name, REL_HOOK_PATH);
+          if (hasHookScript(candidate)) {
             return candidate;
           }
         }
       }
+    } catch {
+      // cache directory may not exist; that's fine
     }
-  } catch {
-    // cache directory may not exist; that's fine
   }
 
-  return claudeDir;
+  return '';
 }
 
-const root = resolvePluginRoot();
-const script = path.join(root, rel);
+const script = resolveScriptPath();
 
-if (fs.existsSync(script)) {
+if (script) {
   const result = spawnSync(
     process.execPath,
     [script],
@@ -157,6 +154,6 @@ if (fs.existsSync(script)) {
 }
 
 process.stderr.write(
-  '[SessionStart] WARNING: could not resolve cc-harness plugin root; skipping session-start hook\n'
+  '[SessionStart] WARNING: could not resolve cc-harness session-start runner; skipping session-start hook\n'
 );
 process.stdout.write(raw);

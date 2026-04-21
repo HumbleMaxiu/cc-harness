@@ -97,6 +97,25 @@ function renderCodexAgentToml(agentName, sourceContent) {
   ].join('\n');
 }
 
+function renderCodexHooksJson(sourceContent) {
+  const parsed = JSON.parse(sourceContent);
+  const codexHooks = { hooks: {} };
+
+  for (const [eventName, entries] of Object.entries(parsed.hooks || {})) {
+    codexHooks.hooks[eventName] = entries.map((entry) => ({
+      ...entry,
+      hooks: (entry.hooks || []).map((hook) => ({
+        ...hook,
+        command: String(hook.command || '')
+          .replace(/\$\{CLAUDE_PLUGIN_ROOT\}\/scripts\/hooks\//g, '.codex/scripts/hooks/')
+          .replace(/"scripts\/hooks\//g, '".codex/scripts/hooks/'),
+      })),
+    }));
+  }
+
+  return JSON.stringify(codexHooks, null, 2) + '\n';
+}
+
 function assertRelativeLinksExist(relPath) {
   const content = read(relPath);
   const baseDir = path.dirname(relPath);
@@ -1205,6 +1224,20 @@ function assertCodexAgentDirectory() {
   }
 }
 
+function assertCodexHooksConfig() {
+  const expectedHooks = renderCodexHooksJson(read('hooks/hooks.json'));
+  const actualHooks = read('.codex/hooks.json');
+
+  if (expectedHooks !== actualHooks) {
+    fail('.codex/hooks.json: content drift from generated Codex hooks config');
+  }
+
+  const configToml = read('.codex/config.toml');
+  if (!configToml.includes('[features]') || !configToml.includes('codex_hooks = true')) {
+    fail('.codex/config.toml: expected codex_hooks feature toggle');
+  }
+}
+
 function main() {
   const requiredPaths = [
     'AGENTS.md',
@@ -1223,7 +1256,8 @@ function main() {
     '.claude-plugin/plugin.json',
     '.claude-plugin/marketplace.json',
     '.claude/hooks/hooks.json',
-    '.codex/hooks/hooks.json',
+    '.codex/config.toml',
+    '.codex/hooks.json',
     '.codex/agents/feedback-curator.toml',
     '.codex/agents/challenger.toml',
     'skills/doc-sync/SKILL.md',
@@ -1309,10 +1343,10 @@ function main() {
   assertMirrorDirectory('.claude/skills', '.codex/skills');
   assertMirrorDirectory('.claude/agents', 'agents');
   assertCodexAgentDirectory();
+  assertCodexHooksConfig();
   assertMirrorDirectory('.claude/scripts/hooks', 'scripts/hooks');
   assertMirrorDirectory('.claude/scripts/hooks', '.codex/scripts/hooks');
   assertMirrorDirectory('hooks', '.claude/hooks');
-  assertMirrorDirectory('hooks', '.codex/hooks');
 
   if (failures.length > 0) {
     console.error('Harness consistency check failed:\n');
