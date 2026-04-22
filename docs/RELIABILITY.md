@@ -41,6 +41,14 @@ cc-harness 是一个 **无状态文档框架**，运行在 Claude Code 的会话
 
 这些 hooks 的目标是增强恢复与连续性，而不是替代正式的计划文档。
 
+Hook runtime 本身也必须 fail-open：
+
+- 不允许因为 shell 启动差异、插件根目录解析失败或 stdin / EOF 行为异常而把主流程无限挂住
+- 对 Windows PowerShell + Git Bash 这类兼容性较脆弱的运行层，hook 应使用有界等待和超时回退，而不是假设 stdin 一定会正常结束
+- 当 hook 无法安全完成时，应优先透传当前 payload 并输出最小 warning，而不是阻塞 `/harness-setup`、停止点或正常对话
+- Codex hooks 的正常协议输出必须保持在 `stdout` 的 JSON 中；关键节点调试日志应走 `stderr`，如需稳定排障应通过 [`.codex/hook-logging.json`](../.codex/hook-logging.json) 启用并写入 `.codex/logs/hooks.log`
+- Claude hooks 也应把关键节点调试日志放在 `stderr`，并通过 [`.claude/hook-logging.json`](../.claude/hook-logging.json) 启用写入 `.claude/logs/hooks.log`；如需临时自定义落点，可设置 `CC_HARNESS_HOOK_LOG_PATH`
+
 第一阶段 hooks 只做最小硬信号检测，当前要求至少能提示：
 
 - `missing-run-trace`

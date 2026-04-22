@@ -6,15 +6,6 @@ const path = require('path');
 
 let cachedHookLogPath;
 
-function parseHookInput(raw) {
-  try {
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
 function safeStat(target) {
   try {
     return fs.statSync(target);
@@ -23,14 +14,14 @@ function safeStat(target) {
   }
 }
 
-function findClaudeRoot(startDir) {
+function findCodexRoot(startDir) {
   let current = path.resolve(startDir || process.cwd());
 
   while (true) {
-    const claudeDir = path.join(current, '.claude');
-    const stat = safeStat(claudeDir);
+    const codexDir = path.join(current, '.codex');
+    const stat = safeStat(codexDir);
     if (stat && stat.isDirectory()) {
-      return claudeDir;
+      return codexDir;
     }
 
     const parent = path.dirname(current);
@@ -41,12 +32,12 @@ function findClaudeRoot(startDir) {
   }
 }
 
-function readHookLoggingConfig(claudeRoot) {
-  if (!claudeRoot) {
+function readHookLoggingConfig(codexRoot) {
+  if (!codexRoot) {
     return null;
   }
 
-  const configPath = path.join(claudeRoot, 'hook-logging.json');
+  const configPath = path.join(codexRoot, 'hook-logging.json');
   const stat = safeStat(configPath);
   if (!stat || !stat.isFile()) {
     return null;
@@ -71,8 +62,8 @@ function resolveHookLogPath() {
     return cachedHookLogPath;
   }
 
-  const claudeRoot = findClaudeRoot(process.cwd());
-  const config = readHookLoggingConfig(claudeRoot);
+  const codexRoot = findCodexRoot(process.cwd());
+  const config = readHookLoggingConfig(codexRoot);
   if (!config || config.enabled !== true) {
     cachedHookLogPath = null;
     return cachedHookLogPath;
@@ -80,8 +71,8 @@ function resolveHookLogPath() {
 
   const configuredPath = typeof config.logPath === 'string' ? config.logPath.trim() : '';
   const defaultPath = path.join('logs', 'hooks.log');
-  cachedHookLogPath = claudeRoot
-    ? path.resolve(claudeRoot, configuredPath || defaultPath)
+  cachedHookLogPath = codexRoot
+    ? path.resolve(codexRoot, configuredPath || defaultPath)
     : null;
   return cachedHookLogPath;
 }
@@ -119,33 +110,48 @@ function logHook(stage, message, details) {
     }, {}))
     : '';
 
-  const line = `[claude-hook] ${new Date().toISOString()} ${stage} ${message}${detailSuffix}`;
+  const line = `[codex-hook] ${new Date().toISOString()} ${stage} ${message}${detailSuffix}`;
   writeStderrLine(line);
   writeFileLogLine(line);
 }
 
-function isCodexHookPayload(raw, expectedEventName) {
-  const parsed = parseHookInput(raw);
-  if (!parsed || typeof parsed.hook_event_name !== 'string') {
-    return false;
-  }
-
-  if (!expectedEventName) {
-    return true;
-  }
-
-  return parsed.hook_event_name === expectedEventName;
+function summarizeHookInput(parsed, raw) {
+  return {
+    bytes: Buffer.byteLength(raw || '', 'utf8'),
+    event: parsed && parsed.hook_event_name,
+    tool: parsed && parsed.tool_name,
+    cwd: parsed && parsed.cwd,
+  };
 }
 
-function emitCodexSystemMessage(message, options = {}) {
-  const payload = {
-    systemMessage: message,
-  };
+function readHookInput() {
+  const raw = fs.readFileSync(0, 'utf8');
 
-  if (options.hookSpecificOutput) {
-    payload.hookSpecificOutput = options.hookSpecificOutput;
+  try {
+    const parsed = JSON.parse(raw);
+    logHook(
+      'input',
+      parsed && typeof parsed === 'object' ? 'parsed hook payload' : 'parsed non-object hook payload',
+      summarizeHookInput(parsed, raw)
+    );
+    return parsed && typeof parsed === 'object'
+      ? { raw, parsed }
+      : { raw, parsed: null };
+  } catch {
+    logHook('input', 'failed to parse hook payload as JSON', {
+      bytes: Buffer.byteLength(raw || '', 'utf8'),
+    });
+    return { raw, parsed: null };
   }
+}
 
+function emitJson(payload) {
+  logHook('output', 'emitting hook JSON payload', {
+    keys: Object.keys(payload || {}).join(','),
+    hasSystemMessage: typeof payload.systemMessage === 'string',
+    systemMessageLength:
+      typeof payload.systemMessage === 'string' ? payload.systemMessage.length : undefined,
+  });
   process.stdout.write(JSON.stringify(payload));
 }
 
@@ -177,10 +183,6 @@ function extractField(section, key) {
   return match ? match[1].trim() : '';
 }
 
-function preview(content, lines) {
-  return content.trim().split('\n').slice(0, lines).join('\n');
-}
-
 function detectDriftSignals(content) {
   const signals = [];
   const runTrace = extractSection(content, '### Run Trace');
@@ -208,10 +210,8 @@ function detectDriftSignals(content) {
   }
 
   return {
-    driftStatus: signals.length > 0 ? 'attention-needed' : 'clear',
     driftSignals: signals,
     pendingOperationGate: gatePending ? 'true' : 'false',
-    runTracePreview: runTrace ? preview(runTrace, 12) : 'none recorded in current active plan',
   };
 }
 
@@ -224,18 +224,13 @@ function readLatestPlan(repoRoot) {
 
   const latest = plans[0];
   const content = fs.readFileSync(latest.abs, 'utf8');
-  const relPath = path.relative(repoRoot, latest.abs);
   const planState = {
     name: latest.name,
-    abs: latest.abs,
-    relPath,
-    content,
     uncheckedSteps: (content.match(/- \[ \]/g) || []).length,
     ...detectDriftSignals(content),
   };
   logHook('plan', 'loaded latest active plan', {
     plan: planState.name,
-    relPath: planState.relPath,
     uncheckedSteps: planState.uncheckedSteps,
     driftSignals: planState.driftSignals.join(','),
     pendingOperationGate: planState.pendingOperationGate,
@@ -244,11 +239,8 @@ function readLatestPlan(repoRoot) {
 }
 
 module.exports = {
-  emitCodexSystemMessage,
-  isCodexHookPayload,
-  listActivePlans,
+  emitJson,
   logHook,
-  parseHookInput,
-  preview,
+  readHookInput,
   readLatestPlan,
 };

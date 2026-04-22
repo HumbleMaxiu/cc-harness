@@ -28,9 +28,49 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { logHook } = require('./plan-persist-common');
 
-// Read the raw JSON event from stdin
-const raw = fs.readFileSync(0, 'utf8');
+function getStdinTimeoutMs() {
+  const value = Number.parseInt(process.env.CC_HARNESS_HOOK_STDIN_TIMEOUT_MS || '1000', 10);
+  return Number.isFinite(value) && value >= 0 ? value : 1000;
+}
+
+function readStdinWithTimeout(timeoutMs) {
+  if (process.stdin.isTTY) {
+    return Promise.resolve({ raw: '', timedOut: false });
+  }
+
+  return new Promise((resolve) => {
+    let raw = '';
+    let settled = false;
+
+    const finish = (timedOut) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      clearTimeout(timer);
+      process.stdin.removeListener('data', onData);
+      process.stdin.removeListener('end', onEnd);
+      process.stdin.removeListener('error', onError);
+      resolve({ raw, timedOut });
+    };
+
+    const onData = (chunk) => {
+      raw += chunk;
+    };
+    const onEnd = () => finish(false);
+    const onError = () => finish(false);
+
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', onData);
+    process.stdin.on('end', onEnd);
+    process.stdin.on('error', onError);
+    process.stdin.resume();
+
+    const timer = setTimeout(() => finish(true), timeoutMs);
+  });
+}
 
 const CURRENT_PLUGIN_SLUG = 'cc-harness';
 const LEGACY_PLUGIN_SLUGS = ['ecc', 'everything-claude-code'];
@@ -114,46 +154,81 @@ function resolveScriptPath() {
   return '';
 }
 
-const script = resolveScriptPath();
+async function main() {
+  logHook('SessionStart', 'session-start bootstrap started');
+  const { raw, timedOut } = await readStdinWithTimeout(getStdinTimeoutMs());
+  logHook('SessionStart', 'stdin collected', {
+    bytes: Buffer.byteLength(raw || '', 'utf8'),
+    timedOut: timedOut ? 'true' : 'false',
+  });
+  if (timedOut) {
+    process.stderr.write(
+      '[SessionStart] WARNING: stdin read timed out; continuing with partial payload\n'
+    );
+  }
 
-if (script) {
-  const result = spawnSync(
-    process.execPath,
-    [script],
-    {
-      input: raw,
-      encoding: 'utf8',
-      env: process.env,
-      cwd: process.cwd(),
-      timeout: 30000,
+  const script = resolveScriptPath();
+  logHook('SessionStart', 'resolved session-start script', { script });
+
+  if (script) {
+    const result = spawnSync(
+      process.execPath,
+      [script],
+      {
+        input: raw,
+        encoding: 'utf8',
+        env: process.env,
+        cwd: process.cwd(),
+        timeout: 30000,
+      }
+    );
+    logHook('SessionStart', 'session-start child process completed', {
+      status: result.status,
+      signal: result.signal,
+      error: result.error ? result.error.message : '',
+      stdoutBytes:
+        typeof result.stdout === 'string' ? Buffer.byteLength(result.stdout, 'utf8') : 0,
+      stderrBytes:
+        typeof result.stderr === 'string' ? Buffer.byteLength(result.stderr, 'utf8') : 0,
+    });
+
+    const stdout = typeof result.stdout === 'string' ? result.stdout : '';
+    if (stdout) {
+      process.stdout.write(stdout);
+    } else {
+      process.stdout.write(raw);
     }
+
+    if (result.stderr) {
+      process.stderr.write(result.stderr);
+    }
+
+    if (result.error || result.status === null || result.signal) {
+      const reason = result.error
+        ? result.error.message
+        : result.signal
+          ? 'signal ' + result.signal
+          : 'missing exit status';
+      process.stderr.write('[SessionStart] ERROR: session-start hook failed: ' + reason + '\n');
+      logHook('SessionStart', 'session-start child process failed', { reason });
+      process.exit(1);
+    }
+
+    logHook('SessionStart', 'session-start bootstrap exiting successfully', {
+      exitCode: Number.isInteger(result.status) ? result.status : 0,
+    });
+    process.exit(Number.isInteger(result.status) ? result.status : 0);
+  }
+
+  process.stderr.write(
+    '[SessionStart] WARNING: could not resolve cc-harness session-start runner; skipping session-start hook\n'
   );
-
-  const stdout = typeof result.stdout === 'string' ? result.stdout : '';
-  if (stdout) {
-    process.stdout.write(stdout);
-  } else {
-    process.stdout.write(raw);
-  }
-
-  if (result.stderr) {
-    process.stderr.write(result.stderr);
-  }
-
-  if (result.error || result.status === null || result.signal) {
-    const reason = result.error
-      ? result.error.message
-      : result.signal
-        ? 'signal ' + result.signal
-        : 'missing exit status';
-    process.stderr.write('[SessionStart] ERROR: session-start hook failed: ' + reason + '\n');
-    process.exit(1);
-  }
-
-  process.exit(Number.isInteger(result.status) ? result.status : 0);
+  logHook('SessionStart', 'could not resolve session-start runner; passing through payload');
+  process.stdout.write(raw);
 }
 
-process.stderr.write(
-  '[SessionStart] WARNING: could not resolve cc-harness session-start runner; skipping session-start hook\n'
-);
-process.stdout.write(raw);
+main().catch((error) => {
+  process.stderr.write('[SessionStart] ERROR: unexpected failure: ' + error.message + '\n');
+  logHook('SessionStart', 'unexpected bootstrap failure', { error: error.message });
+  process.exit(1);
+});

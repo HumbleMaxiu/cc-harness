@@ -2,7 +2,9 @@
 'use strict';
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const failures = [];
@@ -95,25 +97,6 @@ function renderCodexAgentToml(agentName, sourceContent) {
     '"""',
     '',
   ].join('\n');
-}
-
-function renderCodexHooksJson(sourceContent) {
-  const parsed = JSON.parse(sourceContent);
-  const codexHooks = { hooks: {} };
-
-  for (const [eventName, entries] of Object.entries(parsed.hooks || {})) {
-    codexHooks.hooks[eventName] = entries.map((entry) => ({
-      ...entry,
-      hooks: (entry.hooks || []).map((hook) => ({
-        ...hook,
-        command: String(hook.command || '')
-          .replace(/\$\{CLAUDE_PLUGIN_ROOT\}\/scripts\/hooks\//g, '.codex/scripts/hooks/')
-          .replace(/"scripts\/hooks\//g, '".codex/scripts/hooks/'),
-      })),
-    }));
-  }
-
-  return JSON.stringify(codexHooks, null, 2) + '\n';
 }
 
 function assertRelativeLinksExist(relPath) {
@@ -1225,16 +1208,131 @@ function assertCodexAgentDirectory() {
 }
 
 function assertCodexHooksConfig() {
-  const expectedHooks = renderCodexHooksJson(read('hooks/hooks.json'));
-  const actualHooks = read('.codex/hooks.json');
+  let parsed;
+  try {
+    parsed = JSON.parse(read('.codex/hooks.json'));
+  } catch {
+    fail('.codex/hooks.json: must be valid JSON');
+    parsed = null;
+  }
 
-  if (expectedHooks !== actualHooks) {
-    fail('.codex/hooks.json: content drift from generated Codex hooks config');
+  if (parsed) {
+    const postToolHooks = parsed.hooks?.PostToolUse;
+    const stopHooks = parsed.hooks?.Stop;
+
+    if (!Array.isArray(postToolHooks) || postToolHooks.length === 0) {
+      fail('.codex/hooks.json: expected PostToolUse hook entry');
+    }
+
+    if (!Array.isArray(stopHooks) || stopHooks.length === 0) {
+      fail('.codex/hooks.json: expected Stop hook entry');
+    }
+
+    const postCommand = postToolHooks?.[0]?.hooks?.[0]?.command || '';
+    if (!String(postCommand).includes('/.codex/scripts/hooks/post-tool-use.js')) {
+      fail('.codex/hooks.json: PostToolUse should point to .codex/scripts/hooks/post-tool-use.js');
+    }
+
+    const stopCommand = stopHooks?.[0]?.hooks?.[0]?.command || '';
+    if (!String(stopCommand).includes('/.codex/scripts/hooks/stop.js')) {
+      fail('.codex/hooks.json: Stop should point to .codex/scripts/hooks/stop.js');
+    }
   }
 
   const configToml = read('.codex/config.toml');
   if (!configToml.includes('[features]') || !configToml.includes('codex_hooks = true')) {
     fail('.codex/config.toml: expected codex_hooks feature toggle');
+  }
+}
+
+function runNodeScript(scriptPath, args, options = {}) {
+  return spawnSync(process.execPath, [scriptPath, ...args], {
+    cwd: options.cwd || repoRoot,
+    input: options.input || '',
+    encoding: 'utf8',
+    env: options.env || process.env,
+    timeout: options.timeout || 30000,
+  });
+}
+
+function assertCodexHookRuntime() {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-harness-codex-hook-'));
+  const activePlanDir = path.join(tempRoot, 'docs', 'exec-plans', 'active');
+  fs.mkdirSync(activePlanDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(activePlanDir, '2026-04-22-codex-hook-smoke.md'),
+    [
+      '# Codex Hook Smoke',
+      '',
+      '### Run Trace',
+      '- plan_path: docs/exec-plans/active/2026-04-22-codex-hook-smoke.md',
+      '',
+      '### Plan Drift',
+      '- drift_detected: true',
+      '- resolved_by:',
+      '',
+      '### Operation Gate',
+      '- confirmation_status: pending',
+      '',
+      '### Final Summary',
+      '- plan_drift_status: unresolved',
+      '',
+      '- [ ] remaining step',
+      '',
+    ].join('\n')
+  );
+
+  try {
+    const postToolResult = runNodeScript(path.join(repoRoot, '.codex', 'scripts', 'hooks', 'post-tool-use.js'), [], {
+      cwd: tempRoot,
+      input: JSON.stringify({
+        hook_event_name: 'PostToolUse',
+        cwd: tempRoot,
+        tool_name: 'Bash',
+        tool_input: { command: 'echo ok' },
+      }),
+    });
+
+    if (postToolResult.error || postToolResult.status !== 0) {
+      fail('.codex hook runtime: PostToolUse hook runner should exit successfully');
+    } else {
+      try {
+        const parsed = JSON.parse(postToolResult.stdout || '{}');
+        if (typeof parsed.systemMessage !== 'string' || parsed.systemMessage.length === 0) {
+          fail('.codex hook runtime: PostToolUse hook should emit systemMessage JSON');
+        }
+        if (parsed.hookSpecificOutput != null) {
+          fail('.codex hook runtime: PostToolUse hook should not emit hookSpecificOutput unless returning a block decision');
+        }
+      } catch {
+        fail('.codex hook runtime: PostToolUse hook stdout must be valid JSON');
+      }
+    }
+
+    const stopResult = runNodeScript(path.join(repoRoot, '.codex', 'scripts', 'hooks', 'stop.js'), [], {
+      cwd: tempRoot,
+      input: JSON.stringify({
+        hook_event_name: 'Stop',
+        cwd: tempRoot,
+        stop_hook_active: false,
+        last_assistant_message: 'done',
+      }),
+    });
+
+    if (stopResult.error || stopResult.status !== 0) {
+      fail('.codex hook runtime: Stop hook runner should exit successfully');
+    } else {
+      try {
+        const parsed = JSON.parse(stopResult.stdout || '{}');
+        if (typeof parsed.systemMessage !== 'string' || parsed.systemMessage.length === 0) {
+          fail('.codex hook runtime: Stop hook should emit systemMessage JSON');
+        }
+      } catch {
+        fail('.codex hook runtime: Stop hook stdout must be valid JSON');
+      }
+    }
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
   }
 }
 
@@ -1285,6 +1383,7 @@ function main() {
     'examples/claude-code/global-settings.json',
     'skills/dev-workflow/SKILL.md',
     '.claude/skills/dev-workflow/SKILL.md',
+    '.claude/hook-logging.json',
     'scripts/hooks/session-start.js',
     '.claude/scripts/hooks/plan-status.js',
     '.claude/scripts/hooks/plan-refresh.js',
@@ -1294,10 +1393,10 @@ function main() {
     'scripts/hooks/plan-refresh.js',
     'scripts/hooks/plan-write-reminder.js',
     'scripts/hooks/plan-stop-check.js',
-    '.codex/scripts/hooks/plan-status.js',
-    '.codex/scripts/hooks/plan-refresh.js',
-    '.codex/scripts/hooks/plan-write-reminder.js',
-    '.codex/scripts/hooks/plan-stop-check.js',
+    '.codex/scripts/hooks/codex-hook-common.js',
+    '.codex/scripts/hooks/post-tool-use.js',
+    '.codex/scripts/hooks/stop.js',
+    '.codex/hook-logging.json',
   ];
 
   for (const relPath of requiredPaths) {
@@ -1344,8 +1443,8 @@ function main() {
   assertMirrorDirectory('.claude/agents', 'agents');
   assertCodexAgentDirectory();
   assertCodexHooksConfig();
+  assertCodexHookRuntime();
   assertMirrorDirectory('.claude/scripts/hooks', 'scripts/hooks');
-  assertMirrorDirectory('.claude/scripts/hooks', '.codex/scripts/hooks');
   assertMirrorDirectory('hooks', '.claude/hooks');
 
   if (failures.length > 0) {

@@ -538,6 +538,10 @@ npm test
 
 当前 Codex hooks 与 Claude hooks 分开维护，不再从 Claude hook runner 自动镜像生成。Codex 只启用不会改写 stdout JSON 的安全 hooks 子集；像 SessionStart / plan-status / plan-refresh 这类 Claude 风格文本注入 hooks 暂不直接复用，避免触发无效 JSON 输出。已启用的 Codex hooks 会使用 git-root-based 命令路径，并对 `PostToolUse` / `Stop` 返回 Codex 原生 JSON 输出。
 
+如果你需要排查 Codex hook 运行过程，可通过 [`.codex/hook-logging.json`](.codex/hook-logging.json) 控制文件日志。当前仓库默认开启，并把关键节点日志写到 `.codex/logs/hooks.log`；如需临时覆盖路径，仍可设置 `CC_HARNESS_HOOK_LOG_PATH`。
+
+如果你需要排查 Claude Code hook 运行过程，可通过 [`.claude/hook-logging.json`](.claude/hook-logging.json) 控制文件日志。当前仓库默认开启，并把 `run-with-flags`、`plan-write-reminder`、`plan-stop-check` 和 `session-start-bootstrap` 的关键节点日志写到 `.claude/logs/hooks.log`；如需临时覆盖路径，仍可设置 `CC_HARNESS_HOOK_LOG_PATH`。
+
 ### 主要目录
 
 - [`.claude/`](.claude/)：Claude Code 事实来源
