@@ -4,6 +4,40 @@
 const fs = require('fs');
 const path = require('path');
 
+function parseHookInput(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function isCodexHookPayload(raw, expectedEventName) {
+  const parsed = parseHookInput(raw);
+  if (!parsed || typeof parsed.hook_event_name !== 'string') {
+    return false;
+  }
+
+  if (!expectedEventName) {
+    return true;
+  }
+
+  return parsed.hook_event_name === expectedEventName;
+}
+
+function emitCodexSystemMessage(message, options = {}) {
+  const payload = {
+    systemMessage: message,
+  };
+
+  if (options.hookSpecificOutput) {
+    payload.hookSpecificOutput = options.hookSpecificOutput;
+  }
+
+  process.stdout.write(JSON.stringify(payload));
+}
+
 function listActivePlans(repoRoot) {
   const activeDir = path.join(repoRoot, 'docs', 'exec-plans', 'active');
   if (!fs.existsSync(activeDir)) {
@@ -90,7 +124,10 @@ function readLatestPlan(repoRoot) {
 }
 
 module.exports = {
+  emitCodexSystemMessage,
+  isCodexHookPayload,
   listActivePlans,
+  parseHookInput,
   preview,
   readLatestPlan,
 };

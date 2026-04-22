@@ -536,7 +536,7 @@ npm test
 
 其中 Codex 还需要项目级 [`.codex/config.toml`](.codex/config.toml) 显式打开 `codex_hooks = true`。
 
-当前 Codex hooks 与 Claude hooks 分开维护，不再从 Claude hook runner 自动镜像生成。Codex 只启用不会改写 stdout JSON 的安全 hooks 子集；像 SessionStart / plan-status / plan-refresh 这类 Claude 风格文本注入 hooks 暂不直接复用，避免触发无效 JSON 输出。已启用的 Codex hooks 会使用 git-root-based 命令路径，并对 `PostToolUse` / `Stop` 返回 Codex 原生 JSON 输出。
+当前 Codex hooks 与 Claude hooks 分开维护，不再从 Claude hook runner 自动镜像生成。Codex 已单独实现 `SessionStart`、`UserPromptSubmit`、`PreToolUse`、`PostToolUse`、`Stop` 五类 hooks，统一使用 git-root-based 命令路径，并按 Codex 官方协议返回原生 JSON 输出：`SessionStart` / `UserPromptSubmit` 通过 `additionalContext` 注入上下文，`PreToolUse` / `PostToolUse` / `Stop` 通过 `systemMessage` 给出提醒，避免再走 Claude 风格的 stdout 文本拼接。
 
 如果你需要排查 Codex hook 运行过程，可通过 [`.codex/hook-logging.json`](.codex/hook-logging.json) 控制文件日志。当前仓库默认开启，并把关键节点日志写到 `.codex/logs/hooks.log`；如需临时覆盖路径，仍可设置 `CC_HARNESS_HOOK_LOG_PATH`。
 

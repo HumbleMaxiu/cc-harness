@@ -1,27 +1,44 @@
 #!/usr/bin/env node
 'use strict';
 
-const fs = require('fs');
-const raw = fs.readFileSync(0, 'utf8');
-const repoRoot = process.cwd();
-const { preview, readLatestPlan } = require('./plan-persist-common');
+const { emitJson, logHook, readHookInput, readLatestPlan } = require('./codex-hook-common');
 
-const latest = readLatestPlan(repoRoot);
-if (!latest) {
-  process.stdout.write(raw);
+const { parsed } = readHookInput();
+logHook('UserPromptSubmit', 'plan-status hook execution started');
+
+if (!parsed || parsed.hook_event_name !== 'UserPromptSubmit') {
+  logHook('UserPromptSubmit', 'skipping plan-status hook', {
+    reason: !parsed ? 'missing-or-invalid-payload' : 'non-user-prompt-submit-event',
+    event: parsed && parsed.hook_event_name,
+  });
   process.exit(0);
 }
 
-process.stdout.write(
-  raw +
-    '\n<PLAN_STATUS>\n' +
-    `active_plan: ${latest.relPath}\n` +
-    `drift_status: ${latest.driftStatus}\n` +
-    `drift_signals: ${latest.driftSignals.length > 0 ? latest.driftSignals.join(', ') : 'none'}\n` +
-    `pending_operation_gate: ${latest.pendingOperationGate}\n\n` +
-    'plan_preview:\n' +
-    preview(latest.content, 24) +
-    '\n\nrun_trace_preview:\n' +
-    latest.runTracePreview +
-    '\n</PLAN_STATUS>\n'
-);
+const latest = readLatestPlan(process.cwd());
+if (!latest) {
+  logHook('UserPromptSubmit', 'no active plan found; skipping plan-status hook');
+  process.exit(0);
+}
+
+const additionalContext = [
+  '<PLAN_STATUS>',
+  `active_plan: ${latest.name}`,
+  `unchecked_steps: ${latest.uncheckedSteps}`,
+  `drift_signals: ${latest.driftSignals.length > 0 ? latest.driftSignals.join(', ') : 'none'}`,
+  `pending_operation_gate: ${latest.pendingOperationGate}`,
+  '</PLAN_STATUS>',
+].join('\n');
+
+logHook('UserPromptSubmit', 'prepared plan-status additional context', {
+  plan: latest.name,
+  uncheckedSteps: latest.uncheckedSteps,
+  driftSignals: latest.driftSignals.join(','),
+  pendingOperationGate: latest.pendingOperationGate,
+});
+
+emitJson({
+  hookSpecificOutput: {
+    hookEventName: 'UserPromptSubmit',
+    additionalContext,
+  },
+});

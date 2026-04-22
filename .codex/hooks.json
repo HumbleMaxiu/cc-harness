@@ -1,5 +1,43 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/scripts/hooks/session-start.js\""
+          }
+        ],
+        "description": "Inject using-brainstorming and memory snapshot on session start",
+        "id": "session-start"
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/scripts/hooks/plan-status.js\""
+          }
+        ],
+        "description": "Attach current active plan summary before prompt submission",
+        "id": "plan-status"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/scripts/hooks/plan-refresh.js\""
+          }
+        ],
+        "description": "Re-anchor the active plan before Bash tool use",
+        "id": "plan-refresh"
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Bash",

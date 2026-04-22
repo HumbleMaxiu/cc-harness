@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const raw = fs.readFileSync(0, 'utf8');
-const { readLatestPlan } = require('./plan-persist-common');
+const { emitCodexSystemMessage, isCodexHookPayload, readLatestPlan } = require('./plan-persist-common');
 
 const latest = readLatestPlan(process.cwd());
 if (latest) {
@@ -16,9 +16,14 @@ if (latest) {
   const gateSummary = latest.pendingOperationGate === 'true'
     ? ' A pending operation gate still exists.'
     : '';
-  process.stderr.write(
-    `[PlanPersist] Stop check: ${stepSummary}${driftSummary}${gateSummary} Confirm Run Trace and phase status before exit.\n`
-  );
+  const message = `[PlanPersist] Stop check: ${stepSummary}${driftSummary}${gateSummary} Confirm Run Trace and phase status before exit.`;
+
+  if (isCodexHookPayload(raw, 'Stop')) {
+    emitCodexSystemMessage(message);
+    process.exit(0);
+  }
+
+  process.stderr.write(message + '\n');
 }
 
 process.stdout.write(raw);

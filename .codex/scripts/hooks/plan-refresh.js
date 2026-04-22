@@ -1,28 +1,43 @@
 #!/usr/bin/env node
 'use strict';
 
-const fs = require('fs');
-const raw = fs.readFileSync(0, 'utf8');
-const repoRoot = process.cwd();
-const { preview, readLatestPlan } = require('./plan-persist-common');
+const { emitJson, logHook, readHookInput, readLatestPlan } = require('./codex-hook-common');
 
-const latest = readLatestPlan(repoRoot);
-if (!latest) {
-  process.stdout.write(raw);
+const { parsed } = readHookInput();
+logHook('PreToolUse', 'plan-refresh hook execution started');
+
+if (!parsed || parsed.hook_event_name !== 'PreToolUse' || parsed.tool_name !== 'Bash') {
+  logHook('PreToolUse', 'skipping plan-refresh hook', {
+    reason: !parsed
+      ? 'missing-or-invalid-payload'
+      : parsed.hook_event_name !== 'PreToolUse'
+        ? 'non-pre-tool-use-event'
+        : 'non-bash-tool',
+    event: parsed && parsed.hook_event_name,
+    tool: parsed && parsed.tool_name,
+  });
   process.exit(0);
 }
 
-process.stdout.write(
-  raw +
-    '\n<PLAN_REFRESH>\n' +
-    `active_plan: ${latest.relPath}\n` +
-    'refresh_reason: re-anchor current phase before tool use\n\n' +
-    `drift_status: ${latest.driftStatus}\n` +
-    `drift_signals: ${latest.driftSignals.length > 0 ? latest.driftSignals.join(', ') : 'none'}\n` +
-    `pending_operation_gate: ${latest.pendingOperationGate}\n\n` +
-    'plan_preview:\n' +
-    preview(latest.content, 18) +
-    '\n\nrun_trace_preview:\n' +
-    latest.runTracePreview +
-    '\n</PLAN_REFRESH>\n'
-);
+const latest = readLatestPlan(process.cwd());
+if (!latest) {
+  logHook('PreToolUse', 'no active plan found; skipping plan-refresh hook');
+  process.exit(0);
+}
+
+const systemMessage =
+  `[PlanPersist] Active plan ${latest.name}; re-anchor before running Bash. ` +
+  `Unchecked steps: ${latest.uncheckedSteps}. ` +
+  `Drift signals: ${latest.driftSignals.length > 0 ? latest.driftSignals.join(', ') : 'none'}. ` +
+  `Pending operation gate: ${latest.pendingOperationGate}.`;
+
+logHook('PreToolUse', 'prepared plan-refresh system message', {
+  plan: latest.name,
+  uncheckedSteps: latest.uncheckedSteps,
+  driftSignals: latest.driftSignals.join(','),
+  pendingOperationGate: latest.pendingOperationGate,
+});
+
+emitJson({
+  systemMessage,
+});

@@ -1217,8 +1217,23 @@ function assertCodexHooksConfig() {
   }
 
   if (parsed) {
+    const sessionStartHooks = parsed.hooks?.SessionStart;
+    const promptHooks = parsed.hooks?.UserPromptSubmit;
+    const preToolHooks = parsed.hooks?.PreToolUse;
     const postToolHooks = parsed.hooks?.PostToolUse;
     const stopHooks = parsed.hooks?.Stop;
+
+    if (!Array.isArray(sessionStartHooks) || sessionStartHooks.length === 0) {
+      fail('.codex/hooks.json: expected SessionStart hook entry');
+    }
+
+    if (!Array.isArray(promptHooks) || promptHooks.length === 0) {
+      fail('.codex/hooks.json: expected UserPromptSubmit hook entry');
+    }
+
+    if (!Array.isArray(preToolHooks) || preToolHooks.length === 0) {
+      fail('.codex/hooks.json: expected PreToolUse hook entry');
+    }
 
     if (!Array.isArray(postToolHooks) || postToolHooks.length === 0) {
       fail('.codex/hooks.json: expected PostToolUse hook entry');
@@ -1226,6 +1241,21 @@ function assertCodexHooksConfig() {
 
     if (!Array.isArray(stopHooks) || stopHooks.length === 0) {
       fail('.codex/hooks.json: expected Stop hook entry');
+    }
+
+    const sessionStartCommand = sessionStartHooks?.[0]?.hooks?.[0]?.command || '';
+    if (!String(sessionStartCommand).includes('/.codex/scripts/hooks/session-start.js')) {
+      fail('.codex/hooks.json: SessionStart should point to .codex/scripts/hooks/session-start.js');
+    }
+
+    const promptCommand = promptHooks?.[0]?.hooks?.[0]?.command || '';
+    if (!String(promptCommand).includes('/.codex/scripts/hooks/plan-status.js')) {
+      fail('.codex/hooks.json: UserPromptSubmit should point to .codex/scripts/hooks/plan-status.js');
+    }
+
+    const preToolCommand = preToolHooks?.[0]?.hooks?.[0]?.command || '';
+    if (!String(preToolCommand).includes('/.codex/scripts/hooks/plan-refresh.js')) {
+      fail('.codex/hooks.json: PreToolUse should point to .codex/scripts/hooks/plan-refresh.js');
     }
 
     const postCommand = postToolHooks?.[0]?.hooks?.[0]?.command || '';
@@ -1258,7 +1288,9 @@ function runNodeScript(scriptPath, args, options = {}) {
 function assertCodexHookRuntime() {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'cc-harness-codex-hook-'));
   const activePlanDir = path.join(tempRoot, 'docs', 'exec-plans', 'active');
+  const memoryDir = path.join(tempRoot, 'docs', 'memory');
   fs.mkdirSync(activePlanDir, { recursive: true });
+  fs.mkdirSync(path.join(memoryDir, 'feedback'), { recursive: true });
   fs.writeFileSync(
     path.join(activePlanDir, '2026-04-22-codex-hook-smoke.md'),
     [
@@ -1281,8 +1313,78 @@ function assertCodexHookRuntime() {
       '',
     ].join('\n')
   );
+  fs.writeFileSync(path.join(memoryDir, 'index.md'), '# Smoke Memory\n');
 
   try {
+    const sessionStartResult = runNodeScript(path.join(repoRoot, '.codex', 'scripts', 'hooks', 'session-start.js'), [], {
+      cwd: tempRoot,
+      input: JSON.stringify({
+        hook_event_name: 'SessionStart',
+        cwd: tempRoot,
+        source: 'startup',
+      }),
+    });
+
+    if (sessionStartResult.error || sessionStartResult.status !== 0) {
+      fail('.codex hook runtime: SessionStart hook runner should exit successfully');
+    } else {
+      try {
+        const parsed = JSON.parse(sessionStartResult.stdout || '{}');
+        const context = parsed?.hookSpecificOutput?.additionalContext;
+        if (typeof context !== 'string' || !context.includes('<MEMORY>')) {
+          fail('.codex hook runtime: SessionStart hook should emit additionalContext memory snapshot JSON');
+        }
+      } catch {
+        fail('.codex hook runtime: SessionStart hook stdout must be valid JSON');
+      }
+    }
+
+    const promptResult = runNodeScript(path.join(repoRoot, '.codex', 'scripts', 'hooks', 'plan-status.js'), [], {
+      cwd: tempRoot,
+      input: JSON.stringify({
+        hook_event_name: 'UserPromptSubmit',
+        cwd: tempRoot,
+        prompt: 'continue',
+      }),
+    });
+
+    if (promptResult.error || promptResult.status !== 0) {
+      fail('.codex hook runtime: UserPromptSubmit hook runner should exit successfully');
+    } else {
+      try {
+        const parsed = JSON.parse(promptResult.stdout || '{}');
+        const context = parsed?.hookSpecificOutput?.additionalContext;
+        if (typeof context !== 'string' || !context.includes('<PLAN_STATUS>')) {
+          fail('.codex hook runtime: UserPromptSubmit hook should emit additionalContext JSON');
+        }
+      } catch {
+        fail('.codex hook runtime: UserPromptSubmit hook stdout must be valid JSON');
+      }
+    }
+
+    const preToolResult = runNodeScript(path.join(repoRoot, '.codex', 'scripts', 'hooks', 'plan-refresh.js'), [], {
+      cwd: tempRoot,
+      input: JSON.stringify({
+        hook_event_name: 'PreToolUse',
+        cwd: tempRoot,
+        tool_name: 'Bash',
+        tool_input: { command: 'echo ok' },
+      }),
+    });
+
+    if (preToolResult.error || preToolResult.status !== 0) {
+      fail('.codex hook runtime: PreToolUse hook runner should exit successfully');
+    } else {
+      try {
+        const parsed = JSON.parse(preToolResult.stdout || '{}');
+        if (typeof parsed.systemMessage !== 'string' || parsed.systemMessage.length === 0) {
+          fail('.codex hook runtime: PreToolUse hook should emit systemMessage JSON');
+        }
+      } catch {
+        fail('.codex hook runtime: PreToolUse hook stdout must be valid JSON');
+      }
+    }
+
     const postToolResult = runNodeScript(path.join(repoRoot, '.codex', 'scripts', 'hooks', 'post-tool-use.js'), [], {
       cwd: tempRoot,
       input: JSON.stringify({
@@ -1394,6 +1496,9 @@ function main() {
     'scripts/hooks/plan-write-reminder.js',
     'scripts/hooks/plan-stop-check.js',
     '.codex/scripts/hooks/codex-hook-common.js',
+    '.codex/scripts/hooks/session-start.js',
+    '.codex/scripts/hooks/plan-status.js',
+    '.codex/scripts/hooks/plan-refresh.js',
     '.codex/scripts/hooks/post-tool-use.js',
     '.codex/scripts/hooks/stop.js',
     '.codex/hook-logging.json',

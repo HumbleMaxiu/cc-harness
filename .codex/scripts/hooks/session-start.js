@@ -3,33 +3,34 @@
 
 /**
  * session-start.js
- *
- * ECC SessionStart hook - injects the using-brainstorming skill plus a minimal project memory snapshot into new sessions.
  */
 
 const fs = require('fs');
 const path = require('path');
+const { emitJson, logHook, readHookInput } = require('./codex-hook-common');
 
-// Read stdin
-const raw = fs.readFileSync(0, 'utf8');
+const { parsed } = readHookInput();
+logHook('SessionStart', 'session-start hook execution started');
+
+if (!parsed || parsed.hook_event_name !== 'SessionStart') {
+  logHook('SessionStart', 'skipping session-start hook', {
+    reason: !parsed ? 'missing-or-invalid-payload' : 'non-session-start-event',
+    event: parsed && parsed.hook_event_name,
+  });
+  process.exit(0);
+}
 
 let skillContent = '';
 const candidates = [
-  // 1. CLAUDE_PLUGIN_ROOT/skills/ (对应 .claude/skills/ 布局，最优先)
-  path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'skills', 'using-brainstorming', 'SKILL.md'),
-  // 2. CLAUDE_PLUGIN_ROOT 直接 (旧路径兜底)
-  path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'using-brainstorming', 'SKILL.md'),
-  // 3. 项目本地 .claude/skills/
+  path.join(process.cwd(), '.codex', 'skills', 'using-brainstorming', 'SKILL.md'),
   path.join(process.cwd(), '.claude', 'skills', 'using-brainstorming', 'SKILL.md'),
-  // 4. 项目本地根路径
-  path.join(process.cwd(), 'using-brainstorming', 'SKILL.md'),
-  // 5. __dirname 回溯 (scripts/hooks/ → 项目根目录)
+  path.join(process.cwd(), 'skills', 'using-brainstorming', 'SKILL.md'),
   path.join(__dirname, '..', '..', 'skills', 'using-brainstorming', 'SKILL.md'),
-  path.join(__dirname, '..', '..', 'using-brainstorming', 'SKILL.md'),
 ];
 for (const candidate of candidates) {
   if (fs.existsSync(candidate)) {
     skillContent = fs.readFileSync(candidate, 'utf8');
+    logHook('SessionStart', 'resolved using-brainstorming skill source', { candidate });
     break;
   }
 }
@@ -74,18 +75,29 @@ const memoryBlocks = memoryFiles
 const injections = [];
 
 if (skillContent) {
-  injections.push(`\n<SKILL>\n${skillContent}\n</SKILL>\n`);
+  injections.push(`<SKILL>\n${skillContent}\n</SKILL>`);
 }
 
 if (memoryBlocks) {
-  injections.push(`\n<MEMORY>\n${memoryBlocks}\n</MEMORY>\n`);
+  injections.push(`<MEMORY>\n${memoryBlocks}\n</MEMORY>`);
 }
 
 if (!injections.length) {
-  process.stdout.write(raw);
+  logHook('SessionStart', 'no session-start context available; skipping output');
   process.exit(0);
 }
 
-// Output: pass through original plus all available injections.
-process.stdout.write(raw + injections.join(''));
-process.exit(0);
+const additionalContext = injections.join('\n\n');
+
+logHook('SessionStart', 'prepared session-start additional context', {
+  source: parsed.source,
+  hasSkill: skillContent ? 'true' : 'false',
+  memoryFileCount: memoryBlocks ? memoryBlocks.split('<FILE path=').length - 1 : 0,
+});
+
+emitJson({
+  hookSpecificOutput: {
+    hookEventName: 'SessionStart',
+    additionalContext,
+  },
+});

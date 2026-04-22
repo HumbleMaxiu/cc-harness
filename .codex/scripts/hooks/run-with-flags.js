@@ -18,6 +18,8 @@
  *   ECC_HOOK_PROFILE - Controls which hooks run. Can be "minimal", "standard", or "strict".
  *                       Hooks only run if their flags overlap with the current profile.
  *                       Default is "standard".
+ *   CC_HARNESS_HOOK_STDIN_TIMEOUT_MS - Max time to wait for hook stdin before
+ *                       continuing with the payload collected so far. Defaults to 1000ms.
  *
  * The hook profile hierarchy is:
  *   minimal  - Only essential hooks (session start, etc.)
@@ -28,6 +30,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { parseHookInput } = require('./plan-persist-common');
 
 // Profile hierarchy - each level includes the previous
 const PROFILE_HIERARCHY = {
@@ -55,10 +58,10 @@ function shouldRunHook(hookFlags) {
   const allowedProfiles = PROFILE_HIERARCHY[currentProfile] || ['standard'];
 
   // Hook flags are comma-separated
-  const hookProfiles = hookFlags.split(',').map(f => f.trim());
+  const hookProfiles = hookFlags.split(',').map((flag) => flag.trim());
 
   // Check if any of the hook's profiles match the current profile
-  return hookProfiles.some(profile => allowedProfiles.includes(profile));
+  return hookProfiles.some((profile) => allowedProfiles.includes(profile));
 }
 
 /**
@@ -77,6 +80,53 @@ function parseArgs() {
     hookScript: args[1],
     flags: args[2],
   };
+}
+
+function getStdinTimeoutMs() {
+  const value = Number.parseInt(process.env.CC_HARNESS_HOOK_STDIN_TIMEOUT_MS || '1000', 10);
+  return Number.isFinite(value) && value >= 0 ? value : 1000;
+}
+
+function readStdinWithTimeout(timeoutMs) {
+  if (process.stdin.isTTY) {
+    return Promise.resolve({ raw: '', timedOut: false });
+  }
+
+  return new Promise((resolve) => {
+    let raw = '';
+    let settled = false;
+
+    const finish = (timedOut) => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      clearTimeout(timer);
+      process.stdin.removeListener('data', onData);
+      process.stdin.removeListener('end', onEnd);
+      process.stdin.removeListener('error', onError);
+      resolve({ raw, timedOut });
+    };
+
+    const onData = (chunk) => {
+      raw += chunk;
+    };
+    const onEnd = () => finish(false);
+    const onError = () => finish(false);
+
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', onData);
+    process.stdin.on('end', onEnd);
+    process.stdin.on('error', onError);
+    process.stdin.resume();
+
+    const timer = setTimeout(() => finish(true), timeoutMs);
+  });
+}
+
+function isCodexHookPayload(raw) {
+  const parsed = parseHookInput(raw);
+  return Boolean(parsed && typeof parsed.hook_event_name === 'string');
 }
 
 /**
@@ -165,67 +215,79 @@ function resolveHookScriptPath(hookScript) {
   return '';
 }
 
-// Main execution
-const { event, hookScript, flags } = parseArgs();
+async function main() {
+  const { event, hookScript, flags } = parseArgs();
+  const { raw, timedOut } = await readStdinWithTimeout(getStdinTimeoutMs());
+  const codexPayload = isCodexHookPayload(raw);
 
-// Check if hook should run based on profile
-if (!shouldRunHook(flags)) {
-  // Read stdin and pass through without running hook
-  const raw = fs.readFileSync(0, 'utf8');
-  process.stdout.write(raw);
-  process.exit(0);
-}
-
-// Resolve plugin root and hook script path
-const scriptPath = resolveHookScriptPath(hookScript);
-
-if (!scriptPath || !fs.existsSync(scriptPath)) {
-  console.error(`[run-with-flags] ERROR: Hook script not found: ${scriptPath}`);
-  const raw = fs.readFileSync(0, 'utf8');
-  process.stdout.write(raw);
-  process.exit(0);
-}
-
-// Read stdin
-const raw = fs.readFileSync(0, 'utf8');
-
-// Determine the proper Node.js executable
-const nodePath = process.execPath;
-
-// Spawn the hook script
-const result = spawnSync(
-  nodePath,
-  [scriptPath],
-  {
-    input: raw,
-    encoding: 'utf8',
-    env: process.env,
-    cwd: process.cwd(),
-    timeout: 30000,
+  if (timedOut) {
+    console.error(
+      `[run-with-flags] WARNING: stdin read timed out for hook "${event}"; continuing with partial payload`
+    );
   }
-);
 
-// Handle output
-const stdout = typeof result.stdout === 'string' ? result.stdout : '';
-if (stdout) {
-  process.stdout.write(stdout);
-} else {
-  process.stdout.write(raw);
+  // Check if hook should run based on profile
+  if (!shouldRunHook(flags)) {
+    if (!codexPayload) {
+      process.stdout.write(raw);
+    }
+    process.exit(0);
+  }
+
+  // Resolve plugin root and hook script path
+  const scriptPath = resolveHookScriptPath(hookScript);
+
+  if (!scriptPath || !fs.existsSync(scriptPath)) {
+    console.error(`[run-with-flags] ERROR: Hook script not found: ${scriptPath}`);
+    if (!codexPayload) {
+      process.stdout.write(raw);
+    }
+    process.exit(0);
+  }
+
+  // Determine the proper Node.js executable
+  const nodePath = process.execPath;
+
+  // Spawn the hook script
+  const result = spawnSync(
+    nodePath,
+    [scriptPath],
+    {
+      input: raw,
+      encoding: 'utf8',
+      env: process.env,
+      cwd: process.cwd(),
+      timeout: 30000,
+    }
+  );
+
+  // Handle output
+  const stdout = typeof result.stdout === 'string' ? result.stdout : '';
+  if (stdout) {
+    process.stdout.write(stdout);
+  } else if (!codexPayload) {
+    process.stdout.write(raw);
+  }
+
+  if (result.stderr) {
+    process.stderr.write(result.stderr);
+  }
+
+  // Handle errors
+  if (result.error || result.status === null || result.signal) {
+    const reason = result.error
+      ? result.error.message
+      : result.signal
+        ? 'signal ' + result.signal
+        : 'missing exit status';
+    console.error(`[run-with-flags] ERROR: Hook "${event}" failed: ${reason}`);
+    process.exit(1);
+  }
+
+  process.exit(Number.isInteger(result.status) ? result.status : 0);
 }
 
-if (result.stderr) {
-  process.stderr.write(result.stderr);
-}
-
-// Handle errors
-if (result.error || result.status === null || result.signal) {
-  const reason = result.error
-    ? result.error.message
-    : result.signal
-      ? 'signal ' + result.signal
-      : 'missing exit status';
-  console.error(`[run-with-flags] ERROR: Hook "${event}" failed: ${reason}`);
+main().catch((error) => {
+  console.error(`[run-with-flags] ERROR: Unexpected failure: ${error.message}`);
   process.exit(1);
-}
-
-process.exit(Number.isInteger(result.status) ? result.status : 0);
+});
