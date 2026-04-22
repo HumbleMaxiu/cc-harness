@@ -33,7 +33,7 @@ description: 根据用户当前场景推荐合适的 cc-harness skill、workflow
 - 多步骤落地：先 `/writing-plans`
 - 已有清晰计划，需要执行：进 `/dev-workflow`
 - 只做文档维护：用 `/doc-sync`
-- 提反馈：用 `/feedback`
+- 提反馈并让系统判断是否应进入长期 memory：用 `/feedback`
 - 查反馈：用 `/feedback-query`
 - 不知道怎么开始：先用 `/harness-help`
 

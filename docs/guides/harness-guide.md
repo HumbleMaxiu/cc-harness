@@ -131,7 +131,7 @@
 ### memory
 
 - `docs/memory/` 是长期事实来源
-- 用户反馈优先通过 `/feedback` 进入 `user-feedback.md`
+- `/feedback` 先分诊；只有 durable 的长期用户反馈才进入 `user-feedback.md`
 - Agent / 自检反馈进 `agent-feedback.md`
 - 重复问题升级到 `prevents-recurrence.md`
 

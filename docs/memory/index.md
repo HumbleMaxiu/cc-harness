@@ -11,7 +11,7 @@
 
 ## 反馈相关
 
-- [用户反馈](feedback/user-feedback.md) — 用户直接给出的纠正、偏好、请求或投诉
+- [用户反馈](feedback/user-feedback.md) — 经过分诊后，确认为 durable、跨任务可复用的用户反馈
 - [Agent 反馈](feedback/agent-feedback.md) — 来自 Reviewer、Tester 或自检的问题，由 `feedback-curator` 或主 agent 记录
 - [防止再犯](feedback/prevents-recurrence.md) — 已升级为规范的重复问题和预防措施
 - [Feedback Archive](feedback/archive/index.md) — 已完成汇总的历史反馈趋势和月度归档
@@ -29,3 +29,4 @@
 - 当前任务做到哪一阶段、最近跑了什么命令、为什么中断，优先写入任务层 `Run Trace`
 - 恢复时先读 memory 了解约束，再读 `Run Trace` 定位当前阶段；两者不能互相替代
 - 原始终端输出、临时调试细节和一次性失败文本，不应直接堆进长期 memory
+- 当前任务里的实现说明、验收补充、测试同步和 session-only 指令，也不应直接写进长期 memory

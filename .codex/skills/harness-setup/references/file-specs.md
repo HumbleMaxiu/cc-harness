@@ -233,7 +233,7 @@ Before substantive edits: read `AGENTS.md`, `ARCHITECTURE.md`, `docs/exec-plans/
 
 ### `docs/memory/feedback/user-feedback.md`
 
-- **Purpose：** 记录用户直接给出的纠正、偏好、请求或投诉。
+- **Purpose：** 记录经过分诊后，确认为 durable、跨任务可复用的用户反馈；不用于保存 task-local 指令。
 - **Include：** 字段说明、追加约定、是否需要防止再犯。
 
 ### `docs/memory/feedback/agent-feedback.md`

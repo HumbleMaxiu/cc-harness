@@ -88,7 +88,7 @@
 - 声称"完成"前 → 运行标准质量门禁（文档同步 + 代码规范 + 进度验证）
 
 ### 反馈规则
-- 用户反馈 → 记录到 `docs/memory/feedback/user-feedback.md` 并立即应用
+- 用户反馈 → 先分诊；只有 durable 的长期反馈才记录到 `docs/memory/feedback/user-feedback.md`，task-local 指令只在当前任务上下文应用
 - Agent 反馈 → 记录到 `docs/memory/feedback/agent-feedback.md`，阻塞项优先自动修复回流，非阻塞建议在最终交付统一汇总
 - 同类问题出现 2 次或以上 → 同步到 `docs/memory/feedback/prevents-recurrence.md` 并升级为规范
 

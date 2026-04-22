@@ -195,7 +195,7 @@
 
 推荐理解方式：
 
-- `/feedback` 负责“提”
+- `/feedback` 负责“提 + 分诊”
 - `/feedback-query` 负责“查”
 
 ## Skill 选择指南
@@ -214,7 +214,7 @@
 | `/doc-sync` | 文档影响分析与同步 | 改了代码、配置、workflow、agent、docs 索引时 |
 | `/harness-audit` | 检查 harness 健康状态 | 想看当前 harness 缺口和下一轮补齐优先级时 |
 | `/harness-quality-gate` | 交付前质量门禁 | 准备提交、交付、结束一个阶段时 |
-| `/feedback` | 提交新反馈 | 想提意见、纠正流程、记录体验问题时 |
+| `/feedback` | 分诊并提交反馈 | 想提意见、纠正流程、记录体验问题或长期偏好时 |
 | `/feedback-query` | 查询反馈历史和 recurrence | 想回看反馈、做 summary、看 skill candidate 时 |
 | `/skill-creator` | 创建或改进 skill | 已经明确要把 recurring workflow 升级成 skill 时 |
 | `/exa-search` | 通过 Exa 做研究 | 需要网页、代码、公司、人物等外部研究时 |
@@ -535,6 +535,8 @@ npm test
 - [.codex/hooks.json](.codex/hooks.json)
 
 其中 Codex 还需要项目级 [`.codex/config.toml`](.codex/config.toml) 显式打开 `codex_hooks = true`。
+
+当前 Codex hooks 与 Claude hooks 分开维护，不再从 Claude hook runner 自动镜像生成。Codex 只启用不会改写 stdout JSON 的安全 hooks 子集；像 SessionStart / plan-status / plan-refresh 这类 Claude 风格文本注入 hooks 暂不直接复用，避免触发无效 JSON 输出。已启用的 Codex hooks 会使用 git-root-based 命令路径，并对 `PostToolUse` / `Stop` 返回 Codex 原生 JSON 输出。
 
 ### 主要目录
 
