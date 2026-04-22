@@ -103,7 +103,7 @@ ls .claude/agents/
 
 ### 反馈规则
 
-- **用户反馈**：优先级最高。记录到 `docs/memory/feedback/user-feedback.md`，立即执行，无需询问
+- **用户反馈**：优先级最高。仅当用户明确要“提 feedback / 记录意见”，或反馈会约束未来类似任务、agent 行为、workflow 规则、长期偏好时，记录到 `docs/memory/feedback/user-feedback.md`；当前任务内的一次性实现指令（如 UI 微调、文案修改、颜色选择、测试同步）默认视为需求/验收标准，不进入长期 feedback memory
 - **Agent 反馈**：来自 Reviewer/Tester 或自检的问题。先记录到 `docs/memory/feedback/agent-feedback.md`；阻塞型反馈优先自动修复并继续主流程，非阻塞建议在最终交付前统一汇总给用户确认
 - **防止再犯**：同一问题出现 2 次或以上 → 将预防措施写入 `AGENTS.md` 或相关规范
 - 新会话或 `/compact` 后恢复上下文时，先读 `docs/memory/index.md`，再按需查看 `docs/memory/feedback/`

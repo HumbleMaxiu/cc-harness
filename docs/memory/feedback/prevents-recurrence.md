@@ -51,5 +51,8 @@
 
 | ID | 问题类型 | 描述 | 预防措施 | 次数 | 提名状态 | 已同步位置 |
 |----|---------|------|---------|------|---------|-----------|
+| `pr-20260422-003` | `feedback-overcapture` | 如果把“纠正 / 偏好 / 请求”不加区分地都写入长期 feedback memory，当前任务里的 UI 微调、样式选择、测试同步就会被误判为用户反馈，导致 memory 被一次性实现细节污染。 | 记录用户反馈前，必须先区分“当前任务指令”与“跨任务可复用规则”：只有显式 feedback、agent/workflow 体验意见，或未来类似任务都应遵守的长期偏好/标准，才允许写入 `user-feedback.md`；任务内实现细节必须留在 spec、Run Trace、验收标准或测试更新中。 | `1` | `candidate` | `docs/memory/feedback/user-feedback.md`, `AGENTS.md`, `docs/feedback/feedback-collection.md` |
+| `pr-20260422-002` | `codex-hook-coupling` | 把 Codex hooks 当成 Claude hooks 的镜像变体，会把 Claude 风格的 runner、stdin/stdout 假设和同步校验一起带进 Codex，导致 `PostToolUse` / `Stop` 的 JSON 输出协议频繁失真。 | Codex hooks 必须作为独立运行层维护：`.codex/hooks.json` 和 `.codex/scripts/hooks/` 不应由 Claude hooks 自动生成；校验应验证 Codex 文档要求的事件形状和 runtime smoke，而不是要求与 Claude hook 脚本逐字一致。 | `1` | `candidate` | `docs/memory/feedback/user-feedback.md`, `README.md` |
+| `pr-20260422-001` | `hook-stdin-blocking` | 在 Windows PowerShell + Git Bash 等兼容性较脆弱的运行层里，Claude Code hook 的 stdin / EOF 行为可能与默认假设不一致；如果 hook 入口同步阻塞读取 stdin，就会把 `/harness-setup` 或停止点长期卡住，并弹出无输出的 bash 窗口。 | 任何直接挂到 hook 生命周期的入口脚本都必须 fail-open：对 stdin 使用有界等待或超时回退，不得假设 EOF 一定及时到达；若 payload、路径解析或 shell 行为异常，应优先透传当前 payload 并输出 warning，而不是无限阻塞主流程。 | `1` | `candidate` | `docs/memory/feedback/user-feedback.md`, `docs/RELIABILITY.md` |
 | `pr-20260416-001` | `mirror-sync-overwrite` | 当 `.claude/`、`skills/`、`.codex/` 出现内容漂移时，agent 为了修复 consistency check 直接运行 `sync:mirrors`，会把“声明上的事实源”覆盖到其他目录，进而抹掉只存在于镜像侧、但其实更新的用户修改。 | 运行任何 mirror sync 前，必须先检查三侧 diff 并明确“最新事实来源”来自哪一侧；若存在用户手工改动或无法确定来源，禁止直接 sync，改为手动合并或先向用户确认；不得把“让检查通过”当作 sync 的充分理由。 | `1` | `candidate` | `docs/memory/feedback/user-feedback.md` |
 | <!-- 按需追加 --> | | | | | | |

@@ -1,51 +1,12 @@
 {
   "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \".codex/scripts/hooks/session-start-bootstrap.js\""
-          }
-        ],
-        "description": "Inject using-brainstorming skill on session start",
-        "id": "session-start"
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \".codex/scripts/hooks/run-with-flags.js\" \"user-prompt-submit:plan-status\" \".codex/scripts/hooks/plan-status.js\" \"standard,strict\""
-          }
-        ],
-        "description": "Inject current active plan status on every user prompt",
-        "id": "plan-status"
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \".codex/scripts/hooks/run-with-flags.js\" \"pre-tool-use:plan-refresh\" \".codex/scripts/hooks/plan-refresh.js\" \"standard,strict\""
-          }
-        ],
-        "description": "Refresh active plan and run trace before tool execution",
-        "id": "plan-refresh"
-      }
-    ],
     "PostToolUse": [
       {
-        "matcher": "*",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "node \".codex/scripts/hooks/run-with-flags.js\" \"post-tool-use:plan-write-reminder\" \".codex/scripts/hooks/plan-write-reminder.js\" \"standard,strict\""
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/scripts/hooks/post-tool-use.js\""
           }
         ],
         "description": "Remind the agent to update Run Trace after writes",
@@ -54,11 +15,10 @@
     ],
     "Stop": [
       {
-        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "node \".codex/scripts/hooks/run-with-flags.js\" \"stop:plan-stop-check\" \".codex/scripts/hooks/plan-stop-check.js\" \"standard,strict\""
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/scripts/hooks/stop.js\""
           }
         ],
         "description": "Check active plan completeness before stop",
