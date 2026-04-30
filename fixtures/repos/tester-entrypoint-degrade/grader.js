@@ -12,7 +12,7 @@ async function grade(context) {
     };
   }
 
-  const handoff = context.submission.read('handoff/tester.md');
+  const handoff = context.submission.read('handoff/tester.md').replace(/\r\n/g, '\n');
   context.assertIncludes(handoff, '### 测试矩阵', 'tester handoff');
   context.assertIncludes(handoff, '### 验证入口探测', 'tester handoff');
   context.assertIncludes(handoff, 'command_selection_rationale:', 'tester handoff');

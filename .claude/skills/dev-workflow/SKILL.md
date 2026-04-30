@@ -104,6 +104,22 @@ description: 开发流程 agent 系统。包含 A/Dev/R/T 四种角色，支持 
 
 ## 三种开发模式
 
+### 模式选择速判
+
+先用下表判断默认模式，再在执行中根据反馈和风险升级。不要只按“任务大小”选择模式；重点看是否需要独立视角、状态追踪和循环收口。
+
+| 模式 | 一句话定位 | 主要收益 | 主要代价 | 选择成本 | 错误使用信号 |
+|------|------------|----------|----------|----------|--------------|
+| `Skill` | 主 agent 串行执行的轻量闭环 | 快、上下文集中、适合小范围变更 | 独立审查弱，容易把自检当 reviewer | 低：只维护 `Skill Workflow Record` | 已出现第二轮反馈、需要独立 reviewer/tester、或完成声明依赖复杂推断 |
+| `Subagent` | 主 agent 编排 A/Dev/R/T/C 的串行 handoff | 状态清楚，门禁明确，适合 review/test loop | prompt 打包和 handoff 校验成本更高 | 中：每个角色必须产出有效 handoff | 空 handoff 被当通过、Tester 被 build 替代、Challenger Gate 没有落到流程 |
+| `Team` | 多个独立视角并行审查/验证 | 并行覆盖多个风险面，适合高风险或争议变更 | 协调和汇总成本最高，容易产生结论冲突 | 高：需要合并多个 reviewer/tester/challenger 结论 | 只是普通串行审查却开 Team，或没有明确并行问题拆分 |
+
+默认建议：
+
+- 小范围、低风险、单文件或纯文档变更：从 `Skill` 开始。
+- 需要真实 reviewer/tester 门禁、预计会有修复回流、或需要 Challenger 独立挑战：从 `Subagent` 开始。
+- 同一变更需要多个互不依赖的审查面并行判断：才使用 `Team`。
+
 ### Skill 模式
 
 **适用场景**：单一任务、边界清楚、工具数量有限、不需要独立 reviewer 角色或并行审查
@@ -413,6 +429,42 @@ Skill 模式后续建议引入少量阶段型专用 Skill，用于稳定单 agen
 6. 阻塞型反馈先按风险分级，再决定自动修复回流还是保留到最终确认；非阻塞建议可在最终交付前统一向用户汇总
 7. 当 `Challenger Gate.challenge_required=true` 时，在 `Architect -> Developer` 之间，或 `Tester -> Final Summary` 之前插入 `challenger`
 
+### Subagent Challenger 接入
+
+Subagent 模式的默认主干应显式包含 Challenger Gate，而不是把 Challenger 当成临时可选角色。主 agent 必须在两个稳定点检查是否需要挑战：
+
+| 接入点 | Gate 名称 | 触发原因 | 阻塞规则 | 通过后流向 |
+|--------|-----------|----------|----------|------------|
+| `Architect -> Developer` 之间 | `pre-dev-challenge` | `plan-claim` / `api-assumption` | `challenger` verdict 为 `REFUTED` 或 `UNVERIFIED` 且 blocking_threshold 命中时，回到 Architect 补计划或补证据 | `Developer` |
+| `Tester -> Final Summary` 之间 | `pre-final-challenge` | `completion-claim` / `drift-verification-gap` | 完成声明无法被证据支撑时，回到 Developer / Tester 补验证；不得直接交付 | `Architect` 文档维护或最终总结 |
+
+最小 handoff 字段：
+
+```markdown
+### Challenger Gate
+- gate_name: pre-dev-challenge | pre-final-challenge
+- challenge_required:
+- trigger_reason:
+- review_scope:
+- evidence_refs:
+- blocking_threshold:
+- handoff_target: challenger | none
+
+### Challenger Result
+- challenger-result: CONFIRMED | REFUTED | UNVERIFIED | SKIPPED
+- evidence_gap:
+- required_followup:
+- next_phase:
+```
+
+执行约束：
+
+- `challenge_required=true` 时必须先调用 `challenger`，再进入下一个角色。
+- `challenger-result=CONFIRMED` 才能沿主干继续。
+- `challenger-result=REFUTED` 必须回到产生 claim 的角色修正计划、实现或完成声明。
+- `challenger-result=UNVERIFIED` 不自动等同失败；若命中 `blocking_threshold`，先补证据或验证，否则作为 remaining risk 进入最终汇总。
+- `challenge_required=false` 也要记录 gate 决策和跳过理由，避免最终总结里出现没有来源的完成声明。
+
 ### Team 模式
 
 **适用场景**：需要多角度并行审查
@@ -431,6 +483,10 @@ Skill 模式后续建议引入少量阶段型专用 Skill，用于稳定单 agen
     ↓
 Architect 检查计划文档
     ↓
+Challenger Gate: pre-dev-challenge
+    ↓ [challenge_required=true]
+Challenger 对计划/API 假设做对抗式验证
+    ↓
 Dev 实现
     ↓
 Reviewer 审查
@@ -441,6 +497,10 @@ Feedback Curator 记录反馈并输出摘要
 Dev 实现
     ↓ [APPROVED]
 Tester 测试
+    ↓
+Challenger Gate: pre-final-challenge
+    ↓ [challenge_required=true]
+Challenger 对完成声明/偏移证据做对抗式验证
     ↓
 Feedback Curator 记录反馈并输出摘要
     ↓ [REJECTED]
@@ -522,6 +582,30 @@ Dev 实现
   - 明确的 handoff 输出契约
 - 不要原样重放更长的 prompt 去赌第二次会成功
 
+### Loop Budget
+
+Subagent 模式允许自动回流，但必须有明确预算和升级边界。主 agent 在 `Run Trace` 中维护以下计数：
+
+```markdown
+### Loop Budget
+- review_loop_count:
+- test_loop_count:
+- challenge_loop_count:
+- max_review_loops: 2
+- max_test_loops: 2
+- max_challenge_loops: 1
+- loop_budget_exceeded: true | false
+```
+
+处理规则：
+
+- `review_loop_count` 每发生一次 Reviewer `REJECTED -> Developer fix` 增加 1。
+- `test_loop_count` 每发生一次 Tester `REJECTED -> Developer fix` 增加 1。
+- `challenge_loop_count` 每发生一次 Challenger `REFUTED/UNVERIFIED -> 补证据/补计划/补验证` 增加 1。
+- 任一计数超过对应 `max_*_loops` 时，设置 `loop_budget_exceeded=true`，停止自动回流，进入 `BLOCKED` 或升级到 `Team`。
+- 同一问题第二次出现时，必须把 recurrence candidate 交给 `feedback-curator`，不能继续只做局部修补。
+- 每次回流后必须重新经过导致回流的 gate；例如 Reviewer 修复后重跑 Reviewer，Tester 修复后重跑 Tester，Challenger 补证据后重跑 Challenger Gate。
+
 ### 循环定义
 
 | 循环 | 条件 | 动作 |
@@ -532,6 +616,9 @@ Dev 实现
 | Tester | REJECTED + low risk | `feedback-curator` 记录阻塞反馈，主 agent 自动回到实现修复并继续循环 |
 | Tester | REJECTED + medium/high risk | `feedback-curator` 记录阻塞反馈，主 agent 停止自动修改，把风险保留到最终确认或显式 gate |
 | Tester | APPROVED | 进入 Architect 维护 |
+| Challenger | REFUTED | 回到产生 claim 的角色修正计划、实现、测试证据或完成声明 |
+| Challenger | UNVERIFIED + blocking_threshold 命中 | 补证据或补验证；若超过 `max_challenge_loops` 则 `BLOCKED` |
+| 任一 gate | loop_budget_exceeded=true | 停止自动回流，升级到 `Team` 或交付前显式汇报阻塞状态 |
 
 **终止条件**：Reviewer APPROVED + Tester APPROVED
 

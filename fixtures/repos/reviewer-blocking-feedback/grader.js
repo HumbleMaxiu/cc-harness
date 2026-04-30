@@ -12,7 +12,7 @@ async function grade(context) {
     };
   }
 
-  const handoff = context.submission.read('handoff/reviewer.md');
+  const handoff = context.submission.read('handoff/reviewer.md').replace(/\r\n/g, '\n');
   context.assertIncludes(handoff, '### Findings', 'reviewer handoff');
   context.assertIncludes(handoff, 'blocking: true', 'reviewer handoff');
   context.assertIncludes(handoff, '### Feedback Record', 'reviewer handoff');

@@ -16,7 +16,7 @@ async function grade(context) {
   }
 
   const memoryDoc = context.submission.read('docs/memory/feedback/agent-feedback.md');
-  const handoff = context.submission.read('handoff/feedback-curator.md');
+  const handoff = context.submission.read('handoff/feedback-curator.md').replace(/\r\n/g, '\n');
 
   context.assertIncludes(memoryDoc, 'id: af-', 'agent-feedback');
   context.assertIncludes(memoryDoc, 'execution:', 'agent-feedback');

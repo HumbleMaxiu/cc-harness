@@ -69,7 +69,7 @@ function parseMarkdownLinks(content) {
 }
 
 function parseFrontmatter(markdown) {
-  const match = markdown.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!match) {
     return { body: markdown.trim() };
   }
@@ -804,6 +804,47 @@ function assertSubagentPayloadGuardrails() {
   }
 }
 
+function assertDevWorkflowFlowTuning() {
+  const workflow = read('skills/dev-workflow/SKILL.md');
+  const agentSpec = read('docs/product-specs/agent-system.md');
+  const readme = read('README.md');
+
+  [
+    '### 模式选择速判',
+    '选择成本',
+    '主要收益',
+    '主要代价',
+    '错误使用信号',
+    '### Subagent Challenger 接入',
+    'pre-dev-challenge',
+    'pre-final-challenge',
+    'challenger-result',
+    '### Loop Budget',
+    'review_loop_count',
+    'test_loop_count',
+    'challenge_loop_count',
+    'loop_budget_exceeded',
+  ].forEach((snippet) => {
+    if (!workflow.includes(snippet)) {
+      fail(`skills/dev-workflow/SKILL.md: expected flow-tuning contract ${snippet}`);
+    }
+  });
+
+  [
+    'Subagent 模式的默认主干应显式包含 Challenger Gate',
+    'Loop Budget',
+    'review_loop_count',
+  ].forEach((snippet) => {
+    if (!agentSpec.includes(snippet)) {
+      fail(`docs/product-specs/agent-system.md: expected flow-tuning spec ${snippet}`);
+    }
+  });
+
+  if (!readme.includes('模式选择时先看收益、代价和错误使用信号')) {
+    fail('README.md: expected flow-tuning mode selection guidance');
+  }
+}
+
 function assertHarnessAuditDocs() {
   const qualityScore = read('docs/QUALITY_SCORE.md');
   const harnessAudit = read('skills/harness-audit/SKILL.md');
@@ -1534,6 +1575,7 @@ function main() {
   assertChallengerDocs();
   assertSubagentFailureRecovery();
   assertSubagentPayloadGuardrails();
+  assertDevWorkflowFlowTuning();
   assertHarnessAuditDocs();
   assertMemoryToSkillDocs();
   assertPainPointDocs();

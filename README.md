@@ -125,7 +125,9 @@
 6. 交付前运行 `/harness-quality-gate`
 7. 过程中如果对体验、流程或规范有意见，用 `/feedback`
 
-进入 `Subagent` 模式时，空返回或无效 handoff 不能被当作通过；同时不要把全量文件列表和重复规则直接塞进 subagent prompt。
+进入 `/dev-workflow` 后，模式选择时先看收益、代价和错误使用信号：`Skill` 适合小范围低风险闭环，`Subagent` 适合需要 Reviewer / Tester / Challenger 门禁的串行 handoff，`Team` 只在确实需要并行多视角时使用。
+
+进入 `Subagent` 模式时，空返回或无效 handoff 不能被当作通过；同时不要把全量文件列表和重复规则直接塞进 subagent prompt。`Challenger Gate` 应在 `Architect -> Developer` 与 `Tester -> Final Summary` 两个稳定点判断是否触发，循环修复必须记录 `Loop Budget`，避免无限自动回流。
 
 ## 详细使用步骤
 

@@ -12,7 +12,7 @@ async function grade(context) {
     };
   }
 
-  const handoff = context.submission.read('handoff/architect.md');
+  const handoff = context.submission.read('handoff/architect.md').replace(/\r\n/g, '\n');
   context.assertIncludes(handoff, '### 范围确认', 'architect handoff');
   context.assertIncludes(handoff, 'execution_ready:', 'architect handoff');
   context.assertIncludes(handoff, '### 计划校验清单', 'architect handoff');
