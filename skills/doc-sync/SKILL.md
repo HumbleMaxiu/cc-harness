@@ -1,6 +1,6 @@
 ---
 name: doc-sync
-description: 基于代码、配置、agent、skill、workflow 变更进行文档影响分析、同步更新、索引维护与结果落账。用于：源码改动后的 docs 同步、架构变更后的文档补齐、release 前文档扫尾，或用户要求维护 AGENTS.md、ARCHITECTURE.md、design docs、product specs、memory/feedback 文档。
+description: 基于代码、配置、role skill、workflow 变更进行文档影响分析、同步更新、索引维护与结果落账。用于：源码改动后的 docs 同步、架构变更后的文档补齐、release 前文档扫尾，或用户要求维护 AGENTS.md、ARCHITECTURE.md、design docs、product specs、memory/feedback 文档。
 ---
 
 # Doc Sync
@@ -18,7 +18,7 @@ description: 基于代码、配置、agent、skill、workflow 变更进行文档
 
 当出现以下任一情况时使用：
 
-- 修改了源码、配置、agent、skill、workflow
+- 修改了源码、配置、role skill、workflow
 - 修改了架构边界、角色职责或 workflow 规则
 - 用户要求“同步文档”“补齐 design doc”“维护 AGENTS.md / ARCHITECTURE.md”
 - `dev-workflow` 进入 `Doc Sync` 阶段

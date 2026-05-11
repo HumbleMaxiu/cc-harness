@@ -12,6 +12,7 @@ const {
 } = require('./plan-persist-common');
 
 const parsed = parseHookInput(raw);
+const isCodexPostToolUse = isCodexHookPayload(raw, 'PostToolUse');
 logHook('PostToolUse', 'plan-write-reminder started', {
   event: parsed && parsed.hook_event_name,
   tool: parsed && parsed.tool_name,
@@ -32,7 +33,7 @@ if (latest) {
     driftSignals: latest.driftSignals.join(','),
   });
 
-  if (isCodexHookPayload(raw, 'PostToolUse')) {
+  if (isCodexPostToolUse) {
     logHook('PostToolUse', 'emitting Codex JSON reminder');
     emitCodexSystemMessage(message);
     process.exit(0);
@@ -42,6 +43,9 @@ if (latest) {
   process.stderr.write(message + '\n');
 } else {
   logHook('PostToolUse', 'no active plan available; passthrough only');
+  if (isCodexPostToolUse) {
+    process.exit(0);
+  }
 }
 
 process.stdout.write(raw);

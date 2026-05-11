@@ -25,7 +25,7 @@ description: 显示 cc-harness 的命令索引、根 Skill 入口、常见场景
 
 1. 读取 `AGENTS.md`，获取项目导航与 Skill 快速参考
 2. 读取 `docs/guides/harness-guide.md`，获取场景化使用方式
-3. 扫描 `skills/` 和 `.claude/agents/`，确认当前仓库内可用入口
+3. 扫描 `skills/`，确认当前仓库内可用入口
 4. 用“根入口 + 高频场景”的结构输出帮助信息
 
 ## 输出格式

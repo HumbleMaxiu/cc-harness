@@ -6,7 +6,7 @@
 
 ### `AGENTS.md`
 
-- **Purpose：** Operator + agent 契约；**地图**进入 `docs/`。
+- **Purpose：** Operator + AI 执行契约；**地图**进入 `docs/`。
 - **Length：** 目标约 100 行；**硬上限 120 行**。超过 120 行是质量缺陷。
 - **Include：** 项目一句话描述；优先级顺序（user > harness docs > defaults）；技术栈表；仓库布局表；secrets/logging 规则；测试门槛；链接到 `ARCHITECTURE.md` 和关键 `docs/` 文件。
 - **Include：** 如果仓库启用了记忆机制，在 docs 导航中加入 `docs/memory/index.md`。
@@ -161,9 +161,9 @@
 
 ---
 
-## Agent platform bridge files（scaffold 后）
+## AI platform bridge files（scaffold 后）
 
-这些文件在 IDE 不自动加载 `AGENTS.md` 时**指向 agents at the harness**。**内容模式**（路径来自**仓库根目录**）：
+这些文件在 IDE 不自动加载 `AGENTS.md` 时**指向项目 harness 入口**。**内容模式**（路径来自**仓库根目录**）：
 
 1. Read `AGENTS.md`，然后 `ARCHITECTURE.md`。
 2. Check `docs/exec-plans/active/` for in-flight plans。
@@ -265,11 +265,9 @@ Before substantive edits: read `AGENTS.md`, `ARCHITECTURE.md`, `docs/exec-plans/
 - **Include：** 用户反馈、agent feedback、risk-based auto-apply、rollup/archive 规则、`feedback-curator` 的读取约束。
 - **Required：** 任何依赖 feedback memory 的 agent 都必须把它当作运行前读取项之一。
 
-## `scripts/checks/`
-
-### `scripts/checks/harness-consistency.js`
+## Validation Scripts（可选）
 
 - **Purpose：** 用户项目可运行的通用 harness 自检脚本。
 - **Include：** 关键 harness 文档存在性、索引覆盖、基础 Markdown 链接、memory/feedback/plan 结构检查。
-- **Avoid：** 写死 `cc-harness` 仓库专有规则（例如 `.claude` / `.codex` / 根目录镜像完全一致）作为所有用户项目默认检查项。
-- **Scaffold rule：** 推荐在支持脚本的项目中生成；如果当前项目不适合生成脚本，也应在 `AGENTS.md` 或 `PLANS.md` 标注该能力缺失。
+- **Avoid：** 写死 `cc-harness` 仓库专有规则作为所有用户项目默认检查项。
+- **Scaffold rule：** 当前不强制生成脚本；如果项目需要自动化质量门禁，应在 `AGENTS.md` 或 `PLANS.md` 标注具体入口。

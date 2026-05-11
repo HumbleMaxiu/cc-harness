@@ -1,24 +1,11 @@
 # Exec Plans Index
 
-## 主动执行中
+## Active
 
-| 计划 | 描述 | 状态 |
-|------|------|------|
-| 暂无 | — | — |
+| Plan | Description | Status |
+|------|-------------|--------|
+| None | — | — |
 
-## 已完成
+## Completed
 
-| 计划 | 描述 | 完成日期 |
-|------|------|---------|
-| [completed/2026-04-14-dev-workflow-agent-system.md](completed/2026-04-14-dev-workflow-agent-system.md) | Dev Workflow Agent System 设计文档 | 2026-04-14 |
-| [completed/2026-04-15-feedback-curator-agent.md](completed/2026-04-15-feedback-curator-agent.md) | Feedback Curator Agent 实施计划 | 2026-04-15 |
-| [completed/2026-04-15-agent-contract-upgrade.md](completed/2026-04-15-agent-contract-upgrade.md) | Agent Contract Upgrade 实施计划 | 2026-04-15 |
-| [completed/2026-04-15-automation-enforcement.md](completed/2026-04-15-automation-enforcement.md) | 文档约束到自动化约束实施计划 | 2026-04-15 |
-| [completed/2026-04-15-autonomous-until-final-gate.md](completed/2026-04-15-autonomous-until-final-gate.md) | 持续运行到最终确认实施计划 | 2026-04-15 |
-| [completed/2026-04-15-claude-marketplace-install.md](completed/2026-04-15-claude-marketplace-install.md) | Claude Code marketplace git 安装形态改造 | 2026-04-15 |
-| [completed/2026-04-15-harness-capability-gap-closure.md](completed/2026-04-15-harness-capability-gap-closure.md) | 基于方法论与外部最佳实践补齐 harness 能力缺口（任务 9 延后） | 2026-04-15 |
-| [completed/2026-04-16-feedback-skill.md](completed/2026-04-16-feedback-skill.md) | 用户反馈提交根 Skill 实施计划 | 2026-04-16 |
-| [completed/2026-04-16-harness-main-benchmark-roadmap.md](completed/2026-04-16-harness-main-benchmark-roadmap.md) | 对标 harness-main 的增强路线图与实施计划 | 2026-04-16 |
-| [completed/2026-04-16-planning-drift-and-challenger-stability.md](completed/2026-04-16-planning-drift-and-challenger-stability.md) | Planning Drift Detection 与 Challenger 稳定接入实施计划 | 2026-04-16 |
-| [completed/2026-04-16-subagent-payload-and-timeout-guardrails.md](completed/2026-04-16-subagent-payload-and-timeout-guardrails.md) | Subagent Payload And Timeout Guardrails 实施计划 | 2026-04-16 |
-| [completed/2026-04-16-subagent-failure-recovery.md](completed/2026-04-16-subagent-failure-recovery.md) | Subagent Failure Recovery 实施计划 | 2026-04-16 |
+Historical completed plans from the removed mirror-directory era have been pruned from the active source tree. New completed plans should be added here when they describe the current source-first, role-skill architecture.

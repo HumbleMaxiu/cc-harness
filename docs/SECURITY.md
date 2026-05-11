@@ -26,7 +26,7 @@
 
 ### 高风险工具调用约束模板
 
-当任务涉及 `irreversible-write` 或 `external-side-effect` 时，workflow / agent 必须先整理最小约束块，再由用户确认：
+当任务涉及 `irreversible-write` 或 `external-side-effect` 时，workflow / role skill 必须先整理最小约束块，再由用户确认：
 
 ```markdown
 ### Operation Gate
@@ -60,10 +60,10 @@
 ### Audit
 
 - 所有 npm 发布通过 GitHub Actions CI 执行（需手动 trigger approval）
-- `.claude-plugin/plugin.json` 与 `.claude-plugin/marketplace.json` 中声明的路径需与实际文件对应
+- 安装脚本生成的 host 配置路径需与实际安装文件对应
 - 高风险工具调用必须能从交接文档、`Skill Workflow Record` 或最终总结中追溯其 `operation_risk` 与确认状态
 
 ### 相关文档
 
 - 产品规格：[product-specs/index.md](../product-specs/index.md)
-- Agent 系统：[product-specs/agent-system.md](../product-specs/agent-system.md)
+- 角色 Skill 系统：[product-specs/agent-system.md](../product-specs/agent-system.md)

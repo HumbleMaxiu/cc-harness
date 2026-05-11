@@ -12,6 +12,7 @@ const {
 } = require('./plan-persist-common');
 
 const parsed = parseHookInput(raw);
+const isCodexStop = isCodexHookPayload(raw, 'Stop');
 logHook('Stop', 'plan-stop-check started', {
   event: parsed && parsed.hook_event_name,
   bytes: Buffer.byteLength(raw || '', 'utf8'),
@@ -36,7 +37,7 @@ if (latest) {
     pendingOperationGate: latest.pendingOperationGate,
   });
 
-  if (isCodexHookPayload(raw, 'Stop')) {
+  if (isCodexStop) {
     logHook('Stop', 'emitting Codex JSON stop summary');
     emitCodexSystemMessage(message);
     process.exit(0);
@@ -46,6 +47,9 @@ if (latest) {
   process.stderr.write(message + '\n');
 } else {
   logHook('Stop', 'no active plan available; passthrough only');
+  if (isCodexStop) {
+    process.exit(0);
+  }
 }
 
 process.stdout.write(raw);

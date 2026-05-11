@@ -1,4 +1,0 @@
-{
-  "expected": "fail",
-  "description": "Missing memory recording should fail even if the workflow resumes."
-}

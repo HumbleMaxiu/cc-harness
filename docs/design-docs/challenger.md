@@ -1,4 +1,4 @@
-# Challenger Agent
+# Challenger Role Skill
 
 > Challenger 负责对计划、claim、API 假设和完成声明做对抗式验证，避免主流程在证据不足时继续推进。
 
@@ -20,12 +20,12 @@
 ## 触发时机
 
 - 计划形成后、实现前
-- Agent 声称完成，但结论依赖外部 claim 或复杂推断时
+- 主流程声称完成，但结论依赖外部 claim 或复杂推断时
 - 检测到 `unresolved-plan-drift`，且是否继续推进依赖额外证据判断时
 
 ## Challenger Gate
 
-为了避免 `challenger` 只在“主 agent 想起来了”时才出现，`dev-workflow` 现在应先产出一个稳定的 `Challenger Gate`：
+为了避免 `challenger` 只在“主执行者想起来了”时才出现，`dev-workflow` 现在应先产出一个稳定的 `Challenger Gate`：
 
 ```markdown
 ### Challenger Gate
@@ -51,7 +51,7 @@ Read、Grep、Glob、Bash
 ## 交接格式
 
 ```markdown
-## 交接：Challenger → 主 agent
+## 交接：Challenger → 主执行者
 
 ### Challenge Summary
 - commands_run: ...

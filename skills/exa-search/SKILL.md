@@ -18,7 +18,7 @@ description: 通过Exa MCP进行神经搜索，适用于网络、代码和公司
 
 ## MCP 要求
 
-必须配置 Exa MCP 服务器。添加到 `~/.claude.json`：
+必须配置 Exa MCP 服务器。将以下 server 配置添加到当前 host 的 MCP 配置中：
 
 ```json
 "exa-web-search": {

@@ -1,11 +1,11 @@
-# Reviewer Agent
+# Reviewer Role Skill
 
 > Reviewer 负责审查代码质量和安全性，审查通过才能进入测试。
 
 ## 职责
 
 - 审查代码质量和安全性
-- 审查不通过时输出 `REJECTED`，由主 agent 记录并自动回流修复
+- 审查不通过时输出 `REJECTED`，由主执行者记录并自动回流修复
 - 编写交接文档，记录审查结果
 - 判断问题是否为 recurrence candidate，并为 `feedback-curator` 提供结构化输入
 
@@ -20,9 +20,9 @@
 
 ## 循环规则
 
-- **不通过** → 输出 `REJECTED` + 问题列表 → 由主 agent 记录并自动回流修复
+- **不通过** → 输出 `REJECTED` + 问题列表 → 由主执行者记录并自动回流修复
 - **通过** → 输出 APPROVED → 进入测试阶段
-- **执行失败** → 输出 `BLOCKED`，并明确失败原因；主 agent 先重试同角色，再决定是否走同角色 fallback
+- **执行失败** → 输出 `BLOCKED`，并明确失败原因；主执行者先重试同角色，再决定是否走同角色 fallback
 
 ## 工具
 
@@ -75,7 +75,7 @@ Read、Grep、Glob、Bash
 - failure_stage: none | context-read | diff-review | handoff-write
 - retry_recommended: true | false
 - fallback_allowed: true | false
-- fallback_source: subagent | main-agent | none
+- fallback_source: delegated-role | main-host | none
 
 ### Feedback Record
 source: reviewer | none

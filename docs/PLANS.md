@@ -55,11 +55,11 @@
 2. 更新 `docs/product-specs/index.md`
 3. 在 `AGENTS.md` 文档导航表中追加一行
 
-### 添加新 Agent
-1. 在 `.claude/agents/` 创建 `<role>.md`
-2. 运行 `npm run sync:mirrors`，同步到 `agents/<role>.md`，并生成 `.codex/agents/<role>.toml`
-3. 在 `docs/design-docs/index.md` 追加链接
-4. 在 `AGENTS.md` Agent 团队表中追加一行
+### 添加新 Role Skill
+1. 在 `skills/<role>/SKILL.md` 创建角色 Skill
+2. 如需长期设计说明，在 `docs/design-docs/` 追加角色文档
+3. 更新 `docs/design-docs/index.md`
+4. 更新 `AGENTS.md` 的 Role Skills 表
 
 ### 完成执行计划
 1. 将计划从 `docs/exec-plans/active/` 移动到 `completed/`

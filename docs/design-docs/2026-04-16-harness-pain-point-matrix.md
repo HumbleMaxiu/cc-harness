@@ -16,7 +16,7 @@
 | 先写代码后思考 | `/brainstorming` + `/writing-plans` + `AGENTS.md` 中的 hard gate | 强 | 用户仍可能跳过入口，缺少更显眼的“从哪里开始”产品入口 | 继续强化 `/harness-help`、`/harness-guide` 的默认推荐路径 |
 | 计划漂移 | `docs/exec-plans/active/` + Run Trace + `/plan-persist` + `UserPromptSubmit/PreToolUse/PostToolUse/Stop` hooks | 中强 | 目前提醒为主，尚未对“计划外编辑”做更强的 drift detection | 增加 plan-vs-files/change-set 检测与更明确的 remediation 输出 |
 | 验证缺失 | `/dev-workflow` 的 Reviewer/Tester 闭环 + `/harness-quality-gate` + `/harness-audit` + `QUALITY_SCORE.md` | 中强 | 复杂 claim 过去缺少独立挑战角色，跨外部 API/行为证据仍容易松动 | 把 Challenger 更稳定接入执行流，并继续扩展 audit 信号 |
-| 文档腐坏 | `/doc-sync` + `docs/*/index.md` + `scripts/checks/harness-consistency.js` | 强 | 目前更擅长检测存在性与索引一致性，对“文档过时但结构仍在”的问题还不够强 | 增加 freshness / ownership / workflow completeness 信号 |
+| 文档腐坏 | `/doc-sync` + `docs/*/index.md` + 人工交付前检查 | 中 | 自动一致性检查脚本已移除，对“文档过时但结构仍在”的问题仍需要新设计 | 增加 freshness / ownership / workflow completeness 信号 |
 | 反馈无法沉淀 | `/feedback` + feedback memory + recurrence 规则 + `Skill Promotion Candidate` | 中强 | 已能记录与提炼，但“从 recurring issue 到新 skill”还偏人工触发 | 增加 skill candidate 汇总视图和更直接的 `/skill-creator` 接力 |
 | 恢复困难 | SessionStart memory 注入 + Run Trace + `/plan-persist` hooks + `docs/memory/index.md` | 中强 | 恢复信息已存在，但不同层级信息的优先级还需要更产品化地解释给用户 | 在 guide/help 中继续强化 resume 路径，并补更清晰的恢复 checklist |
 

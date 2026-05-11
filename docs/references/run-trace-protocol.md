@@ -41,11 +41,11 @@
 - 最小恢复锚点：`Context`、`Mode Decision`、`Execution`、`Self Review`、`Verification`、`Doc Sync`、`Final Summary`
 - `Run Trace` 可以内嵌在 `Skill Workflow Record` 中，作为当前阶段的简洁摘要
 
-### Subagent / Team 模式
+### Delegated Role / Parallel Review 模式
 
 - 主事实来源：多角色交接文档链
 - 最小恢复锚点：最近一次 `APPROVED / REJECTED / BLOCKED` 交接文档
-- `Run Trace` 可以放在统一交接文档骨架中，确保主 agent 能快速定位“最后进行到哪里”
+- `Run Trace` 可以放在统一交接文档骨架中，确保主执行者能快速定位“最后进行到哪里”
 
 ## Resume Protocol
 

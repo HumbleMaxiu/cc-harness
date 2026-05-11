@@ -1,4 +1,0 @@
-{
-  "expected": "fail",
-  "description": "Architect output should fail when it skips the docs impact matrix."
-}

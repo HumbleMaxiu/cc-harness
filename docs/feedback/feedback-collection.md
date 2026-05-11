@@ -5,7 +5,7 @@
 | 类型 | 来源 | 处理方式 |
 |------|------|---------|
 | **用户反馈** | 用户直接给出 | 先分诊；只有 durable 项进入长期 memory |
-| **Agent 反馈** | 自检、Reviewer、Tester | 先抽象为问题模式和规则，再记录；阻塞项按风险分级处理，非阻塞建议最终统一汇总 |
+| **Role/self-check 反馈** | 自检、Reviewer、Tester | 先抽象为问题模式和规则，再记录；阻塞项按风险分级处理，非阻塞建议最终统一汇总 |
 | **防止再犯** | 重复出现的问题 | 2次以上写入规范 |
 
 ## 用户反馈处理流程
@@ -35,7 +35,7 @@
 按以下顺序判断是否写入 `user-feedback.md`：
 
 1. 用户是否其实在查历史或做 summary；如果是，转 `/feedback-query`
-2. 内容是否来自 Reviewer / Tester / 自检；如果是，转 Agent 反馈流
+2. 内容是否来自 Reviewer / Tester / 自检；如果是，转 role/self-check 反馈流
 3. 内容是否只影响当前任务；如果是，归 `task_local_note`
 4. 内容是否在评价 agent、workflow、harness 或协作体验；如果是，归长期用户反馈
 5. 内容是否会约束未来类似任务的长期偏好、规则或判断标准；如果是，归长期用户反馈
@@ -87,13 +87,13 @@
 - 用户要查历史、看统计、找 recurrence 时，使用 `/feedback-query`
 - 不应要求用户先手动描述一整套字段，再由 agent 被动转写
 
-## Agent 反馈处理流程
+## Role / Self-Check 反馈处理流程
 
-1. **识别**：Agent 自检发现问题，或 Reviewer/Tester 返回 `REJECTED`，或在 `APPROVED` 下提出改进建议
+1. **识别**：自检发现问题，或 Reviewer/Tester role skill 返回 `REJECTED`，或在 `APPROVED` 下提出改进建议
 2. **抽象**：先把原始问题归纳成“问题模式 + 通用规则 + 风险等级”，不要直接把 lint / test 原始文本写进长期 memory
 3. **记录**：写入 `docs/memory/feedback/agent-feedback.md`，标注自动执行状态与最终汇总状态
 3. **分类**：
-   - 低风险反馈（通常为局部代码、测试、文档同步）→ 主 agent 可自动修复并继续流程
+   - 低风险反馈（通常为局部代码、测试、文档同步）→ 主执行者可自动修复并继续流程
    - 中高风险反馈（跨模块、删除/迁移、外部副作用、规范升级）→ 记录并保留到最终总结或显式 gate
    - 非阻塞建议（`APPROVED` 下的改进项）→ 当前主流程可继续，在最终交付前统一向用户汇总
 4. **执行/拒绝**：只有 `risk_level=low`、`operation_risk` 不高于 `reversible-write`，且 `action_type` 在自动执行白名单内的项默认自动修复；其余项进入最终总结或显式 gate
@@ -103,10 +103,10 @@
 
 ### Skill 模式补充
 
-- `dev-workflow` 的 `Skill 模式` 也会产生 Agent 反馈，即便没有独立 Reviewer / Tester handoff
+- `dev-workflow` 的内联模式也会产生角色反馈，即便没有独立 Reviewer / Tester handoff
 - Skill 模式中的反馈事实来源是 `Skill Workflow Record` 里的 `Self Review`、`Verification` 和 `Final Summary`
-- 只要这些区块中出现结构化 `feedback_record`，主 agent 或 `feedback-curator` 就应按与 Subagent 模式相同的规则写入 `docs/memory/feedback/agent-feedback.md`
-- 这意味着 Skill 模式不是“没有反馈记录的轻量模式”，而是“单 agent 产出结构化反馈的 workflow 模式”
+- 只要这些区块中出现结构化 `feedback_record`，主流程或 `feedback-curator` 就应按同一规则写入 `docs/memory/feedback/agent-feedback.md`
+- 这意味着内联模式不是“没有反馈记录的轻量模式”，而是“单会话产出结构化反馈的 workflow 模式”
 
 ## Feedback Rollup / Archive
 
@@ -142,17 +142,17 @@
 - `docs/memory/index.md` 是反馈记忆入口，也是会话恢复时的默认读取点
 - SessionStart hook 当前会注入 `using-brainstorming` skill，也会附带 `docs/memory/index.md`、`docs/memory/feedback/prevents-recurrence.md` 以及可用的 feedback 快照，帮助新会话获得最小恢复上下文
 - 即便 hook 已注入 memory 快照，workflow 和各角色仍应把 `docs/memory/` 视为事实来源；需要更完整上下文时继续显式读取原文件，而不是只依赖 hook 注入片段
-- Skill 模式执行时，主 agent 必须在最终交付前整理 `Skill Workflow Record`，作为恢复、memory 写入和最终汇总的事实来源
-- Reviewer / Tester 若发现问题，必须在交接文档中输出结构化的 `Feedback Record`，以便主 agent 追加到 `docs/memory/feedback/agent-feedback.md`
+- Skill 模式执行时，主执行者必须在最终交付前整理 `Skill Workflow Record`，作为恢复、memory 写入和最终汇总的事实来源
+- Reviewer / Tester 若发现问题，必须在交接文档中输出结构化的 `Feedback Record`，以便主执行者追加到 `docs/memory/feedback/agent-feedback.md`
 - Skill 模式若在 `Self Review` / `Verification` 中发现问题，也必须输出结构化的 `feedback_record`，再决定自动修复、升级模式或进入最终汇总
 - `feedback-curator` 负责消费 `Feedback Record`，维护 `agent-feedback.md`，并在需要时更新 `prevents-recurrence.md` 中的提名或统计
 - `feedback-curator` 在执行前应先读取 `docs/feedback/feedback-collection.md` 和 `docs/memory/index.md`，否则视为未完整加载约束
 - `REJECTED` 反馈属于阻塞项，但是否自动修复要看 `risk_level`、`operation_risk` 和 `action_type`；`APPROVED` 下的建议项可以在最终交付前统一汇总
-- `risk_level` 表示问题严重性；`operation_risk` 表示建议动作的执行风险。对于 `irreversible-write` / `external-side-effect`，主 agent 必须先输出 `Operation Gate` 并等待确认
+- `risk_level` 表示问题严重性；`operation_risk` 表示建议动作的执行风险。对于 `irreversible-write` / `external-side-effect`，主执行者必须先输出 `Operation Gate` 并等待确认
 - 主流程的阻塞点由 `dev-workflow` 控制，而不是由 hook 或 shell 层面拦截控制
 - Tester 的验证入口探测属于运行时职责：先探测项目事实，再运行可执行验证，必要时询问用户
-- 当同类问题累计 2 次或以上时，主 agent 必须同步更新 `docs/memory/feedback/prevents-recurrence.md` 和相应规范文件
-- 当活跃 feedback 文件开始变长时，主 agent 或 `feedback-curator` 必须将已完成项归档到 `docs/memory/feedback/archive/`
+- 当同类问题累计 2 次或以上时，主执行者必须同步更新 `docs/memory/feedback/prevents-recurrence.md` 和相应规范文件
+- 当活跃 feedback 文件开始变长时，主执行者或 `feedback-curator` 必须将已完成项归档到 `docs/memory/feedback/archive/`
 
 ## 反馈优先级
 
@@ -170,7 +170,7 @@
 
 写入位置：
 - `AGENTS.md` — 全局行为规则
-- 相关 Agent 定义文件 — 特定角色的规则
+- 相关 Role Skill — 特定角色的规则
 - `docs/RELIABILITY.md` — 可靠性相关规范
 
 ## Memory → Skill 升级路径

@@ -89,7 +89,7 @@
 
 ### 反馈规则
 - 用户反馈 → 先分诊；只有 durable 的长期反馈才记录到 `docs/memory/feedback/user-feedback.md`，task-local 指令只在当前任务上下文应用
-- Agent 反馈 → 记录到 `docs/memory/feedback/agent-feedback.md`，阻塞项优先自动修复回流，非阻塞建议在最终交付统一汇总
+- Role/self-check 反馈 → 记录到 `docs/memory/feedback/agent-feedback.md`，阻塞项优先自动修复回流，非阻塞建议在最终交付统一汇总
 - 同类问题出现 2 次或以上 → 同步到 `docs/memory/feedback/prevents-recurrence.md` 并升级为规范
 
 ### 文档同步（编辑源码后自检）
@@ -108,11 +108,11 @@
 - compact 后重新读取 docs/PLANS.md
 - 大文件 (>300 行)：使用 offset+limit
 
-## Agent 团队
+## Role Skills
 
 | 角色 | 定义 |
 |------|------|
-| {{role}} | [.harness/agents/{{role}}.md](.harness/agents/{{role}}.md) |
+| {{role}} | [skills/{{role}}/SKILL.md](skills/{{role}}/SKILL.md) |
 
 ## How to use this harness
 

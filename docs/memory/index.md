@@ -12,7 +12,7 @@
 ## 反馈相关
 
 - [用户反馈](feedback/user-feedback.md) — 经过分诊后，确认为 durable、跨任务可复用的用户反馈
-- [Agent 反馈](feedback/agent-feedback.md) — 来自 Reviewer、Tester 或自检的问题，由 `feedback-curator` 或主 agent 记录
+- [Role/self-check 反馈](feedback/agent-feedback.md) — 来自 Reviewer、Tester 或自检的问题，由 `feedback-curator` 或主执行者记录
 - [防止再犯](feedback/prevents-recurrence.md) — 已升级为规范的重复问题和预防措施
 - [Feedback Archive](feedback/archive/index.md) — 已完成汇总的历史反馈趋势和月度归档
 

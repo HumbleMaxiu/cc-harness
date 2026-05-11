@@ -136,22 +136,22 @@ git commit -m "feat: add specific feature"
 
 **"计划已完成并保存至 `docs/exec-plans/active/<filename>.md`。三种执行方式：**
 
-**1. 子代理驱动（推荐）** — 我为每个任务派发一个新的 subagent，在任务之间进行审查，快速迭代
+**1. 角色 Skill 驱动（推荐）** — 我按任务阶段调用 `/developer`、`/reviewer`、`/tester` 等角色 Skill，并在阶段之间审查和迭代
 
 **2. 内联执行** — 在此会话中执行任务，带检查点的批量执行
 
-**3. Team 审查** — 主 agent 执行开发流程，但在 Reviewer 阶段组织多个 Reviewer 并行审查
+**3. 并行角色审查** — 主流程执行开发流程，但在 Reviewer 阶段组织多个 bounded review lane 并行审查
 
 **选择哪种方式？"**
 
-**如果选择子代理驱动：**
-- **必需子技能：** 使用 dev-workflow 的 Subagent 模式
-- 主 agent 读取 `.claude/agents/` 中的 agent 定义进行编排
+**如果选择角色 Skill 驱动：**
+- **必需子技能：** 使用 `/dev-workflow`
+- 主流程读取 `skills/<role>/SKILL.md` 中的角色 Skill 契约进行编排
 
 **如果选择内联执行：**
 - **必需子技能：** 使用 dev-workflow 的 Skill 模式
-- 主 agent 直接执行各阶段
+- 主执行者直接执行各阶段
 
-**如果选择 Team 审查：**
-- **必需子技能：** 使用 dev-workflow 的 Team 模式
-- 主 agent 在 Reviewer 阶段组织并行审查并汇总结果
+**如果选择并行角色审查：**
+- **必需子技能：** 使用 `/dev-workflow`
+- 主流程在 Reviewer 阶段组织并行审查并汇总结果

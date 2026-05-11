@@ -17,7 +17,7 @@
  *
  * How it works:
  *   1. Reads the raw JSON event from stdin (passed by Claude Code).
- *   2. Resolves the hook runner script from the current mirrored directory first,
+ *   2. Resolves the hook runner script from the current installed directory first,
  *      then falls back to known plugin locations for Claude installs.
  *   3. Runs `session-start.js` which injects the using-brainstorming skill.
  *   4. Passes stdout/stderr through and forwards the child exit code.
@@ -88,7 +88,7 @@ function hasHookScript(candidate) {
 }
 
 /**
- * Resolve the runner script path across repo-local Codex mirrors and Claude plugin installs.
+ * Resolve the runner script path across repo-local files and Claude plugin installs.
  *
  * @returns {string}
  */
@@ -96,11 +96,6 @@ function resolveScriptPath() {
   const directLocal = path.join(__dirname, 'session-start.js');
   if (hasHookScript(directLocal)) {
     return directLocal;
-  }
-
-  const repoLocal = path.join(process.cwd(), '.codex', REL_HOOK_PATH);
-  if (hasHookScript(repoLocal)) {
-    return repoLocal;
   }
 
   const envRoot = process.env.CLAUDE_PLUGIN_ROOT || '';

@@ -1,4 +1,0 @@
-{
-  "expected": "fail",
-  "description": "Feedback curator output should fail when it writes memory without the required summary handoff."
-}

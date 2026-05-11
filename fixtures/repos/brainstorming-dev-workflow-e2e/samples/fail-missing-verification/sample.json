@@ -1,4 +1,0 @@
-{
-  "expected": "fail",
-  "description": "E2E should fail if the workflow jumps from brainstorming to execution without verification."
-}

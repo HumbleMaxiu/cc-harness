@@ -10,7 +10,7 @@
  *
  * Arguments:
  *   event       - The hook event name (e.g., "session:start", "pre:bash:block-no-verify")
- *   hook-script - Path to the hook script (repo-local, mirrored, or plugin-relative)
+ *   hook-script - Path to the hook script (repo-local, installed, or plugin-relative)
  *   flags       - Comma-separated list of hook profiles this hook belongs to
  *                 (e.g., "minimal,standard,strict")
  *
@@ -130,7 +130,7 @@ function isCodexHookPayload(raw) {
 }
 
 /**
- * Resolve the hook script path across repo-local Codex mirrors and Claude plugin installs.
+ * Resolve the hook script path across repo-local files, installed runtime folders, and Claude plugin installs.
  */
 function resolveHookScriptPath(hookScript) {
   const normalized = String(hookScript || '').trim();
@@ -147,9 +147,9 @@ function resolveHookScriptPath(hookScript) {
     return cwdPath;
   }
 
-  const mirroredRootPath = path.resolve(__dirname, '..', '..', normalized);
-  if (fs.existsSync(mirroredRootPath)) {
-    return mirroredRootPath;
+  const sourceRootPath = path.resolve(__dirname, '..', '..', normalized);
+  if (fs.existsSync(sourceRootPath)) {
+    return sourceRootPath;
   }
 
   const CURRENT_PLUGIN_SLUG = 'cc-harness';

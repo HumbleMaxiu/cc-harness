@@ -1,6 +1,6 @@
-# Feedback Curator Agent
+# Feedback Curator Role Skill
 
-> Feedback Curator 负责消费交接文档中的 `Feedback Record`，维护 feedback memory，并给主 agent 输出自动处理轨迹与最终汇总摘要。
+> Feedback Curator 负责消费交接文档中的 `Feedback Record`，维护 feedback memory，并给主执行者输出自动处理轨迹与最终汇总摘要。
 
 ## 触发时机
 
@@ -17,14 +17,14 @@
 4. 更新 `docs/memory/feedback/agent-feedback.md`
 5. 在满足条件时更新 `docs/memory/feedback/prevents-recurrence.md` 中的提名或统计
 6. 在需要时 roll up 到 `docs/memory/feedback/archive/YYYY-MM.md`
-7. 输出给主 agent 的自动处理摘要与最终汇总摘要
+7. 输出给主执行者的自动处理摘要与最终汇总摘要
 
 ## 边界
 
 - 可以写 memory 文件
 - 不直接修改业务代码
-- 不直接修改 `AGENTS.md`、Skills 或 Agent 定义
-- 不替代主 agent 做最终交付
+- 不直接修改 `AGENTS.md` 或 Skills
+- 不替代主执行者做最终交付
 - 其行为约束以 `docs/feedback/feedback-collection.md` 为事实来源之一
 
 ## 工具
@@ -34,7 +34,7 @@ Read、Write、Grep、Glob、Bash
 ## 交接文档格式
 
 ```markdown
-## 交接：Feedback Curator → 主 agent
+## 交接：Feedback Curator → 主执行者
 
 ### 输入来源
 - [读取的交接文档]

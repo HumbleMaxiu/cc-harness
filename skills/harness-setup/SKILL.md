@@ -54,7 +54,7 @@ Scaffold 不是写具体功能文档，而是搭建**文档框架**和**约定**
 
 - `light`
   - 仍生成核心入口文档与索引，但项目级文档保持更轻的 skeleton
-  - 默认强调 `Skill` / 单 agent workflow
+  - 默认强调 `Skill` / 单执行者 workflow
   - checks / hooks 以推荐项为主，避免过度框架化
 - `standard`
   - 生成完整基础文档集
@@ -213,7 +213,7 @@ digraph harness {
 - 已安装 Skills 快速参考（带使用场景；默认包含 `/doc-sync`、`/harness-help`、`/harness-audit`、`/harness-guide`、`/harness-quality-gate`）
 - **行为规则**（从 [references/behavior-rules.md](references/behavior-rules.md) 提取，作为 hooks 未生效时的后备）
 
-`docs/memory/index.md` 必须声明 `docs/memory/` 是工作记忆的事实来源，`docs/memory/feedback/` 必须包含用户反馈、Agent 反馈、防止再犯和 archive 结构；`docs/feedback/feedback-collection.md` 必须作为 feedback 规则的事实来源之一生成到用户项目中。
+`docs/memory/index.md` 必须声明 `docs/memory/` 是工作记忆的事实来源，`docs/memory/feedback/` 必须包含用户反馈、role/self-check 反馈、防止再犯和 archive 结构；`docs/feedback/feedback-collection.md` 必须作为 feedback 规则的事实来源之一生成到用户项目中。
 
 如果 scaffold 生成了 `dev-workflow` 或等效实现/审查 workflow 入口，则应同时在 `AGENTS.md` 或相关指南中暴露 `/doc-sync`，让用户和 agent 都有统一的文档维护入口。
 

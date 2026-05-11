@@ -46,8 +46,8 @@ Hook runtime 本身也必须 fail-open：
 - 不允许因为 shell 启动差异、插件根目录解析失败或 stdin / EOF 行为异常而把主流程无限挂住
 - 对 Windows PowerShell + Git Bash 这类兼容性较脆弱的运行层，hook 应使用有界等待和超时回退，而不是假设 stdin 一定会正常结束
 - 当 hook 无法安全完成时，应优先透传当前 payload 并输出最小 warning，而不是阻塞 `/harness-setup`、停止点或正常对话
-- Codex hooks 的正常协议输出必须保持在 `stdout` 的 JSON 中；关键节点调试日志应走 `stderr`，如需稳定排障应通过 [`.codex/hook-logging.json`](../.codex/hook-logging.json) 启用并写入 `.codex/logs/hooks.log`
-- Claude hooks 也应把关键节点调试日志放在 `stderr`，并通过 [`.claude/hook-logging.json`](../.claude/hook-logging.json) 启用写入 `.claude/logs/hooks.log`；如需临时自定义落点，可设置 `CC_HARNESS_HOOK_LOG_PATH`
+- Codex hooks 的正常协议输出必须保持在 `stdout` 的 JSON 中；关键节点调试日志应走 `stderr`，安装后可通过目标项目的 `.codex/hook-logging.json` 写入 `.codex/logs/hooks.log`
+- Claude Code hooks 也应把关键节点调试日志放在 `stderr`，安装后可通过目标项目的 `.claude/hook-logging.json` 写入 `.claude/logs/hooks.log`；如需临时自定义落点，可设置 `CC_HARNESS_HOOK_LOG_PATH`
 
 第一阶段 hooks 只做最小硬信号检测，当前要求至少能提示：
 
@@ -58,15 +58,15 @@ Hook runtime 本身也必须 fail-open：
 
 这些信号用于提醒“当前事实链可能已漂移”，而不是创建新的计划事实源。
 
-### Subagent Reliability
+### Delegated Role Reliability
 
-`Subagent` 模式的可靠性还依赖主 agent 的输入打包方式。
+委托角色执行的可靠性依赖主流程的输入打包方式。
 
 - `payload_mode`：默认使用 `compact-summary`，优先传 plan / handoff / file refs，而不是大段内联内容
-- `timeout-aware-retry`：subagent 首次失败后，先判断是否属于 payload 过重、工具超时或空结果
+- `timeout-aware-retry`：委托执行首次失败后，先判断是否属于 payload 过重、工具超时或空结果
 - `narrowed-payload-retry`：第二次重试必须收窄 payload，只保留最关键的 `step_scope`、`changed_files_summary` 和少量 `evidence_refs`
 
-如果主 agent 已经观察到空输出、只有 1 行占位内容或明显超时，不应原样重放同一大 prompt。
+如果主执行者已经观察到空输出、只有 1 行占位内容或明显超时，不应原样重放同一大 prompt。
 
 ### Resume Protocol
 
@@ -87,7 +87,7 @@ Hook runtime 本身也必须 fail-open：
 
 ### 幂等性
 
-- Skill 和 Agent 定义（Markdown 文件）：幂等，无状态，可重复调用
+- Skill 定义（Markdown 文件）：幂等，无状态，可重复调用
 - 交接文档：追加写入，不覆盖已有内容
 - Exec plans：Git 版本化，可回滚
 - Run Trace：结构化摘要可重复更新，不依赖完整终端输出
@@ -101,5 +101,5 @@ Hook runtime 本身也必须 fail-open：
 ### Observability
 
 - 目前无完整运行时日志输出
-- Agent 工作流通过 `Skill Workflow Record`、交接文档和 `Run Trace` 显式记录，可被主 agent 和人类审查
+- 角色 Skill 工作流通过 `Skill Workflow Record`、交接文档和 `Run Trace` 显式记录，可被主流程和人类审查
 - 长期 memory 只保留跨任务可复用事实；阶段性轨迹保留在任务层结构化记录中

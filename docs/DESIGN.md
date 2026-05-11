@@ -2,20 +2,20 @@
 
 ## 设计理念
 
-cc-harness 的核心目标是**降低 harness engineering 的使用门槛**，让任何 Claude Code 用户都能快速为自己的项目搭建标准化的 agent 协作环境。
+cc-harness 的核心目标是**降低 harness engineering 的使用门槛**，让 Claude Code 和 Codex 用户都能快速为自己的项目搭建标准化的 AI 协作环境。
 
 ### 系统优化目标
 
 1. **零配置起步** — 用户只需运行 `/harness-setup`，经过少量问答即可生成完整 harness。
-2. **渐进式复杂** — 默认 scaffold 提供最小集；随着项目增长，逐步扩展 domains、agents、hooks。
+2. **渐进式复杂** — 默认 scaffold 提供最小集；随着项目增长，逐步扩展 domains、role skills、hooks。
 3. **文档即代码** — 所有 harness 文件（AGENTS.md、design-docs、exec-plans）存在于 Git 中，版本化、可 review、可复用。
-4. **交接有记录** — Agent 工作流中的每个角色完成后必须输出交接文档，确保上下文不丢失。
-5. **收口回到文档** — skills、agents、hooks、MCPs、commands、rules 的价值，最终都要落回到文档读取、维护、补齐或流程收口上。
+4. **交接有记录** — 每个角色 Skill 完成后必须输出交接文档，确保上下文不丢失。
+5. **收口回到文档** — skills、hooks、MCPs、commands、rules 的价值，最终都要落回到文档读取、维护、补齐或流程收口上。
 
 ### 架构决策
 
 - **Markdown-first** — 所有文档和定义使用 Markdown，无需额外格式或工具。
-- **Skill + Agent 分离** — Skill 定义流程编排，Agent 定义角色能力，各自独立、可复用。
+- **Skill-first roles** — 流程入口和角色能力都以 Skill 形式维护，减少 host-specific 定义漂移。
 - **Hooks 最小化** — 仅在必要时使用 session hooks，避免过度侵入 Claude Code 行为。
 - **Docs-first operational surface** — 文档不是附属说明，而是 harness 的主操作面：scaffold、workflow、feedback、quality gate、memory 都应能回写或消费 docs。
 - **Foundation before tooling** — 先补齐文档中心化的基础收口能力，再接入 UI 还原、e2e 生成、测试工具等更强的工具型能力。

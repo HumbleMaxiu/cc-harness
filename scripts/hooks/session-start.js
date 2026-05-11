@@ -4,26 +4,23 @@
 /**
  * session-start.js
  *
- * ECC SessionStart hook - injects the using-brainstorming skill plus a minimal project memory snapshot into new sessions.
+ * SessionStart hook - injects the using-brainstorming skill plus a minimal project memory snapshot into new sessions.
  */
 
 const fs = require('fs');
 const path = require('path');
+const { emitCodexAdditionalContext, isCodexHookPayload } = require('./plan-persist-common');
 
-// Read stdin
 const raw = fs.readFileSync(0, 'utf8');
 
 let skillContent = '';
 const candidates = [
-  // 1. CLAUDE_PLUGIN_ROOT/skills/ (对应 .claude/skills/ 布局，最优先)
   path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'skills', 'using-brainstorming', 'SKILL.md'),
-  // 2. CLAUDE_PLUGIN_ROOT 直接 (旧路径兜底)
   path.join(process.env.CLAUDE_PLUGIN_ROOT || '', 'using-brainstorming', 'SKILL.md'),
-  // 3. 项目本地 .claude/skills/
   path.join(process.cwd(), '.claude', 'skills', 'using-brainstorming', 'SKILL.md'),
-  // 4. 项目本地根路径
+  path.join(process.cwd(), '.codex', 'skills', 'using-brainstorming', 'SKILL.md'),
+  path.join(process.cwd(), 'skills', 'using-brainstorming', 'SKILL.md'),
   path.join(process.cwd(), 'using-brainstorming', 'SKILL.md'),
-  // 5. __dirname 回溯 (scripts/hooks/ → 项目根目录)
   path.join(__dirname, '..', '..', 'skills', 'using-brainstorming', 'SKILL.md'),
   path.join(__dirname, '..', '..', 'using-brainstorming', 'SKILL.md'),
 ];
@@ -82,10 +79,16 @@ if (memoryBlocks) {
 }
 
 if (!injections.length) {
-  process.stdout.write(raw);
+  if (!isCodexHookPayload(raw, 'SessionStart')) {
+    process.stdout.write(raw);
+  }
   process.exit(0);
 }
 
-// Output: pass through original plus all available injections.
+if (isCodexHookPayload(raw, 'SessionStart')) {
+  emitCodexAdditionalContext('SessionStart', injections.join('\n'));
+  process.exit(0);
+}
+
 process.stdout.write(raw + injections.join(''));
 process.exit(0);

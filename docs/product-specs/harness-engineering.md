@@ -52,14 +52,14 @@
 | `docs/design-docs/*` | `/brainstorming` | `architect` |
 | `docs/exec-plans/*` | `/writing-plans` | `architect` / `dev-workflow` |
 | `docs/product-specs/*` | `/harness-setup` 初始化 domain | 用户任务流 + `architect` |
-| `docs/memory/index.md` | `/harness-setup` | 主 agent / `feedback-curator` |
+| `docs/memory/index.md` | `/harness-setup` | 主执行者 / `feedback-curator` |
 | `docs/memory/feedback/*` | `/harness-setup` | `feedback-curator` |
 | `docs/feedback/feedback-collection.md` | `/harness-setup` | `feedback-curator` + `architect` |
 | `docs/generated/*` | `/harness-setup` 占位 | 领域实现流程或项目脚本 |
 | `docs/references/*` | `/harness-setup` 占位 | 人工维护或专项 skill |
 | `docs/QUALITY_SCORE.md` | `/harness-setup` | `architect` / update workflow |
 | 健康检查入口（如 `/harness-audit`） | `/harness-setup` 暴露入口 | `architect` / `tester` / 用户 |
-| `scripts/checks/harness-consistency.js` | `/harness-setup`（推荐生成） | `architect` / tester |
+| 验证脚本（如项目选择生成） | `/harness-setup`（可选） | `architect` / tester |
 | 文档同步入口（如 `/doc-sync`） | `/harness-setup` 暴露入口 | `architect` / `dev-workflow` / 用户 |
 
 ### 当前原则
@@ -202,16 +202,14 @@ profile 影响至少应体现在：
 
 ### Generic Harness Check
 
-`scripts/checks/harness-consistency.js` 不应只服务 `cc-harness` 仓库本身。
-
-对于用户项目，更有价值的是生成一个**通用版 harness self-check**，至少检查：
+当前不强制生成 repo-local test/check 脚本。对于需要自动化质量门禁的用户项目，更有价值的是生成一个**通用版 harness self-check**，至少检查：
 
 - 关键 harness 文档是否存在
 - index 与目录是否一致
 - 关键 Markdown 链接是否有效
 - memory / feedback / plan 基础结构是否存在
 
-只有像 `.claude ↔ skills ↔ .codex` 镜像一致性这类仓库私有规则，才属于插件自身自检，而不是所有用户项目的默认要求。
+只有像“安装脚本是否能正确生成目标 host 运行目录”这类仓库私有规则，才属于项目自身自检，而不是所有用户项目的默认要求。
 
 ### 风险模型脚手架责任
 

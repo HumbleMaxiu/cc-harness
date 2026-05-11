@@ -23,14 +23,16 @@ function safeStat(target) {
   }
 }
 
-function findClaudeRoot(startDir) {
+function findHarnessRuntimeRoot(startDir) {
   let current = path.resolve(startDir || process.cwd());
 
   while (true) {
-    const claudeDir = path.join(current, '.claude');
-    const stat = safeStat(claudeDir);
-    if (stat && stat.isDirectory()) {
-      return claudeDir;
+    for (const dirName of ['.claude', '.codex']) {
+      const candidate = path.join(current, dirName);
+      const stat = safeStat(candidate);
+      if (stat && stat.isDirectory()) {
+        return candidate;
+      }
     }
 
     const parent = path.dirname(current);
@@ -41,12 +43,12 @@ function findClaudeRoot(startDir) {
   }
 }
 
-function readHookLoggingConfig(claudeRoot) {
-  if (!claudeRoot) {
+function readHookLoggingConfig(runtimeRoot) {
+  if (!runtimeRoot) {
     return null;
   }
 
-  const configPath = path.join(claudeRoot, 'hook-logging.json');
+  const configPath = path.join(runtimeRoot, 'hook-logging.json');
   const stat = safeStat(configPath);
   if (!stat || !stat.isFile()) {
     return null;
@@ -71,8 +73,8 @@ function resolveHookLogPath() {
     return cachedHookLogPath;
   }
 
-  const claudeRoot = findClaudeRoot(process.cwd());
-  const config = readHookLoggingConfig(claudeRoot);
+  const runtimeRoot = findHarnessRuntimeRoot(process.cwd());
+  const config = readHookLoggingConfig(runtimeRoot);
   if (!config || config.enabled !== true) {
     cachedHookLogPath = null;
     return cachedHookLogPath;
@@ -80,8 +82,8 @@ function resolveHookLogPath() {
 
   const configuredPath = typeof config.logPath === 'string' ? config.logPath.trim() : '';
   const defaultPath = path.join('logs', 'hooks.log');
-  cachedHookLogPath = claudeRoot
-    ? path.resolve(claudeRoot, configuredPath || defaultPath)
+  cachedHookLogPath = runtimeRoot
+    ? path.resolve(runtimeRoot, configuredPath || defaultPath)
     : null;
   return cachedHookLogPath;
 }
@@ -119,7 +121,7 @@ function logHook(stage, message, details) {
     }, {}))
     : '';
 
-  const line = `[claude-hook] ${new Date().toISOString()} ${stage} ${message}${detailSuffix}`;
+  const line = `[cc-harness-hook] ${new Date().toISOString()} ${stage} ${message}${detailSuffix}`;
   writeStderrLine(line);
   writeFileLogLine(line);
 }
@@ -147,6 +149,15 @@ function emitCodexSystemMessage(message, options = {}) {
   }
 
   process.stdout.write(JSON.stringify(payload));
+}
+
+function emitCodexAdditionalContext(hookEventName, additionalContext) {
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName,
+      additionalContext,
+    },
+  }));
 }
 
 function listActivePlans(repoRoot) {
@@ -244,6 +255,7 @@ function readLatestPlan(repoRoot) {
 }
 
 module.exports = {
+  emitCodexAdditionalContext,
   emitCodexSystemMessage,
   isCodexHookPayload,
   listActivePlans,

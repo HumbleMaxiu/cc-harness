@@ -4,7 +4,7 @@
 
 ## 目标
 
-提供一套 Skill 创作和发布工具，让开发者能够创建符合 cc-harness 规范的 Claude Code Skills，并在 marketplace 中分发。
+提供一套 Skill 创作和维护工具，让开发者能够创建符合 cc-harness 规范的 Skills，并通过安装脚本投放到 Claude Code 或 Codex 项目。
 
 ## 用户可见行为
 
@@ -15,7 +15,7 @@
 1. 定义 Skill 名称和描述
 2. 编写 SKILL.md 主文件
 3. 可选：添加 references/ 和 scripts/
-4. 发布到 `.claude-plugin/marketplace.json`
+4. 通过 `install.sh` 验证该 Skill 能被安装到目标 host
 
 ### Skill 结构规范
 
@@ -46,6 +46,12 @@ description: <一句话描述>
 |-------|------|
 | brainstorming | 创造性需求和设计探索 |
 | dev-workflow | A/Dev/R/T 角色开发流程 |
+| architect | 计划检查和文档影响判断 |
+| challenger | 对抗式验证 |
+| developer | TDD 实现 |
+| reviewer | 代码质量和安全审查 |
+| tester | 验证入口探测和测试执行 |
+| feedback-curator | feedback memory 维护 |
 | feedback | 用户反馈提交入口 |
 | feedback-query | feedback 历史查询与摘要 |
 | plan-persist | 轻量 planning 持续化与恢复锚点 |
@@ -95,4 +101,4 @@ description: <一句话描述>
 ## 相关文档
 
 - [docs/design-docs/core-beliefs.md](../design-docs/core-beliefs.md)
-- `.claude-plugin/marketplace.json`
+- [docs/install-ai.md](../install-ai.md)
