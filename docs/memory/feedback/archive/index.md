@@ -1,4 +1,4 @@
-# Feedback Archive Index
+# Feedback 归档索引
 
 > 存放已完成汇总的 feedback 月度归档。长期 memory 只保留最近待处理项、近期已处理项和当前有效规则；更早的记录应迁移到这里。
 

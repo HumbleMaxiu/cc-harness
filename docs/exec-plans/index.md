@@ -1,11 +1,15 @@
-# Exec Plans Index
+# Exec Plans 索引
 
 ## Active
 
-| Plan | Description | Status |
-|------|-------------|--------|
-| None | — | — |
+当前没有 active plan。
 
 ## Completed
 
-Historical completed plans from the removed mirror-directory era have been pruned from the active source tree. New completed plans should be added here when they describe the current source-first, role-skill architecture.
+| Plan | 说明 | 状态 |
+|------|------|------|
+| [2026-05-13-feedback-skill-audit.md](completed/2026-05-13-feedback-skill-audit.md) | 使用独立 `/skill-audit` 审查 `/feedback`，记录自动检查与模型输出 | Completed |
+| [2026-05-13-skill-standard.md](completed/2026-05-13-skill-standard.md) | Skill 标准方案实施：标准文档、skill-creator、audit/check script、三方 skill 引入约束 | Completed |
+| [2026-05-14-pm-orchestrator-migration.md](completed/2026-05-14-pm-orchestrator-migration.md) | 将旧执行入口迁移为 `/pm-orchestrator`，由 PM 总控负责阶段控制、skill 分配、失败回流和并行/串行策略 | Completed |
+
+已移除的 mirror-directory 时代历史 completed plans 已从 active source tree 清理。新的 completed plans 只有在描述当前 source-first、role-skill 架构时才添加到这里。

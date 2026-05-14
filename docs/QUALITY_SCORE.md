@@ -1,4 +1,4 @@
-# Quality Score — cc-harness
+# 质量评分 — cc-harness
 
 ## 质量记分卡
 
@@ -19,7 +19,7 @@
 | 审计分类 | 主要检查 | 仓库信号 / 命令 |
 |---------|---------|----------------|
 | 文档与索引 | 关键文档存在、索引覆盖、链接有效 | 当前手动检查 |
-| Workflow 健康 | active / completed plan、Run Trace 相关约定、workflow 契约 | `docs/exec-plans/index.md`、`skills/dev-workflow/SKILL.md` |
+| Workflow 健康 | active / completed plan、Run Trace 相关约定、workflow 契约 | `docs/exec-plans/index.md`、`skills/pm-orchestrator/SKILL.md` |
 | Eval 与验证 | 安装冒烟是否可运行 | `install.sh`、`scripts/install.mjs` |
 | Memory / Feedback | memory 入口、feedback 结构、防止再犯链路 | `docs/memory/index.md`、`docs/feedback/feedback-collection.md` |
 | Install 完整性 | 安装脚本、hook 配置、role skills | `install.sh`、`scripts/install.mjs`、`scripts/hooks/` |

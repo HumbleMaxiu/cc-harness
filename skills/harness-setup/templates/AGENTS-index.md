@@ -47,6 +47,7 @@
 | Skill | 用途 |
 |-------|------|
 | {{skill_name}} | {{skill_description}} |
+| `/follow-goal` | 长跑任务的 objective、停止条件和 checkpoint 执行协议 |
 | `/doc-sync` | 基于代码和流程变更同步相关文档、索引和导航 |
 
 ## Harness 命令
@@ -57,6 +58,7 @@
 | harness audit | 项目健康检查 |
 | harness quality gate | 提交前质量门禁 |
 | harness guide | Skill 推荐 |
+| follow goal | 长跑任务 Goal Contract |
 
 ## 上下文恢复（/compact 后或新会话）
 

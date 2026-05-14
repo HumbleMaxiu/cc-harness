@@ -1,4 +1,4 @@
-# Harness Pain Point Matrix
+# Harness 痛点矩阵
 
 > **背景：** 基于本地对标仓库 `/Users/masiyuan/Downloads/harness-main` 的产品化做法，整理 `cc-harness` 当前面向用户的核心痛点、已实现能力、缺口与下一步增强方向。
 
@@ -15,28 +15,28 @@
 |------|----------|------|----------|--------|
 | 先写代码后思考 | `/brainstorming` + `/writing-plans` + `AGENTS.md` 中的 hard gate | 强 | 用户仍可能跳过入口，缺少更显眼的“从哪里开始”产品入口 | 继续强化 `/harness-help`、`/harness-guide` 的默认推荐路径 |
 | 计划漂移 | `docs/exec-plans/active/` + Run Trace + `/plan-persist` + `UserPromptSubmit/PreToolUse/PostToolUse/Stop` hooks | 中强 | 目前提醒为主，尚未对“计划外编辑”做更强的 drift detection | 增加 plan-vs-files/change-set 检测与更明确的 remediation 输出 |
-| 验证缺失 | `/dev-workflow` 的 Reviewer/Tester 闭环 + `/harness-quality-gate` + `/harness-audit` + `QUALITY_SCORE.md` | 中强 | 复杂 claim 过去缺少独立挑战角色，跨外部 API/行为证据仍容易松动 | 把 Challenger 更稳定接入执行流，并继续扩展 audit 信号 |
+| 验证缺失 | `/pm-orchestrator` 的 Reviewer/Tester 闭环 + `/harness-quality-gate` + `/harness-audit` + `QUALITY_SCORE.md` | 中强 | 复杂 claim 过去缺少独立挑战角色，跨外部 API/行为证据仍容易松动 | 把 Challenger 更稳定接入执行流，并继续扩展 audit 信号 |
 | 文档腐坏 | `/doc-sync` + `docs/*/index.md` + 人工交付前检查 | 中 | 自动一致性检查脚本已移除，对“文档过时但结构仍在”的问题仍需要新设计 | 增加 freshness / ownership / workflow completeness 信号 |
 | 反馈无法沉淀 | `/feedback` + feedback memory + recurrence 规则 + `Skill Promotion Candidate` | 中强 | 已能记录与提炼，但“从 recurring issue 到新 skill”还偏人工触发 | 增加 skill candidate 汇总视图和更直接的 `/skill-creator` 接力 |
 | 恢复困难 | SessionStart memory 注入 + Run Trace + `/plan-persist` hooks + `docs/memory/index.md` | 中强 | 恢复信息已存在，但不同层级信息的优先级还需要更产品化地解释给用户 | 在 guide/help 中继续强化 resume 路径，并补更清晰的恢复 checklist |
 
 ## 当前能力地图
 
-### Root Entries
+### 根入口
 
 - `/harness-help`：给出命令索引和高频入口
 - `/harness-guide`：根据场景推荐 skill 或 workflow
 - `/harness-audit`：读取仓库信号并输出结构化健康检查
 - `/harness-quality-gate`：交付前执行质量门禁
 
-### Execution Continuity
+### 执行连续性
 
 - `/brainstorming`：需求与方案探索
 - `/writing-plans`：复杂任务计划
 - `/plan-persist`：小任务和 bugfix 的轻量持续 planning
 - hooks：在提示、工具前后与停止点持续回注 active plan / trace
 
-### Multi-role Verification
+### 多角色验证
 
 - `Architect`：计划与文档一致性
 - `Developer`：实现与 TDD
@@ -45,7 +45,7 @@
 - `Challenger`：对计划、claim、外部 API 假设进行对抗式验证
 - `Feedback Curator`：整理反馈、更新 memory、推动 recurrence 提炼
 
-### Knowledge Retention
+### 知识保留
 
 - `docs/memory/feedback/user-feedback.md`
 - `docs/memory/feedback/agent-feedback.md`

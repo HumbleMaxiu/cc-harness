@@ -20,7 +20,8 @@
 
 并应在生成结果中暴露最小默认 workflow 入口，包括：
 
-- `/dev-workflow` — 实现、审查、验证主流程
+- `/pm-orchestrator` — PM 总控层，负责阶段控制、skill 分配、失败回流和 gate 编排
+- `/follow-goal` — 长跑任务的 objective、停止条件、validation loop 和 checkpoint 协议
 - `/doc-sync` — 代码或流程变更后的文档同步入口
 - `/harness-help` — 根入口与场景索引
 - `/harness-guide` — 场景到 workflow 的推荐入口
@@ -50,7 +51,8 @@
 | `docs/FRONTEND.md` | `/harness-setup`（如适用） | 前端相关设计/实现流程 |
 | `AGENTS.md` | `/harness-setup` | `architect` |
 | `docs/design-docs/*` | `/brainstorming` | `architect` |
-| `docs/exec-plans/*` | `/writing-plans` | `architect` / `dev-workflow` |
+| `docs/exec-plans/*` | `/writing-plans` | `architect` / `pm-orchestrator` |
+| Goal Contract | `/follow-goal` | `pm-orchestrator` / `plan-persist` / 用户 |
 | `docs/product-specs/*` | `/harness-setup` 初始化 domain | 用户任务流 + `architect` |
 | `docs/memory/index.md` | `/harness-setup` | 主执行者 / `feedback-curator` |
 | `docs/memory/feedback/*` | `/harness-setup` | `feedback-curator` |
@@ -60,7 +62,7 @@
 | `docs/QUALITY_SCORE.md` | `/harness-setup` | `architect` / update workflow |
 | 健康检查入口（如 `/harness-audit`） | `/harness-setup` 暴露入口 | `architect` / `tester` / 用户 |
 | 验证脚本（如项目选择生成） | `/harness-setup`（可选） | `architect` / tester |
-| 文档同步入口（如 `/doc-sync`） | `/harness-setup` 暴露入口 | `architect` / `dev-workflow` / 用户 |
+| 文档同步入口（如 `/doc-sync`） | `/harness-setup` 暴露入口 | `architect` / `pm-orchestrator` / 用户 |
 
 ### 当前原则
 
@@ -200,7 +202,7 @@ profile 影响至少应体现在：
 
 这样用户拿到 scaffold 后，看到的是“我该怎么用它解决问题”，而不是“它生成了哪些文件”。
 
-### Generic Harness Check
+### 通用 Harness Check
 
 当前不强制生成 repo-local test/check 脚本。对于需要自动化质量门禁的用户项目，更有价值的是生成一个**通用版 harness self-check**，至少检查：
 
@@ -222,7 +224,7 @@ profile 影响至少应体现在：
 - 自动执行白名单 / 黑名单
 - 高风险动作的 `Operation Gate` 模板
 
-这样用户项目在接入 `dev-workflow`、Reviewer、Tester、Feedback Curator 时，才能共享同一套“什么可以自动做、什么必须先确认”的语义。
+这样用户项目在接入 `pm-orchestrator`、Reviewer、Tester、Feedback Curator 时，才能共享同一套“什么可以自动做、什么必须先确认”的语义。
 
 ### 用户输入到工具调用的约束模板
 
@@ -261,7 +263,7 @@ profile 影响至少应体现在：
 | `/harness-setup update` | 增量更新现有 harness |
 | `/doc-sync` | scaffold 后可直接用于文档维护与 docs freshness |
 
-## Edge Cases
+## Edge Cases（边界情况）
 
 - **已有 harness**：提示用户选择 re-scaffold（覆盖）或 update（增量修改）
 - **缺失关键目录**：只创建缺失的目录，不删除用户文件

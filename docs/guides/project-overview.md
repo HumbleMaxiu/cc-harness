@@ -1,17 +1,18 @@
-# Project Overview — cc-harness
+# 项目总览 — cc-harness
 
-`cc-harness` turns AI collaboration rules into repository-owned skills, hooks, docs, and memory. The repository is intentionally source-first: it does not store generated Claude Code or Codex runtime folders.
+`cc-harness` 将 AI 协作规则沉淀为仓库内的 skills、hooks、docs 和 memory。仓库刻意保持 source-first：不保存已生成的 Claude Code 或 Codex runtime folders。
 
-## What It Solves
+## 解决的问题
 
-| Problem | cc-harness Answer |
+| 问题 | cc-harness 的解法 |
 |---------|-------------------|
-| jumping into code too early | `/brainstorming`, `/writing-plans`, and `AGENTS.md` rules |
-| plan drift | exec plans, Run Trace, `/plan-persist`, and hooks |
-| weak verification | `/dev-workflow`, role skills, and `/harness-quality-gate` |
-| stale docs | `/doc-sync` and docs indexes |
-| lost feedback | `/feedback`, feedback memory, recurrence records |
-| hard recovery | memory docs, Run Trace, and session-start context |
+| 过早进入编码 | `/brainstorming`、`/writing-plans` 和 `AGENTS.md` rules |
+| plan drift | exec plans、Run Trace、`/plan-persist` 和 hooks |
+| 长跑任务缺少停止条件 | `/follow-goal` 的 Goal Contract、validation loop 和 checkpoint status |
+| 验证不足 | `/pm-orchestrator`、role skills 和 `/harness-quality-gate` |
+| docs 过时 | `/doc-sync` 和 docs indexes |
+| feedback 丢失 | `/feedback`、feedback memory、recurrence records |
+| 恢复困难 | memory docs、Run Trace 和 session-start context |
 
 ## Source Model
 
@@ -23,16 +24,16 @@ cc-harness/
 └── docs/            # methodology, guides, specs, memory
 ```
 
-Host runtime folders are generated in the target project:
+Host runtime folders 会在目标项目中生成：
 
 - Claude Code: `.claude/`
 - Codex: `.codex/`
 
-Those folders are not checked into this repository.
+这些 folders 不提交到本仓库。
 
 ## Role Skills
 
-The development roles are ordinary skills:
+开发角色都是普通 skills：
 
 - `/architect`
 - `/challenger`
@@ -41,9 +42,9 @@ The development roles are ordinary skills:
 - `/tester`
 - `/feedback-curator`
 
-`/dev-workflow` coordinates these role skills with structured handoffs and verification evidence.
+`/pm-orchestrator` 通过结构化 handoffs 和 verification evidence 协调这些 role skills。
 
-## Typical Flow
+## 典型流程
 
 ```mermaid
 flowchart TD
@@ -53,14 +54,17 @@ flowchart TD
     HarnessSetup --> Scope
     Scope --> Explore{"Need design exploration?"}
     Explore -->|Yes| Brain["/brainstorming"]
-    Explore -->|No| Plan["/writing-plans or /plan-persist"]
+    Explore -->|No| LongGoal{"Long-running goal?"}
     Brain --> Plan
-    Plan --> Dev["/dev-workflow"]
-    Dev --> Sync["/doc-sync"]
+    LongGoal -->|Yes| Goal["/follow-goal"]
+    LongGoal -->|No| Plan["/writing-plans or /plan-persist"]
+    Goal --> Plan
+    Plan --> PM["/pm-orchestrator"]
+    PM --> Sync["/doc-sync"]
     Sync --> Gate["/harness-quality-gate"]
     Gate --> Done["Delivery summary"]
 ```
 
-## Installation
+## 安装
 
-See [AI-Facing Installation Guide](../install-ai.md) for the script-based install flow.
+脚本化安装流程见 [面向 AI 的安装说明](../install-ai.md)。

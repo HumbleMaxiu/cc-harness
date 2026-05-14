@@ -1,4 +1,4 @@
-# Feedback Curator Role Skill
+# Feedback Curator Role Skill 设计
 
 > Feedback Curator 负责消费交接文档中的 `Feedback Record`，维护 feedback memory，并给主执行者输出自动处理轨迹与最终汇总摘要。
 

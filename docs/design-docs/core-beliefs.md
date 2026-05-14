@@ -1,4 +1,4 @@
-# Core Beliefs — cc-harness
+# 核心信念 — cc-harness
 
 ## 核心工程信念
 

@@ -167,6 +167,11 @@ function codexHooks(codexRoot) {
 function installSharedFiles(runtimeRoot) {
   copyDir(path.join(repoRoot, 'skills'), path.join(runtimeRoot, 'skills'));
   copyDir(path.join(repoRoot, 'scripts', 'hooks'), path.join(runtimeRoot, 'scripts', 'hooks'));
+  writeJson(path.join(runtimeRoot, 'package.json'), {
+    ...readJsonIfExists(path.join(runtimeRoot, 'package.json')),
+    private: true,
+    type: 'commonjs',
+  });
   writeJson(path.join(runtimeRoot, 'hook-logging.json'), {
     enabled: true,
     logPath: 'logs/hooks.log',

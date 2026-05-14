@@ -18,7 +18,7 @@ description: 为当前任务提供轻量 planning 持续化，围绕 active exec
 
 - 任务复杂、跨模块、需要完整实施计划时，优先 `/writing-plans`
 - 用户只是想查看命令索引，改用 `/harness-help`
-- 用户要开始正式执行复杂任务，改用 `/writing-plans` → `/dev-workflow`
+- 用户要开始正式执行复杂任务，改用 `/writing-plans` → `/pm-orchestrator`
 
 ## 边界
 

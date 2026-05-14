@@ -47,7 +47,7 @@
 - 最小恢复锚点：最近一次 `APPROVED / REJECTED / BLOCKED` 交接文档
 - `Run Trace` 可以放在统一交接文档骨架中，确保主执行者能快速定位“最后进行到哪里”
 
-## Resume Protocol
+## Resume Protocol（恢复协议）
 
 ### 新会话恢复
 

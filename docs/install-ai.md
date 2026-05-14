@@ -1,70 +1,72 @@
-# AI-Facing Installation Guide
+# 面向 AI 的安装说明
 
-This document is written for an AI coding agent. If a user gives you this file and asks you to install `cc-harness`, follow these steps exactly.
+这份文档写给 AI coding agent。如果用户把这份文件交给你，并要求安装 `cc-harness`，请严格按以下步骤执行。
 
-## Objective
+## 目标
 
-Install the repository's source skills and hooks into a target project for Claude Code, Codex, or both.
+把仓库中的 source skills 和 hooks 安装到目标项目，支持 Claude Code、Codex 或两者同时安装。
 
-The source repository does not store checked-in runtime folders. You must run the installer, which generates the host-specific runtime files in the target project.
+source 仓库不保存已提交的 runtime folders。必须运行安装器，由安装器在目标项目中生成 host-specific runtime files。
 
-## Prerequisites
+## 前置条件
 
-- A local checkout of `cc-harness`
-- Node.js available as `node`
-- A target project path
-- Write access to the target project
+- 本地已有 `cc-harness` checkout
+- 可以通过 `node` 使用 Node.js
+- 已知目标项目路径
+- 对目标项目有写入权限
 
-## Command
+## 命令
 
-From the `cc-harness` checkout:
+在 `cc-harness` checkout 中运行：
 
 ```bash
 ./install.sh --target both --dest /path/to/target/project
 ```
 
-Use a narrower target when requested:
+如果用户只要求安装某个 host，使用更窄的 target：
 
 ```bash
 ./install.sh --target claude-code --dest /path/to/target/project
 ./install.sh --target codex --dest /path/to/target/project
 ```
 
-## Expected Generated Files
+## 预期生成文件
 
-For Claude Code:
+Claude Code：
 
 ```text
 <target>/.claude/skills/
 <target>/.claude/scripts/hooks/
+<target>/.claude/package.json
 <target>/.claude/settings.json
 <target>/.claude/hook-logging.json
 ```
 
-For Codex:
+Codex：
 
 ```text
 <target>/.codex/skills/
 <target>/.codex/scripts/hooks/
+<target>/.codex/package.json
 <target>/.codex/config.toml
 <target>/.codex/hooks.json
 <target>/.codex/hook-logging.json
 ```
 
-## Verification
+## 验证
 
-After install, verify the generated files exist:
+安装后，确认生成文件存在：
 
 ```bash
 test -f /path/to/target/project/.claude/settings.json || true
 test -f /path/to/target/project/.codex/hooks.json || true
 ```
 
-This source checkout currently has no repo-local npm test/check script. Use the install smoke checks above as the validation path.
+当前 source checkout 没有 repo-local npm test/check script。请使用上面的 install smoke checks 作为验证路径。
 
-## Rules
+## 规则
 
-- Do not copy deleted repository mirror directories from old commits.
-- Do not recreate repository-level `.claude`, `.codex`, `.claude-plugin`, `examples`, `fixtures`, or `agents` directories.
-- Runtime folders belong in the target project only.
-- If the target already has host config, preserve unrelated settings and merge the `cc-harness` hook entries.
+- 不要从旧 commit 复制已删除的 repository mirror directories。
+- 不要在仓库级别重新创建 `.claude`、`.codex`、`.claude-plugin`、`examples`、`fixtures` 或 `agents` 目录。
+- Runtime folders 只应出现在目标项目中。
+- 如果目标项目已有 host config，保留无关设置，只合并 `cc-harness` hook entries。

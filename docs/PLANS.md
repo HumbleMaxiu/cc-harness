@@ -2,7 +2,7 @@
 
 ## 当前路线图
 
-`cc-harness` 当前不再只按“仓库搭起来了没有”来规划，而是按产品能力缺口推进。现阶段路线图分为 `P0 / P1 / P2` 三层。
+`cc-harness` 当前不再只按“仓库搭起来了没有”来规划，而是按产品能力缺口推进。现阶段路线图分为 `P0 / P1 / P2 / P3` 四层。
 
 ### P0 — 可发现性与执行连续性
 
@@ -11,6 +11,7 @@
 - [x] 提供 `/harness-help`、`/harness-guide`、`/harness-audit`、`/harness-quality-gate`
 - [x] 为 `docs/exec-plans/active/` + Run Trace 增加持续 planning hooks
 - [x] 增加 `/plan-persist` 作为轻量 planning 入口
+- [x] 增加 `/follow-goal`，为长跑任务建立 objective、停止条件和 validation loop
 
 ### P1 — 验证严谨度与健康信号
 
@@ -26,7 +27,18 @@
 
 - [x] 建立 feedback / recurrence -> `Skill Promotion Candidate` 升级路径
 - [x] 建立 pain point matrix 与对外能力地图
+- [x] 将 `cc-harness Skill Standard` 接入 `/skill-creator`、`/skill-audit` 和手动检查脚本，支撑 feedback-generated skill
 - [ ] 让 `harness-setup` 更系统地推荐 shared skill / project-local skill 组合
+
+### P3 — PM Orchestrator 与端到端交付
+
+目标：从“推荐入口和执行 workflow”升级为“一个 command 从需求推进到上线前 gate”。
+
+- [x] 定义 PM orchestrator 的职责边界和 handoff contract
+- [ ] 建立需求文档、需求评审、需求确认的标准 skill / command 入口
+- [x] 将 TDD、UI 还原、测试、代码审查、CI/CD 信号纳入统一 stage policy
+- [x] 定义审查不通过、测试不通过、CI/CD 失败时的自动回流方案
+- [ ] 按 Review Pack Registry 评估并整合 GitHub 开源资源，形成符合本项目质量要求的可复用 skills / references
 
 ## 当前能力地图
 
@@ -34,7 +46,9 @@
 |--------|----------|------------------|
 | 根入口 | `/harness-help`、`/harness-guide` | 不知道从哪开始 |
 | Planning | `/brainstorming`、`/writing-plans`、`/plan-persist` | 先想清楚，再进入执行 |
-| Execution | `/dev-workflow` | 实现、审查、验证形成闭环 |
+| Long-running Goals | `/follow-goal` | 迁移、大重构、部署 retry 或实验需要持续推进 |
+| PM Orchestration | `/pm-orchestrator` | 从需求到开发、测试、review、CI/CD gate 的阶段编排 |
+| Execution Skills | `/developer`、`/reviewer`、`/tester`、`/architect` | 被 PM 按阶段调度的实现、审查、验证和文档影响判断能力 |
 | Documentation | `/doc-sync` | 代码变了但文档没跟上 |
 | Audit / Gate | `/harness-audit`、`/harness-quality-gate` | 交付前缺少健康检查和门禁 |
 | Retention | `/feedback`、memory、recurrence | 反馈只停留在聊天里 |
@@ -44,9 +58,10 @@
 下一阶段优先级仍然按下面顺序推进：
 
 1. 强化 planning drift detection，而不引入第二套计划事实源
-2. 让 Challenger 更稳定接入 `dev-workflow`
+2. 让 Challenger 更稳定接入 `/pm-orchestrator`
 3. 扩展 audit 的证据强度与文档新鲜度信号
 4. 让 memory -> skill 的升级路径更自动化
+5. 扩展 PM orchestrator，把 vibe coding 的轻量辅助和 AI coding 的长任务交付流程分层接起来
 
 ## 常用维护动作
 

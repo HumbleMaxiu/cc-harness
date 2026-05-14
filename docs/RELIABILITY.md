@@ -1,4 +1,4 @@
-# Reliability — cc-harness
+# 可靠性 — cc-harness
 
 ## 可靠性预期
 
@@ -58,7 +58,7 @@ Hook runtime 本身也必须 fail-open：
 
 这些信号用于提醒“当前事实链可能已漂移”，而不是创建新的计划事实源。
 
-### Delegated Role Reliability
+### 委托 Role 的可靠性
 
 委托角色执行的可靠性依赖主流程的输入打包方式。
 
@@ -68,7 +68,7 @@ Hook runtime 本身也必须 fail-open：
 
 如果主执行者已经观察到空输出、只有 1 行占位内容或明显超时，不应原样重放同一大 prompt。
 
-### Resume Protocol
+### Resume Protocol（恢复协议）
 
 恢复顺序：
 
@@ -98,7 +98,7 @@ Hook runtime 本身也必须 fail-open：
 - 添加新 design doc 后：更新 `docs/design-docs/index.md`
 - 执行计划完成后：从 `active/` 移动到 `completed/`，附上完成摘要
 
-### Observability
+### Observability（可观测性）
 
 - 目前无完整运行时日志输出
 - 角色 Skill 工作流通过 `Skill Workflow Record`、交接文档和 `Run Trace` 显式记录，可被主流程和人类审查

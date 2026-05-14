@@ -12,7 +12,7 @@ description: 根据用户当前场景推荐合适的 cc-harness skill、workflow
 - 用户问“我该从哪里开始”
 - 用户问“这个场景该用哪个 skill”
 - 用户想知道 bugfix / 新功能 / 架构变更 / feedback 各该怎么走
-- 用户不确定是走 `brainstorming`、`writing-plans` 还是 `dev-workflow`
+- 用户不确定是走 `brainstorming`、`writing-plans` 还是 `pm-orchestrator`
 
 ## 何时不要使用
 
@@ -31,7 +31,8 @@ description: 根据用户当前场景推荐合适的 cc-harness skill、workflow
 
 - 创造性、高不确定性任务：先 `/brainstorming`
 - 多步骤落地：先 `/writing-plans`
-- 已有清晰计划，需要执行：进 `/dev-workflow`
+- 长跑迁移、大重构、部署 retry 或实验：先 `/follow-goal`
+- 已有清晰计划，需要执行：进 `/pm-orchestrator`
 - 只做文档维护：用 `/doc-sync`
 - 提反馈并让系统判断是否应进入长期 memory：用 `/feedback`
 - 查反馈：用 `/feedback-query`

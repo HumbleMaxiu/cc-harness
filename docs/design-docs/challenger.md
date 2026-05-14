@@ -25,7 +25,7 @@
 
 ## Challenger Gate
 
-为了避免 `challenger` 只在“主执行者想起来了”时才出现，`dev-workflow` 现在应先产出一个稳定的 `Challenger Gate`：
+为了避免 `challenger` 只在“主执行者想起来了”时才出现，`pm-orchestrator` 现在应先产出一个稳定的 `Challenger Gate`：
 
 ```markdown
 ### Challenger Gate

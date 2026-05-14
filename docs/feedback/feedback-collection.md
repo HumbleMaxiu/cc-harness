@@ -103,7 +103,7 @@
 
 ### Skill 模式补充
 
-- `dev-workflow` 的内联模式也会产生角色反馈，即便没有独立 Reviewer / Tester handoff
+- `pm-orchestrator` 的内联模式也会产生角色反馈，即便没有独立 Reviewer / Tester handoff
 - Skill 模式中的反馈事实来源是 `Skill Workflow Record` 里的 `Self Review`、`Verification` 和 `Final Summary`
 - 只要这些区块中出现结构化 `feedback_record`，主流程或 `feedback-curator` 就应按同一规则写入 `docs/memory/feedback/agent-feedback.md`
 - 这意味着内联模式不是“没有反馈记录的轻量模式”，而是“单会话产出结构化反馈的 workflow 模式”
@@ -149,7 +149,7 @@
 - `feedback-curator` 在执行前应先读取 `docs/feedback/feedback-collection.md` 和 `docs/memory/index.md`，否则视为未完整加载约束
 - `REJECTED` 反馈属于阻塞项，但是否自动修复要看 `risk_level`、`operation_risk` 和 `action_type`；`APPROVED` 下的建议项可以在最终交付前统一汇总
 - `risk_level` 表示问题严重性；`operation_risk` 表示建议动作的执行风险。对于 `irreversible-write` / `external-side-effect`，主执行者必须先输出 `Operation Gate` 并等待确认
-- 主流程的阻塞点由 `dev-workflow` 控制，而不是由 hook 或 shell 层面拦截控制
+- 主流程的阻塞点由 `pm-orchestrator` 控制，而不是由 hook 或 shell 层面拦截控制
 - Tester 的验证入口探测属于运行时职责：先探测项目事实，再运行可执行验证，必要时询问用户
 - 当同类问题累计 2 次或以上时，主执行者必须同步更新 `docs/memory/feedback/prevents-recurrence.md` 和相应规范文件
 - 当活跃 feedback 文件开始变长时，主执行者或 `feedback-curator` 必须将已完成项归档到 `docs/memory/feedback/archive/`

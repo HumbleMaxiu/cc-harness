@@ -2,45 +2,49 @@
 
 `cc-harness` 是一个文档优先的 harness 系统。仓库事实源是 `skills/`、`scripts/hooks/`、`docs/` 和安装脚本；宿主运行目录由安装脚本生成，不在仓库中保存。
 
-## Project Goal
+## 项目目标
 
 - skills、hooks、commands、rules 都围绕文档工作
 - 它们要么读取文档、写入文档、完善文档，要么把流程结果收口到文档
 - 每一类关键 docs 都应有明确读取入口、维护入口和使用场景
 
-## Navigation
+## 导航
 
-| Area | Path |
+| 区域 | 路径 |
 |------|------|
-| Architecture | [ARCHITECTURE.md](ARCHITECTURE.md) |
-| Methodology | [docs/HARNESS_METHODOLOGY.md](docs/HARNESS_METHODOLOGY.md) |
-| Reliability | [docs/RELIABILITY.md](docs/RELIABILITY.md) |
-| Security | [docs/SECURITY.md](docs/SECURITY.md) |
-| Project Overview | [docs/guides/project-overview.md](docs/guides/project-overview.md) |
-| Harness Guide | [docs/guides/harness-guide.md](docs/guides/harness-guide.md) |
-| AI Install Guide | [docs/install-ai.md](docs/install-ai.md) |
+| 架构 | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| 方法论 | [docs/HARNESS_METHODOLOGY.md](docs/HARNESS_METHODOLOGY.md) |
+| 可靠性 | [docs/RELIABILITY.md](docs/RELIABILITY.md) |
+| 安全 | [docs/SECURITY.md](docs/SECURITY.md) |
+| 项目总览 | [docs/guides/project-overview.md](docs/guides/project-overview.md) |
+| Harness 指南 | [docs/guides/harness-guide.md](docs/guides/harness-guide.md) |
+| AI 安装指南 | [docs/install-ai.md](docs/install-ai.md) |
 | Memory | [docs/memory/index.md](docs/memory/index.md) |
 | Feedback | [docs/feedback/feedback-collection.md](docs/feedback/feedback-collection.md) |
 | Product Specs | [docs/product-specs/](docs/product-specs/index.md) |
+| Skill Standard | [docs/references/skill-standard.md](docs/references/skill-standard.md) |
+| Review Packs | [docs/references/review-pack-registry.md](docs/references/review-pack-registry.md) |
 
-## Source Layout
+## Source 布局
 
-| Path | Purpose |
-|------|---------|
-| [skills/](skills/) | Public workflow skills and role skills |
-| [scripts/hooks/](scripts/hooks/) | Shared hook runtime scripts |
+| 路径 | 用途 |
+|------|------|
+| [skills/](skills/) | 公开 workflow skills 和 role skills |
+| [scripts/hooks/](scripts/hooks/) | 共享 hook runtime scripts |
+| [scripts/checks/](scripts/checks/) | 仓库检查脚本，例如 Skill Standard check |
 | [install.sh](install.sh) | Host installer wrapper |
 | [scripts/install.mjs](scripts/install.mjs) | Claude Code / Codex installer implementation |
 
-The repository must not reintroduce checked-in `.claude/`, `.codex/`, `.claude-plugin/`, `examples/`, `fixtures/`, or `agents/` directories.
+仓库不得重新引入已提交的 `.claude/`、`.codex/`、`.claude-plugin/`、`examples/`、`fixtures/` 或 `agents/` 目录。
 
-## Skill Quick Reference
+## Skill 快速参考
 
-| Skill | Purpose |
-|-------|---------|
+| Skill | 用途 |
+|-------|------|
 | `/brainstorming` | 创造性工作前的需求和设计探索 |
 | `/writing-plans` | 多步骤任务规格和计划 |
-| `/dev-workflow` | 角色 Skill 驱动的实现、审查、验证和文档同步闭环 |
+| `/pm-orchestrator` | PM 总控层，负责阶段控制、skill 分配、失败回流、并行/串行策略和交付 gate 编排 |
+| `/follow-goal` | 长跑任务的 durable objective、停止条件和 checkpoint 执行协议 |
 | `/doc-sync` | 文档影响分析、同步和索引维护 |
 | `/plan-persist` | active plan / Run Trace 的轻量持续化 |
 | `/harness-setup` | 为项目搭建或更新 harness 文档骨架 |
@@ -51,11 +55,12 @@ The repository must not reintroduce checked-in `.claude/`, `.codex/`, `.claude-p
 | `/feedback` | 分诊并提交长期用户反馈 |
 | `/feedback-query` | 查询 feedback 历史和 recurrence |
 | `/skill-creator` | 创建、编辑和审计 Skill |
+| `/skill-audit` | 按 Skill Standard 审计 Skill，供用户和 PM gate 调度 |
 
 ## Role Skills
 
-| Role Skill | Purpose |
-|------------|---------|
+| Role Skill | 用途 |
+|------------|------|
 | `/architect` | 计划检查、docs impact 判断、文档同步 gatekeeping |
 | `/challenger` | 对计划、claim、API 假设和完成声明做对抗式验证 |
 | `/developer` | TDD 实现 |
@@ -63,7 +68,7 @@ The repository must not reintroduce checked-in `.claude/`, `.codex/`, `.claude-p
 | `/tester` | 探测验证入口并执行测试验证 |
 | `/feedback-curator` | 整理 feedback、维护 memory、输出处理摘要 |
 
-## Rules
+## 规则
 
 ### MUST
 
@@ -87,3 +92,11 @@ The repository must not reintroduce checked-in `.claude/`, `.codex/`, `.claude-p
 - 编辑源码、hooks、installer、skills 或 workflow 后，检查相关 docs 是否需要同步
 - 新增或删除 docs 后，更新对应 index
 - 不确定的 docs impact 写入执行记录或最终风险说明
+
+### Skill Standard
+
+- 创建、修改、审计或引入三方 skill 时，读取 `docs/references/skill-standard.md`
+- 从 feedback / recurrence 生成 skill 前，先抽象 pressure scenario
+- 三方来源 skill 必须包含 `references/source.md`
+- 手动检查入口：`node scripts/checks/skill-standard.mjs`
+- 用户或 PM gate 需要结构化审计结果时，使用 `/skill-audit`

@@ -1,4 +1,4 @@
-# Product Sense — cc-harness
+# 产品判断 — cc-harness
 
 ## 产品为谁服务
 
@@ -23,6 +23,22 @@
 
 换句话说，文档不是附属产物，而是整个 harness 的操作界面、长期记忆和协作事实源。
 
+### 终局愿景
+
+`cc-harness` 的最终目标是同时覆盖 vibe coding 和 AI coding：
+
+- **Vibe coding**：用户和模型一起做小功能、bugfix、UI 微调、局部重构时，系统提供轻量 workflow、docs sync、feedback memory 和 quality gate，不打断协作节奏，同时避免文件腐坏和质量失控。
+- **AI coding**：用户从 command 或 skill 进入长任务时，系统能以 PM orchestrator 的方式组织全流程：需求文档、需求评审、需求确认、开发、TDD、UI 还原、测试、代码审查、CI/CD 和上线前 gate。
+
+PM orchestrator 的职责不是替代所有 skills，而是根据任务风险、项目状态和用户目标决定：
+
+- 哪些 skills 参与需求阶段、开发阶段、测试阶段和交付阶段
+- 代码审查和测试验证需要多严格
+- 审查不通过、测试不通过、CI/CD 失败时如何回流处理
+- 什么时候必须暂停并要求用户确认
+
+终局产品体验是：用户给出需求，系统用一条 command 或一个入口，将需求推进到可验证、可审查、可交付的结果。
+
 ### 当前阶段重点
 
 在基础阶段，优先补齐这几类能力：
@@ -30,7 +46,7 @@
 1. **自然语言触发的收口**
    - 例如 `/doc-sync`、`/feedback`、`/harness-quality-gate`
 2. **流程型收口**
-   - 例如 `/dev-workflow` 中多角色协作对计划、验证、反馈和文档的收口
+   - 例如 `/pm-orchestrator` 中多角色协作对计划、验证、反馈和文档的收口
 3. **scaffold 型收口**
    - 例如 `/harness-setup` 读取项目事实、理解用户需求、套用模板后生成 `docs/`、`AGENTS.md`、`ARCHITECTURE.md`
 4. **hook 型收口**
@@ -43,12 +59,14 @@
 - UI 还原度检测
 - e2e 测试生成
 - 测试与验证工具
+- CI/CD 状态读取和失败修复
+- GitHub 开源资源检索、评估和整合
 
 这些能力的目标不是替代文档中心化，而是建立在文档收口稳定之后，进一步补全 harness 的验证和执行能力。
 
 ### 非目标（Non-goals）
 
-- ❌ 不提供运行时执行引擎（依赖 Claude Code 环境）
+- ❌ 不提供独立运行时执行引擎（依赖 Codex / Claude Code 等 host 环境）
 - ❌ 不提供 UI 或 Web 界面
 - ❌ 不强制特定的编程语言或框架
 

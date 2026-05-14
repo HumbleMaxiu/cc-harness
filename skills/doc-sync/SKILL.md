@@ -21,7 +21,7 @@ description: 基于代码、配置、role skill、workflow 变更进行文档影
 - 修改了源码、配置、role skill、workflow
 - 修改了架构边界、角色职责或 workflow 规则
 - 用户要求“同步文档”“补齐 design doc”“维护 AGENTS.md / ARCHITECTURE.md”
-- `dev-workflow` 进入 `Doc Sync` 阶段
+- `pm-orchestrator` 进入 `Doc Sync` 阶段
 - `Architect` 完成 `docs impact matrix` 后需要执行文档维护
 
 ## 何时不要使用
@@ -95,7 +95,7 @@ description: 基于代码、配置、role skill、workflow 变更进行文档影
 
 用户直接调用时，本 Skill 自行完成最小文档影响分析，然后执行同步。
 
-### 作为 `dev-workflow` 阶段
+### 作为 `pm-orchestrator` 阶段
 
 `Doc Sync` 阶段应直接套用本 Skill 的输入输出契约，而不是自由发挥。
 

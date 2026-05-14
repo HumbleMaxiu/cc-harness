@@ -1,4 +1,4 @@
-# Architect Role Skill
+# Architect Role Skill 设计
 
 > Architect 负责任务开始前检查计划文档，开发完成后识别 docs impact，并触发统一的 `/doc-sync` 文档维护能力。
 

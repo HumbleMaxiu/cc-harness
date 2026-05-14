@@ -204,16 +204,28 @@ Codex reads REDLINING.md or OOXML.md only when the user needs those features.
 
 ## Skill Creation Process
 
-Skill creation involves these steps:
+Skill creation in `cc-harness` follows the repository standard, not an external packaging flow.
 
-1. Understand the skill with concrete examples
-2. Plan reusable skill contents (scripts, references, assets)
-3. Initialize the skill (run init_skill.py)
-4. Edit the skill (implement resources and write SKILL.md)
-5. Package the skill (run package_skill.py)
-6. Iterate based on real usage
+Before creating, editing, improving, or auditing a skill, read these files when they exist:
 
-Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
+1. `docs/references/skill-standard-research.md`
+2. `docs/references/skill-standard.md`
+3. `docs/references/skill-pressure-scenarios.md`
+4. `docs/references/review-pack-registry.md` when the skill is a review / verification pack
+
+Follow these phases in order, skipping only when the phase clearly does not apply:
+
+1. Resolve mode and source
+2. Understand concrete examples
+3. Decide whether a skill should exist
+4. Define pressure scenarios when required
+5. Plan reusable contents
+6. Author or update `SKILL.md`
+7. Add references, scripts, assets, or source attribution
+8. Check installable runtime portability when required
+9. Audit against the standard
+10. Run validation when available
+11. Report the result using the output contract
 
 ### Memory-to-Skill Promotion
 
@@ -225,6 +237,8 @@ use it as the default starting point for:
 2. defining scope boundaries
 3. deciding what should remain a rule vs what should become a reusable workflow
 
+When the input comes from feedback or recurrence memory, define at least one pressure scenario before writing the skill. If the request is only a one-time implementation note, current task acceptance detail, or session-only instruction, do not promote it into a skill.
+
 ### Skill Naming
 
 - Use lowercase letters, digits, and hyphens only; normalize user-provided titles to hyphen-case (e.g., "Plan Mode" -> `plan-mode`).
@@ -233,7 +247,25 @@ use it as the default starting point for:
 - Namespace by tool when it improves clarity or triggering (e.g., `gh-address-comments`, `linear-address-issue`).
 - Name the skill folder exactly after the skill name.
 
-### Step 1: Understanding the Skill with Concrete Examples
+### Phase 1: Resolve Mode and Source
+
+Classify the request:
+
+- `create`: create a new local skill
+- `edit`: change an existing skill without changing its contract
+- `improve`: materially improve behavior, trigger accuracy, structure, or output
+- `audit`: inspect a skill and report issues without editing unless asked
+- `third-party-import`: adapt a skill, prompt, rubric, workflow, or review pack from another project
+- `feedback-generated`: promote recurrence / feedback into a reusable skill
+- `installable`: create or update a skill intended for `.codex/skills`, `.claude/skills`, user directories, cross-project reuse, PM gate, installer output, or distribution
+
+For `third-party-import`, do not copy content until source URL, license, and imported commit / tag are known. If license is unclear or incompatible, record it as a candidate only.
+
+For `audit`, inspect before editing and return a `Skill Audit Result`.
+
+For `installable`, apply the runtime portability rules in Phase 8. Do not force those rules on simple repo-local skills unless they reference files outside their own skill directory at runtime.
+
+### Phase 2: Understand the Skill with Concrete Examples
 
 Skip this step only when the skill's usage patterns are already clearly understood. It remains valuable even when working with an existing skill.
 
@@ -250,7 +282,62 @@ To avoid overwhelming users, avoid asking too many questions in a single message
 
 Conclude this step when there is a clear sense of the functionality the skill should support.
 
-### Step 2: Planning the Reusable Skill Contents
+### Phase 3: Decide Whether a Skill Should Exist
+
+Create or promote a skill when:
+
+- The behavior should apply across future tasks, projects, or sessions
+- The task requires non-obvious procedural knowledge
+- The same failure has recurred or is likely to recur
+- A review / test / workflow capability needs a reusable output contract
+- A third-party capability should be wrapped for cc-harness use
+
+Do not create a skill for:
+
+- One-off implementation instructions
+- Current UI acceptance notes
+- Test updates tied only to the current patch
+- Standard practices already enforced by code, tests, hooks, or scripts
+- A rule that belongs in `AGENTS.md` or project docs instead of a reusable workflow
+
+If the best answer is "do not create a skill", explain where the information should live instead.
+
+Also decide whether the skill is:
+
+- `repo-local`: used only in this repository and allowed to reference repo docs as primary context.
+- `installable`: expected to work after being copied into a user runtime.
+- `wrapper`: allowed to call external project files, but must document fallback / blocked behavior when they are absent.
+
+### Phase 4: Define Pressure Scenarios When Required
+
+Use `docs/references/skill-pressure-scenarios.md`.
+
+Pressure scenarios are required for:
+
+- feedback-generated skills
+- review packs
+- workflow, quality gate, safety, or memory-boundary skills
+- skills created because an agent previously made a recurring mistake
+- skills with rules the agent may rationalize away
+
+Minimum scenario:
+
+```markdown
+### Pressure Scenario
+- id:
+- skill_under_test:
+- user_input:
+- pressure:
+- failure_without_skill:
+- rationalization_to_reject:
+- expected_behavior_with_skill:
+- evidence_required:
+- status: proposed / passing / failing / exempted
+```
+
+If a pressure scenario is not needed, record the exemption reason in the result.
+
+### Phase 5: Plan the Reusable Skill Contents
 
 To turn concrete examples into an effective skill, analyze each example by:
 
@@ -274,57 +361,21 @@ Example: When building a `big-query` skill to handle queries like "How many user
 
 To establish the skill's contents, analyze each concrete example to create a list of the reusable resources to include: scripts, references, and assets.
 
-### Step 3: Initializing the Skill
-
-At this point, it is time to actually create the skill.
-
-Skip this step only if the skill being developed already exists, and iteration or packaging is needed. In this case, continue to the next step.
-
-When creating a new skill from scratch, always run the `init_skill.py` script. The script conveniently generates a new template skill directory that automatically includes everything a skill requires, making the skill creation process much more efficient and reliable.
-
-Usage:
-
-```bash
-scripts/init_skill.py <skill-name> --path <output-directory> [--resources scripts,references,assets] [--examples]
-```
-
-Examples:
-
-```bash
-scripts/init_skill.py my-skill --path skills/public
-scripts/init_skill.py my-skill --path skills/public --resources scripts,references
-scripts/init_skill.py my-skill --path skills/public --resources scripts --examples
-```
-
-The script:
-
-- Creates the skill directory at the specified path
-- Generates a SKILL.md template with proper frontmatter and TODO placeholders
-- Optionally creates resource directories based on `--resources`
-- Optionally adds example files when `--examples` is set
-
-After initialization, customize the SKILL.md and add resources as needed. If you used `--examples`, replace or delete placeholder files.
-
-### Step 4: Edit the Skill
+### Phase 6: Author or Update the Skill
 
 When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Codex to use. Include information that would be beneficial and non-obvious to Codex. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Codex instance execute these tasks more effectively.
 
-#### Learn Proven Design Patterns
+Create files directly under `skills/<skill-name>/`.
 
-Consult these helpful guides based on your skill's needs:
+Do not create `.codex/`, `.claude/`, `.claude-plugin/`, `agents/`, `examples/`, or `fixtures/` directories in this repository.
 
-- **Multi-step processes**: See references/workflows.md for sequential workflows and conditional logic
-- **Specific output formats or quality standards**: See references/output-patterns.md for template and example patterns
-
-These files contain established best practices for effective skill design.
-
-#### Start with Reusable Skill Contents
+#### Reusable Skill Contents
 
 To begin implementation, start with the reusable resources identified above: `scripts/`, `references/`, and `assets/` files. Note that this step may require user input. For example, when implementing a `brand-guidelines` skill, the user may need to provide brand assets or templates to store in `assets/`, or documentation to store in `references/`.
 
 Added scripts must be tested by actually running them to ensure there are no bugs and that the output matches what is expected. If there are many similar scripts, only a representative sample needs to be tested to ensure confidence that they all work while balancing time to completion.
 
-If you used `--examples`, delete any placeholder files that are not needed for the skill. Only create resource directories that are actually required.
+Only create resource directories that are actually required.
 
 #### Update SKILL.md
 
@@ -337,44 +388,143 @@ Write the YAML frontmatter with `name` and `description`:
 - `name`: The skill name
 - `description`: This is the primary triggering mechanism for your skill, and helps Codex understand when to use the skill.
   - Include both what the Skill does and specific triggers/contexts for when to use it.
-  - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Codex.
+  - Include activation-critical trigger information here. The body is only loaded after triggering, so body sections cannot compensate for vague frontmatter.
   - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Codex needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
 
-Do not include any other fields in YAML frontmatter.
+Optional frontmatter may be kept when required by the host, but `name` and `description` remain the portable baseline.
 
 ##### Body
 
-Write instructions for using the skill and its bundled resources.
+New or materially changed skills should include:
 
-### Step 5: Packaging a Skill
-
-Once development of the skill is complete, it must be packaged into a distributable .skill file that gets shared with the user. The packaging process automatically validates the skill first to ensure it meets all requirements:
-
-```bash
-scripts/package_skill.py <path/to/skill-folder>
+```markdown
+## 何时使用
+## 何时不要使用
+## 输入 / 读取项
+## 执行流程
+## 输出格式
+## 暂停 / 阻塞条件
 ```
 
-Optional output directory specification:
+Workflow skills should use numbered phases with entry and exit criteria. Review and test skills should produce a structured handoff. Skills that maintain docs or memory must state their docs-first and feedback/memory boundaries.
 
-```bash
-scripts/package_skill.py <path/to/skill-folder> ./dist
+### Phase 7: Third-Party Source Attribution
+
+For `third-party-import`, create `references/source.md` and add a short `## Source` section in `SKILL.md`.
+
+Required `references/source.md` fields:
+
+```markdown
+# Source Attribution
+
+- Source project:
+- Source skill/path:
+- Source URL:
+- License:
+- Imported commit:
+- Import date:
+- Local skill name:
+- Local changes:
+- Compatibility notes:
 ```
 
-The packaging script will:
+If the skill is a review pack candidate, update or reference `docs/references/review-pack-registry.md`.
 
-1. **Validate** the skill automatically, checking:
-   - YAML frontmatter format and required fields
-   - Skill naming conventions and directory structure
-   - Description completeness and quality
-   - File organization and resource references
+### Phase 8: Check Installable Runtime Portability
 
-2. **Package** the skill if validation passes, creating a .skill file named after the skill (e.g., `my-skill.skill`) that includes all files and maintains the proper directory structure for distribution. The .skill file is a zip file with a .skill extension.
+Apply this phase only when the skill is `installable`, `third-party-import`, a review pack, a PM gate participant, or references runtime files outside `skills/<skill-name>/`.
 
-   Security restriction: symlinks are rejected and packaging fails when any symlink is present.
+Required checks:
 
-If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
+1. Identify runtime dependencies mentioned in `SKILL.md`.
+2. If a dependency is required for normal operation, place it under the skill directory:
+   - `skills/<skill-name>/references/` for LLM context
+   - `skills/<skill-name>/scripts/` for deterministic helpers
+   - `skills/<skill-name>/assets/` for output resources
+3. Treat repo-level `docs/`, top-level `scripts/`, temporary paths, and local user paths as supplemental only.
+4. If the dependency cannot be bundled, write explicit fallback / blocked conditions in `SKILL.md`.
+5. For installable skills, run or describe an install smoke check:
 
-### Step 6: Iterate
+```bash
+./install.sh --target codex --dest <tmpdir>
+node <tmpdir>/.codex/skills/<skill-name>/scripts/<script> --help
+```
+
+Adjust the command to the actual script. If there is no script, verify required references exist under the installed skill directory.
+
+Do not make users do this manually when the action is safe and local; run the smoke check yourself.
+
+### Phase 9: Audit Against the Standard
+
+Use `docs/references/skill-standard.md` as the source of truth.
+
+Audit for `ERROR`:
+
+- Missing `SKILL.md`
+- Missing frontmatter
+- Missing `name` or `description`
+- `name` does not match directory name
+- Invalid `name`
+- Third-party skill missing `references/source.md`
+
+Audit for `WARNING`:
+
+- Vague description or missing trigger semantics
+- Missing recommended sections
+- Missing output contract
+- Key skill missing pressure scenario or exemption
+- Host-specific assumptions without compatibility notes
+- Monolithic `SKILL.md` that should use `references/`
+- Installable skill references repo-level docs/scripts as required runtime dependencies without bundled copies or blocked conditions
+
+Do not claim a skill conforms if it has unresolved `ERROR` issues.
+
+### Phase 10: Run Validation When Available
+
+```bash
+node scripts/checks/skill-standard.mjs
+```
+
+```bash
+node scripts/checks/skill-standard.mjs --json
+```
+
+Use `--strict` only when the user or PM orchestrator asks for strict skill health checking.
+
+### Phase 11: Report Result
+
+For creation or update:
+
+```markdown
+### Skill Creator Result
+- skill_path:
+- standard_version:
+- generated_sections:
+- pressure_scenarios:
+- source_attribution:
+- runtime_portability:
+- audit_status:
+- validation:
+- follow_up:
+```
+
+For audit:
+
+```markdown
+### Skill Audit Result
+- skill_path:
+- standard_version:
+- errors:
+- warnings:
+- pressure_scenarios:
+- source_attribution:
+- runtime_portability:
+- validation:
+- recommended_fixes:
+- status: PASS / WARN / FAIL / BLOCKED
+```
+
+### Phase 12: Iterate
 
 After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
 
@@ -382,5 +532,7 @@ After testing the skill, users may request improvements. Often this happens righ
 
 1. Use the skill on real tasks
 2. Notice struggles or inefficiencies
-3. Identify how SKILL.md or bundled resources should be updated
-4. Implement changes and test again
+3. Capture positive / negative examples when they should persist
+4. Update pressure scenarios if the issue is behavioral
+5. Identify how SKILL.md or bundled resources should be updated
+6. Implement changes and validate again

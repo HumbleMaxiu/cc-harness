@@ -12,3 +12,4 @@
 | [reviewer.md](reviewer.md) | Reviewer Role Skill 设计 | 草稿 |
 | [tester.md](tester.md) | Tester Role Skill 设计 | 草稿 |
 | [feedback-curator.md](feedback-curator.md) | Feedback Curator Role Skill 设计 | 草稿 |
+| [third-party-skill-integration.md](third-party-skill-integration.md) | 三方 Skill 引入、source attribution 与 cc-harness contract 适配设计 | 草稿 |
