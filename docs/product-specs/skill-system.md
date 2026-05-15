@@ -50,6 +50,7 @@ description: <能力说明 + 触发场景>
 |-------|------|
 | brainstorming | 创造性需求和设计探索 |
 | pm-orchestrator | PM 总控层，负责阶段控制、skill 分配、失败回流和 gate 编排 |
+| plan-review | 实现前的只读计划审核 gate，由 PM 按风险调度 |
 | follow-goal | 长跑任务的 durable objective、停止条件和 checkpoint 执行协议 |
 | architect | 计划检查和文档影响判断 |
 | challenger | 对抗式验证 |

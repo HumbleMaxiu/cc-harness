@@ -14,6 +14,7 @@ const keySkills = new Set([
   "architect",
   "challenger",
   "pm-orchestrator",
+  "plan-review",
   "feedback",
   "feedback-curator",
   "follow-goal",

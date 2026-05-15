@@ -33,7 +33,7 @@
 2. 澄清或冻结 requirements。
 3. 多步骤任务先写 plan。
 4. 长跑任务先用 `/follow-goal` 明确 objective、stopping condition 和 validation loop。
-5. 通过 `/pm-orchestrator` 执行。
+5. 通过 `/pm-orchestrator` 执行；高风险或多阶段计划由 PM 先调度 `/plan-review`。
 6. 使用 role skills 覆盖 architecture、implementation、review、testing、challenge 和 feedback curation。
 7. 同步 docs。
 8. 运行 quality gate。

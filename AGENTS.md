@@ -43,6 +43,7 @@
 |-------|------|
 | `/brainstorming` | 创造性工作前的需求和设计探索 |
 | `/writing-plans` | 多步骤任务规格和计划 |
+| `/plan-review` | 实现前的只读计划审核 gate，由 `/pm-orchestrator` 按风险调度 |
 | `/pm-orchestrator` | PM 总控层，负责阶段控制、skill 分配、失败回流、并行/串行策略和交付 gate 编排 |
 | `/follow-goal` | 长跑任务的 durable objective、停止条件和 checkpoint 执行协议 |
 | `/doc-sync` | 文档影响分析、同步和索引维护 |

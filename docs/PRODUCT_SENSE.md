@@ -28,7 +28,7 @@
 `cc-harness` 的最终目标是同时覆盖 vibe coding 和 AI coding：
 
 - **Vibe coding**：用户和模型一起做小功能、bugfix、UI 微调、局部重构时，系统提供轻量 workflow、docs sync、feedback memory 和 quality gate，不打断协作节奏，同时避免文件腐坏和质量失控。
-- **AI coding**：用户从 command 或 skill 进入长任务时，系统能以 PM orchestrator 的方式组织全流程：需求文档、需求评审、需求确认、开发、TDD、UI 还原、测试、代码审查、CI/CD 和上线前 gate。
+- **AI coding**：用户从 command 或 skill 进入长任务时，系统能以 PM orchestrator 的方式组织全流程：需求和设计澄清、计划编写、计划审核、开发、TDD、UI 还原、测试、代码审查、CI/CD 和上线前 gate。
 
 PM orchestrator 的职责不是替代所有 skills，而是根据任务风险、项目状态和用户目标决定：
 

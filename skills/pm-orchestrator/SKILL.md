@@ -106,7 +106,7 @@ description: PM 总控层。用于计划后或长任务中进行阶段控制、s
 | Stage | Primary skill | Optional support |
 |---|---|---|
 | unclear goal / creative scope | `/brainstorming` | `/harness-guide` |
-| implementation plan | `/writing-plans` | `/architect` |
+| implementation plan | `/writing-plans` | `/plan-review` for high-risk or multi-stage plans, `/architect` |
 | architecture and docs impact | `/architect` | `/challenger` |
 | implementation | `/developer` | `/tester` for TDD signal |
 | code review | `/reviewer` | review packs, `/challenger` |
@@ -117,6 +117,18 @@ description: PM 总控层。用于计划后或长任务中进行阶段控制、s
 | final release readiness | `/harness-quality-gate` | CI/CD review pack when available |
 
 不要为了形式化而调用无关 skill。PM 的职责是选择合适强度，而不是让每个任务都跑满流程。
+
+### Plan Review Gate
+
+PM 默认不为每个计划强制调度 `/plan-review`。满足任一条件时 SHOULD 调度：
+
+- 跨模块、跨阶段或多角色 handoff。
+- 涉及 public API、数据模型、迁移、权限、安全、支付、发布、CI/CD、UI/e2e 或不可逆操作。
+- 计划包含并行 lane 或高风险 operation gate。
+- spec 与 plan 来自不同会话，或 PM 发现需求 / 计划可能 drift。
+- 用户明确要求 fresh-eyes plan review。
+
+`/plan-review` 返回 `APPROVED` 后才能进入 implementation。返回 `REJECTED` 时回流 `/writing-plans`；返回 `BLOCKED` 时 PM 汇报 blocker 和需要的输入。
 
 ### Phase 4: Decide Serial Or Parallel
 
@@ -178,6 +190,8 @@ PM wave 格式：
 |---|---|
 | unclear requirement | `/brainstorming` or user confirmation |
 | plan missing steps | `/writing-plans` |
+| plan review rejected | `/writing-plans` |
+| plan review blocked | PM clarification or `/brainstorming` when requirements are unclear |
 | architecture/docs impact unclear | `/architect` |
 | implementation bug | `/developer` |
 | test failure due product behavior ambiguity | PM clarification, then `/developer` or `/tester` |

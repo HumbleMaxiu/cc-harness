@@ -51,7 +51,7 @@
 | `docs/FRONTEND.md` | `/harness-setup`（如适用） | 前端相关设计/实现流程 |
 | `AGENTS.md` | `/harness-setup` | `architect` |
 | `docs/design-docs/*` | `/brainstorming` | `architect` |
-| `docs/exec-plans/*` | `/writing-plans` | `architect` / `pm-orchestrator` |
+| `docs/exec-plans/*` | `/writing-plans` | `/plan-review` / `architect` / `pm-orchestrator` |
 | Goal Contract | `/follow-goal` | `pm-orchestrator` / `plan-persist` / 用户 |
 | `docs/product-specs/*` | `/harness-setup` 初始化 domain | 用户任务流 + `architect` |
 | `docs/memory/index.md` | `/harness-setup` | 主执行者 / `feedback-curator` |

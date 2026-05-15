@@ -35,7 +35,7 @@
 目标：从“推荐入口和执行 workflow”升级为“一个 command 从需求推进到上线前 gate”。
 
 - [x] 定义 PM orchestrator 的职责边界和 handoff contract
-- [ ] 建立需求文档、需求评审、需求确认的标准 skill / command 入口
+- [ ] 建立 `/plan-review` 作为 `/writing-plans` 之后、实现之前的可选计划审核 gate
 - [x] 将 TDD、UI 还原、测试、代码审查、CI/CD 信号纳入统一 stage policy
 - [x] 定义审查不通过、测试不通过、CI/CD 失败时的自动回流方案
 - [ ] 按 Review Pack Registry 评估并整合 GitHub 开源资源，形成符合本项目质量要求的可复用 skills / references
@@ -45,7 +45,7 @@
 | 能力层 | 代表入口 | 主要解决什么问题 |
 |--------|----------|------------------|
 | 根入口 | `/harness-help`、`/harness-guide` | 不知道从哪开始 |
-| Planning | `/brainstorming`、`/writing-plans`、`/plan-persist` | 先想清楚，再进入执行 |
+| Planning | `/brainstorming`、`/writing-plans`、`/plan-review`、`/plan-persist` | 先想清楚，检查计划漂移，再进入执行 |
 | Long-running Goals | `/follow-goal` | 迁移、大重构、部署 retry 或实验需要持续推进 |
 | PM Orchestration | `/pm-orchestrator` | 从需求到开发、测试、review、CI/CD gate 的阶段编排 |
 | Execution Skills | `/developer`、`/reviewer`、`/tester`、`/architect` | 被 PM 按阶段调度的实现、审查、验证和文档影响判断能力 |
@@ -57,7 +57,7 @@
 
 下一阶段优先级仍然按下面顺序推进：
 
-1. 强化 planning drift detection，而不引入第二套计划事实源
+1. 强化 planning drift detection：新增 `/plan-review`，但不引入第二套计划事实源
 2. 让 Challenger 更稳定接入 `/pm-orchestrator`
 3. 扩展 audit 的证据强度与文档新鲜度信号
 4. 让 memory -> skill 的升级路径更自动化

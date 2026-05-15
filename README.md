@@ -11,7 +11,7 @@
 `cc-harness` 同时服务两类 AI coding 场景：
 
 - **Vibe coding**：用户和模型协作完成小功能、问题修复、UI 微调或局部重构时，harness 提供轻量 skills、memory、docs sync 和 quality gate，帮助维护文件与产出质量，而不把小任务过度流程化。
-- **AI coding**：用户从 command 或 skill 进入长任务时，harness 逐步覆盖从需求文档、需求评审、需求确认、开发、TDD、UI 还原、测试、代码审查到 CI/CD 的完整流程。目标形态是由 PM orchestrator 根据任务风险和项目状态分配应该使用哪些 skills、哪些阶段需要哪些角色、代码审查严格程度、测试/审查失败后的处理方案，最终实现“一条命令，从需求到上线”。
+- **AI coding**：用户从 command 或 skill 进入长任务时，harness 逐步覆盖从需求和设计澄清、计划编写、计划审核、开发、TDD、UI 还原、测试、代码审查到 CI/CD 的完整流程。目标形态是由 PM orchestrator 根据任务风险和项目状态分配应该使用哪些 skills、哪些阶段需要哪些角色、代码审查严格程度、测试/审查失败后的处理方案，最终实现“一条命令，从需求到上线”。
 
 Claude Code 仍作为兼容 host 支持，但当前分支的核心设计会优先保证 Codex runtime 的 hook 协议、skills 布局和安装结果可用。
 
@@ -39,7 +39,7 @@ flowchart TD
     CodexRuntime --> CodexHost["Codex host<br/>codex_hooks = true"]
     ClaudeRuntime --> ClaudeHost["Claude Code host<br/>compatibility target"]
 
-    CodexHost --> SkillLayer["Skill layer<br/>/harness-guide · /follow-goal · /writing-plans · /pm-orchestrator"]
+    CodexHost --> SkillLayer["Skill layer<br/>/harness-guide · /follow-goal · /writing-plans · /plan-review · /pm-orchestrator"]
     ClaudeHost --> SkillLayer
 
     SkillLayer --> PMOrchestrator["PM orchestrator<br/>stage policy · skill routing · failure handling"]
@@ -98,6 +98,7 @@ flowchart TD
 |-------|---------|
 | `/brainstorming` | 创造性工作前的需求和设计探索 |
 | `/writing-plans` | 多步骤任务计划 |
+| `/plan-review` | 实现前的只读计划审核 gate，由 `/pm-orchestrator` 按风险调度 |
 | `/pm-orchestrator` | PM 总控层，按阶段分配 skills、组织实现/审查/测试/文档同步、处理失败回流和并行/串行策略 |
 | `/follow-goal` | 长跑任务的 durable objective、停止条件和 checkpoint 执行协议 |
 | `/doc-sync` | 文档影响分析、同步和索引维护 |
@@ -131,7 +132,7 @@ flowchart TD
 
 1. 新项目先运行 `/harness-setup` 生成文档骨架。
 2. 新功能先进入 `/brainstorming`，再用 `/writing-plans` 写清范围和验收。
-3. 执行阶段进入 `/pm-orchestrator`，由 PM 分配实现、review、test、docs sync 和 gate。
+3. 执行阶段进入 `/pm-orchestrator`，由 PM 判断是否先调度 `/plan-review`，再分配实现、review、test、docs sync 和 gate。
 4. 文档受影响时运行 `/doc-sync`。
 5. 交付前运行 `/harness-quality-gate`。
 6. 可复用反馈通过 `/feedback` 沉淀到 memory。

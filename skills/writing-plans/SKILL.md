@@ -139,4 +139,6 @@ git commit -m "feat: add specific feature"
 下一步：进入 `/pm-orchestrator`，由 PM 根据计划、风险和文件 ownership 决定串行执行、并行 wave、role skill 分配、review/test gate 和失败回流。
 ```
 
+`/pm-orchestrator` 可以根据风险决定是否调度 `/plan-review` 做 fresh-eyes 审核；`/writing-plans` 自身不直接调用 `/plan-review`，也不决定是否进入实现。
+
 `/writing-plans` 不负责选择具体执行 lane。串行/并行、role skill 调度、review pack 和 quality gate 都由 `/pm-orchestrator` 判断。

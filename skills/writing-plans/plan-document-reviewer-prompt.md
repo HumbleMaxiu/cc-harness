@@ -1,4 +1,6 @@
-# 计划文档审查员提示模板
+# 计划文档审查员提示模板（Legacy Reference）
+
+正式计划审核入口是 `/plan-review`。本文件仅保留为历史 prompt 参考；PM 调度时应优先使用 `skills/plan-review/SKILL.md` 的 output contract。
 
 在派发计划文档审查员子代理时使用此模板。
 
