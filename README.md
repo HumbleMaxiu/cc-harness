@@ -92,6 +92,26 @@ flowchart TD
 
 面向 AI 的安装说明在 [docs/install-ai.md](docs/install-ai.md)。可以把这份文档发给另一个 AI coding agent，让它把 `cc-harness` 安装到目标项目。
 
+### 复制给 Codex 的安装提示词
+
+把下面这段复制到 Codex，并把目标项目路径替换成你的项目路径：
+
+```text
+请把 cc-harness 安装到这个目标项目：
+
+<TARGET_PROJECT_PATH>
+
+请先阅读并遵循安装说明：
+https://github.com/HumbleMaxiu/cc-harness/blob/codex/subagent-skill/docs/install-ai.md
+
+要求：
+- 不要把安装说明内容复述给我，按文档执行即可。
+- 如果本机没有 cc-harness checkout，请按文档在临时目录 clone 指定分支后安装。
+- 安装 target 使用 both，除非我另行指定只安装 codex 或 claude-code。
+- 安装后运行文档里的严格验证，确认 .codex 和 .claude 的关键 runtime 文件都存在。
+- 最后告诉我执行的命令、安装到哪里、验证是否通过、是否有失败或需要我处理的事项。
+```
+
 ## 核心 Skills
 
 | Skill | 用途 |

@@ -10,12 +10,26 @@ source 仓库不保存已提交的 runtime folders。必须运行安装器，由
 
 ## 前置条件
 
-- 本地已有 `cc-harness` checkout
 - 可以通过 `node` 使用 Node.js
 - 已知目标项目路径
 - 对目标项目有写入权限
+- 本地已有 `cc-harness` checkout；如果没有，请在临时目录中 clone 用户指定的 branch / tag / commit，再从该临时 checkout 运行安装器
 
-## 命令
+## 获取 source checkout
+
+如果用户已经提供本地 `cc-harness` checkout，直接使用它。
+
+如果用户只提供远端仓库或文档链接，请先在临时目录中 clone source checkout。示例：
+
+```bash
+tmpdir=$(mktemp -d)
+git clone --branch codex/subagent-skill --single-branch https://github.com/HumbleMaxiu/cc-harness.git "$tmpdir/cc-harness"
+cd "$tmpdir/cc-harness"
+```
+
+如果用户指定了其他 branch、tag 或 commit，以用户指定版本为准。不要使用旧 commit 中已删除的 runtime mirror directories。
+
+## 安装命令
 
 在 `cc-harness` checkout 中运行：
 
@@ -55,11 +69,23 @@ Codex：
 
 ## 验证
 
-安装后，确认生成文件存在：
+安装后，严格确认生成文件存在。不要用 `|| true` 隐藏失败：
 
 ```bash
-test -f /path/to/target/project/.claude/settings.json || true
-test -f /path/to/target/project/.codex/hooks.json || true
+target=/path/to/target/project
+
+test -d "$target/.claude/skills"
+test -d "$target/.claude/scripts/hooks"
+test -f "$target/.claude/package.json"
+test -f "$target/.claude/settings.json"
+test -f "$target/.claude/hook-logging.json"
+
+test -d "$target/.codex/skills"
+test -d "$target/.codex/scripts/hooks"
+test -f "$target/.codex/package.json"
+test -f "$target/.codex/config.toml"
+test -f "$target/.codex/hooks.json"
+test -f "$target/.codex/hook-logging.json"
 ```
 
 当前 source checkout 没有 repo-local npm test/check script。请使用上面的 install smoke checks 作为验证路径。
