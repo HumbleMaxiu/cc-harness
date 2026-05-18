@@ -34,7 +34,7 @@
 3. 多步骤任务先写 plan。
 4. 长跑任务先用 `/follow-goal` 明确 objective、stopping condition 和 validation loop。
 5. 通过 `/pm-orchestrator` 执行；高风险或多阶段计划由 PM 先调度 `/plan-review`。
-6. 使用 role skills 覆盖 architecture、implementation、review、testing、challenge 和 feedback curation。
+6. `/developer` 执行单 slice；行为变更默认通过 `/tdd` 留下 RED/GREEN/REFACTOR 证据。
 7. 同步 docs。
 8. 运行 quality gate。
 
@@ -43,11 +43,20 @@
 | Role Skill | 用途 |
 |------------|-----|
 | `/architect` | 检查 plan 和 docs impact |
-| `/developer` | 基于 TDD evidence 实现 |
+| `/developer` | 单 slice 实现、技术栈识别和 TDD 证据输出 |
 | `/reviewer` | 审查 changed code 和 risks |
 | `/tester` | 探测并运行 verification commands |
 | `/challenger` | 挑战 claims 和 assumptions |
 | `/feedback-curator` | 将可复用 findings 转入 feedback memory |
+
+## Review Pack Routing
+
+| 场景 | 推荐流程 |
+|------|----------|
+| 涉及 auth/secrets/tenant boundary | `/pm-orchestrator` -> `/reviewer` + `/review-security` |
+| 修改 GitHub Actions | `/pm-orchestrator` -> `/reviewer` + `/review-github-actions` |
+| 修改复杂 UI | `/pm-orchestrator` -> `/reviewer` + `/review-frontend` |
+| 修改 hot path/query/cache/bundle | `/pm-orchestrator` -> `/reviewer` + `/review-performance` |
 
 ## 恢复顺序
 

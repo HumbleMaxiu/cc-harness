@@ -139,13 +139,15 @@ CI/CD 或 testing skill 的输出建议统一为：
 
 `/pm-orchestrator` 不直接绑定某个三方项目，而是按 capability 调用：
 
-| Capability | 本地入口 | 可复用来源示例 |
-|------------|----------|----------------|
-| `security_review` | `/review-security` | Trail of Bits security skills |
-| `github_actions_review` | `/review-github-actions` | Trail of Bits / Sentry GitHub workflow skills |
-| `supply_chain_audit` | `/review-supply-chain` | Trail of Bits supply-chain skills |
-| `ui_verification` | `/ui-verify` | Playwright skill / UAT skills |
-| `ci_cd_triage` | `/ci-cd-gate` | GitHub Actions triage skills |
+| Capability | 本地入口 | Status | 可复用来源示例 |
+|------------|----------|--------|----------------|
+| `security_review` | `/review-security` | implemented-local | Sentry security-review, Semgrep, Gitleaks, OSV-Scanner |
+| `github_actions_review` | `/review-github-actions` | implemented-local | Sentry gha-security-review, Trail of Bits agentic-actions-auditor, zizmor, actionlint |
+| `frontend_review` | `/review-frontend` | implemented-local | axe-core, Pa11y, Lighthouse CI, Playwright evidence |
+| `performance_review` | `/review-performance` | implemented-local | Lighthouse CI, size-limit, bundle analyzers |
+| `supply_chain_audit` | `/review-supply-chain` | candidate | Trail of Bits supply-chain skills |
+| `ui_verification` | `/ui-verify` | planned | Playwright skill / UAT skills |
+| `ci_cd_triage` | `/ci-cd-gate` | candidate | GitHub Actions triage skills |
 
 本地入口可以是三方改编，也可以是自研 wrapper。PM orchestrator 只关心 capability 的输入输出契约。
 

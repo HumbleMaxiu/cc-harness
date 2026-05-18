@@ -36,6 +36,7 @@
 
 - [x] 定义 PM orchestrator 的职责边界和 handoff contract
 - [ ] 建立 `/plan-review` 作为 `/writing-plans` 之后、实现之前的可选计划审核 gate
+- [ ] 将 `/developer` 收敛为 stack-aware slice executor，并把 TDD discipline 抽成 `/tdd`
 - [x] 将 TDD、UI 还原、测试、代码审查、CI/CD 信号纳入统一 stage policy
 - [x] 定义审查不通过、测试不通过、CI/CD 失败时的自动回流方案
 - [ ] 按 Review Pack Registry 评估并整合 GitHub 开源资源，形成符合本项目质量要求的可复用 skills / references
@@ -48,7 +49,7 @@
 | Planning | `/brainstorming`、`/writing-plans`、`/plan-review`、`/plan-persist` | 先想清楚，检查计划漂移，再进入执行 |
 | Long-running Goals | `/follow-goal` | 迁移、大重构、部署 retry 或实验需要持续推进 |
 | PM Orchestration | `/pm-orchestrator` | 从需求到开发、测试、review、CI/CD gate 的阶段编排 |
-| Execution Skills | `/developer`、`/reviewer`、`/tester`、`/architect` | 被 PM 按阶段调度的实现、审查、验证和文档影响判断能力 |
+| Execution Skills | `/developer`、`/tdd`、`/reviewer`、`/tester`、`/architect` | 被 PM 按阶段调度的实现、TDD、审查、验证和文档影响判断能力 |
 | Documentation | `/doc-sync` | 代码变了但文档没跟上 |
 | Audit / Gate | `/harness-audit`、`/harness-quality-gate` | 交付前缺少健康检查和门禁 |
 | Retention | `/feedback`、memory、recurrence | 反馈只停留在聊天里 |

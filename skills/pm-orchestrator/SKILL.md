@@ -108,7 +108,7 @@ description: PM 总控层。用于计划后或长任务中进行阶段控制、s
 | unclear goal / creative scope | `/brainstorming` | `/harness-guide` |
 | implementation plan | `/writing-plans` | `/plan-review` for high-risk or multi-stage plans, `/architect` |
 | architecture and docs impact | `/architect` | `/challenger` |
-| implementation | `/developer` | `/tester` for TDD signal |
+| implementation | `/developer` | `/tdd` for behavior changes, `/tester` for independent verification |
 | code review | `/reviewer` | review packs, `/challenger` |
 | verification | `/tester` | `/harness-quality-gate` |
 | skill changes | `/skill-creator` or direct edit | `/skill-audit` |
@@ -117,6 +117,17 @@ description: PM 总控层。用于计划后或长任务中进行阶段控制、s
 | final release readiness | `/harness-quality-gate` | CI/CD review pack when available |
 
 不要为了形式化而调用无关 skill。PM 的职责是选择合适强度，而不是让每个任务都跑满流程。
+
+### Review Pack Scheduling
+
+PM keeps `/reviewer` as the default code review skill and adds review packs by risk:
+
+- auth, permission, secrets, tenant boundary, payment, external request, SQL/shell/template execution, dependency risk: add `/review-security`.
+- `.github/workflows/**`, `action.yml`, `.github/actions/**`, workflow-loaded scripts, or AI agent actions in CI: add `/review-github-actions`.
+- UI components, forms, navigation, loading/error/empty states, accessibility, responsive layout or visual behavior: add `/review-frontend`.
+- hot paths, queries, pagination, cache, API fan-out, large lists, bundle size or expensive render/computation: add `/review-performance`.
+
+Multiple review packs may run in parallel because they are read-only, but PM must aggregate their `Review Handoff` results before deciding whether to backflow to `/developer`.
 
 ### Plan Review Gate
 
@@ -129,6 +140,20 @@ PM 默认不为每个计划强制调度 `/plan-review`。满足任一条件时 S
 - 用户明确要求 fresh-eyes plan review。
 
 `/plan-review` 返回 `APPROVED` 后才能进入 implementation。返回 `REJECTED` 时回流 `/writing-plans`；返回 `BLOCKED` 时 PM 汇报 blocker 和需要的输入。
+
+### TDD Policy
+
+PM 默认对行为变更、bugfix、refactor 和边界条件处理设置 `tdd_required: true`。满足以下任一条件时 MAY 允许 `tdd_exception`：
+
+- 纯文档、纯注释、纯格式化或静态配置。
+- 生成代码或 spike，且用户明确接受后续补测试。
+- 当前 repo 没有可运行测试入口，PM 决定先完成最小实现并把测试缺口交给 `/tester` 或后续计划。
+
+`/developer` 执行 slice 时负责调用 `/tdd` 协议或记录 TDD exception。`/tester` 做实现后的独立验证，不替代 `/tdd` 的 RED/GREEN/REFACTOR 证据。
+
+当 PM 允许 docs-only / config-only 的 `tdd_exception` 时，SHOULD 要求 `/developer` 输出例外原因和证据。证据可以是 scoped diff、hash、命令输出或文件列表，用于证明生产代码或运行行为未被该 slice 改动。
+
+PM 汇总 TDD evidence 时，不只看测试最终通过，还要检查 acceptance coverage：每条验收条件应标明 `RED_VERIFIED`、`GREEN_ONLY` 或 `NOT_COVERED`。核心行为变更缺少 RED evidence 时，回流 `/developer` with `/tdd`；只有低风险补充断言或历史行为可接受 `GREEN_ONLY`，并应在风险说明中写清楚。
 
 ### Phase 4: Decide Serial Or Parallel
 
@@ -194,6 +219,9 @@ PM wave 格式：
 | plan review blocked | PM clarification or `/brainstorming` when requirements are unclear |
 | architecture/docs impact unclear | `/architect` |
 | implementation bug | `/developer` |
+| TDD red invalid or missing | `/developer` with `/tdd` |
+| test entry missing | PM decision, then `/developer` with exception or `/tester` |
+| developer scope expansion | PM clarification or `/writing-plans` when plan ownership is wrong |
 | test failure due product behavior ambiguity | PM clarification, then `/developer` or `/tester` |
 | test failure due test expectation drift | `/tester`, then PM decision |
 | review finding | `/developer` or relevant review pack |

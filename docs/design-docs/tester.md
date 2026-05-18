@@ -12,7 +12,7 @@
 
 ## 测试流程
 
-1. 读取交接文档，理解 Developer 的实现范围
+1. 读取 `Developer Result`、PM Run Trace 或交接文档，理解实现范围
 2. 读取 memory / prevents-recurrence（如果存在）
 3. 探测项目语言、构建系统和验证入口
 4. 建立本轮测试矩阵（unit / integration / regression / lint / typecheck / build）

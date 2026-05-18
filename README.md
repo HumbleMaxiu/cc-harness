@@ -100,6 +100,7 @@ flowchart TD
 | `/writing-plans` | 多步骤任务计划 |
 | `/plan-review` | 实现前的只读计划审核 gate，由 `/pm-orchestrator` 按风险调度 |
 | `/pm-orchestrator` | PM 总控层，按阶段分配 skills、组织实现/审查/测试/文档同步、处理失败回流和并行/串行策略 |
+| `/tdd` | RED/GREEN/REFACTOR 纪律，供 `/developer` 在行为变更中调用 |
 | `/follow-goal` | 长跑任务的 durable objective、停止条件和 checkpoint 执行协议 |
 | `/doc-sync` | 文档影响分析、同步和索引维护 |
 | `/plan-persist` | active plan / Run Trace 的轻量持续化 |
@@ -121,8 +122,12 @@ flowchart TD
 |------------|---------|
 | `/architect` | 计划检查、docs impact 判断、文档同步 gatekeeping |
 | `/challenger` | 对计划、claim、API 假设和完成声明做对抗式验证 |
-| `/developer` | 按计划和 TDD 约束执行实现 |
+| `/developer` | PM 调度下的轻量实现者，负责单 slice 实现、技术栈识别和 TDD 证据输出 |
 | `/reviewer` | 代码质量和安全审查 |
+| `/review-security` | 安全专项审查 pack，按 high-confidence data-flow 模式审查 auth、secrets、injection、tenant boundary 和 dependency risk |
+| `/review-github-actions` | GitHub Actions 专项审查 pack，覆盖 workflow 安全和 AI agent action 风险 |
+| `/review-frontend` | 前端专项审查 pack，覆盖 UI 状态、a11y、responsive、forms 和 interaction risk |
+| `/review-performance` | 性能专项审查 pack，覆盖 hot path、queries、cache、bundle、large lists 和 expensive render/computation |
 | `/tester` | 探测并执行测试、lint、typecheck、build 等验证 |
 | `/feedback-curator` | 维护 role/self-check feedback memory 与 recurrence |
 

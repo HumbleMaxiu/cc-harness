@@ -54,7 +54,8 @@ description: <能力说明 + 触发场景>
 | follow-goal | 长跑任务的 durable objective、停止条件和 checkpoint 执行协议 |
 | architect | 计划检查和文档影响判断 |
 | challenger | 对抗式验证 |
-| developer | TDD 实现 |
+| developer | PM 调度下的轻量单 slice 实现 |
+| tdd | RED/GREEN/REFACTOR 纪律，供 implementation workflow 复用 |
 | reviewer | 代码质量和安全审查 |
 | tester | 验证入口探测和测试执行 |
 | feedback-curator | feedback memory 维护 |
@@ -159,6 +160,15 @@ node scripts/checks/skill-standard.mjs
 ### Review Packs
 
 Review pack 是可被 PM orchestrator 按 capability 调度的专项 review / verification skill。首批候选 capability、source project、license 状态和 wrapper 需求记录在 [Review Pack Registry](../references/review-pack-registry.md)。
+
+已实现的第一批 review packs：
+
+- `/review-security`
+- `/review-github-actions`
+- `/review-frontend`
+- `/review-performance`
+
+这些 pack 是轻量自研 wrapper，不直接 vendoring 三方 skill；三方项目作为 source attribution 和 optional tool references 记录在各自 `references/source.md`。
 
 ## 相关文档
 

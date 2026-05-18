@@ -16,10 +16,10 @@ Review pack 是一种特殊 skill：
 
 | Capability | Local Skill | Source Project | Source Path | License | Status | Notes |
 |------------|-------------|----------------|-------------|---------|--------|-------|
-| `security_review` | `/review-security` | Trail of Bits skills | `plugins/*` security review packs, e.g. static analysis / differential review | CC-BY-SA-4.0 | candidate | 只登记候选；复制或改编前需要 license 决策和 output contract wrapper |
-| `security_review` | `/review-security` | Sentry skills | `skills/security-review`、`skills/code-review` | Apache-2.0 | candidate | 可评估引用结构和 severity 输出；需去除 Sentry-specific policy |
-| `github_actions_review` | `/review-github-actions` | Trail of Bits skills | `plugins/agentic-actions-auditor/skills/agentic-actions-auditor` | CC-BY-SA-4.0 | candidate | 聚焦 AI agent GitHub Actions security；需要 source attribution 和 Review Handoff wrapper |
-| `github_actions_review` | `/review-github-actions` | Sentry skills | `skills/gha-security-review` | Apache-2.0 | candidate | 可评估 GitHub Actions security review 输出结构 |
+| `security_review` | `/review-security` | Sentry security-review, Semgrep, Gitleaks, OSV-Scanner | see `/review-security/references/source.md` | mixed, reference-only | implemented-local | Lightweight high-confidence security review pack; dependency lane included until supply-chain pack exists |
+| `github_actions_review` | `/review-github-actions` | Sentry gha-security-review, Trail of Bits agentic-actions-auditor, zizmor, actionlint | see `/review-github-actions/references/source.md` | mixed, reference-only | implemented-local | Includes agentic actions mode for AI agent workflows |
+| `frontend_review` | `/review-frontend` | axe-core, Pa11y, Lighthouse CI, Playwright | see `/review-frontend/references/source.md` | mixed, reference-only | implemented-local | Code review for UI state, accessibility and interaction risk; consumes but does not create browser evidence |
+| `performance_review` | `/review-performance` | Lighthouse CI, size-limit, webpack bundle analyzer, project-native profilers | see `/review-performance/references/source.md` | mixed, reference-only | implemented-local | High-signal performance risk review; not full profiling |
 | `supply_chain_audit` | `/review-supply-chain` | Trail of Bits skills | `plugins/supply-chain-risk-auditor` | CC-BY-SA-4.0 | candidate | 只登记候选；需明确 package manager 覆盖范围和 false positive 处理 |
 | `ui_verification` | `/ui-verify` | OpenAI bundled / Playwright-like skills | browser / webapp testing skills | varies | planned | 当前仓库可自研 wrapper，输出 Verification Handoff；三方来源待单独调研 |
 | `ci_cd_triage` | `/ci-cd-gate` | GitHub skills / Sentry iterate-pr | GitHub CI triage / `skills/iterate-pr` | Apache-2.0 for Sentry | candidate | 需要和现有 `/harness-quality-gate`、PM orchestrator failure routing 对齐 |
@@ -42,8 +42,9 @@ PM orchestrator SHOULD 按任务风险选择 review pack：
 
 - 涉及 auth、permissions、secrets、payments、tenant boundary：调度 `security_review`。
 - 修改 `.github/workflows/` 或 AI agent CI：调度 `github_actions_review`。
-- 修改 dependencies、lockfile、package manager config：调度 `supply_chain_audit`。
-- 修改 UI、visual behavior、responsive layout：调度 `ui_verification`。
-- CI/CD 失败或发布 gate 前：调度 `ci_cd_triage`。
+- 修改 dependencies、lockfile、package manager config：优先调度 `security_review` dependency lane；未来可拆到 `supply_chain_audit`。
+- 修改 UI、visual behavior、responsive layout：调度 `frontend_review`；需要真实浏览器验收时，只有在 `/ui-verify` implemented 后才调度 `ui_verification`，否则记录 `needs_verification`。
+- 修改 hot path、query、cache、bundle、large list 或 expensive render/computation：调度 `performance_review`。
+- CI/CD 失败或发布 gate 前：`ci_cd_triage` 仍是 future capability；在 `/ci-cd-gate` implemented 前不要把它当作当前 review pack 调度。
 
-本计划不实现具体 review pack；只建立接入规范和 registry。
+本 registry 现在包含第一批 implemented-local review packs；candidate rows 表示未来可拆出的能力。
