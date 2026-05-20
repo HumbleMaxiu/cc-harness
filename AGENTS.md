@@ -54,6 +54,7 @@
 | `/harness-guide` | 根据场景推荐 workflow |
 | `/harness-audit` | 检查 harness 健康度 |
 | `/harness-quality-gate` | 交付前质量门禁 |
+| `/ci-cd-gate` | GitHub Actions PR checks / CI 日志读取、失败分类、交付阻断判断和 PM 回流建议 |
 | `/feedback` | 分诊并提交长期用户反馈 |
 | `/feedback-query` | 查询 feedback 历史和 recurrence |
 | `/skill-creator` | 创建、编辑和审计 Skill |

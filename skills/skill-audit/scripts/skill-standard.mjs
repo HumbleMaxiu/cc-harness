@@ -13,6 +13,7 @@ const root = path.dirname(skillsDir);
 const keySkills = new Set([
   "architect",
   "challenger",
+  "ci-cd-gate",
   "developer",
   "pm-orchestrator",
   "plan-review",

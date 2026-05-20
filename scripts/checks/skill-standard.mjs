@@ -12,6 +12,7 @@ const skillsDir = path.join(root, "skills");
 const keySkills = new Set([
   "architect",
   "challenger",
+  "ci-cd-gate",
   "developer",
   "pm-orchestrator",
   "plan-review",

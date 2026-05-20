@@ -93,9 +93,11 @@ description: PM 总控层。用于计划后或长任务中进行阶段控制、s
 常见动作分类：
 
 - 普通文件编辑：`reversible-write`
+- 创建或修改只运行测试、lint、typecheck、build 的 CI workflow：`reversible-write`
 - `git commit`：`local-history-write`
 - 删除不可恢复数据、重写公共历史或破坏性迁移：`irreversible-write`
 - `git push`、发布、发消息、创建外部 issue / ticket：`external-side-effect`
+- CI workflow 包含 deploy、release、package publish、environment approval、OIDC、secrets 或写权限 token：`external-side-effect`
 
 `local-history-write` SHOULD 进入 Operation Gate，除非用户已经明确要求提交。`irreversible-write` 和 `external-side-effect` MUST 先进入 Operation Gate。commit 和 push 必须分开判断；允许 commit 不代表允许 push。
 
@@ -109,12 +111,14 @@ description: PM 总控层。用于计划后或长任务中进行阶段控制、s
 | implementation plan | `/writing-plans` | `/plan-review` for high-risk or multi-stage plans, `/architect` |
 | architecture and docs impact | `/architect` | `/challenger` |
 | implementation | `/developer` | `/tdd` for behavior changes, `/tester` for independent verification |
+| CI setup or workflow edit | `/developer` | `/review-github-actions`, `/tester`, `/ci-cd-gate` after PR/push |
 | code review | `/reviewer` | review packs, `/challenger` |
 | verification | `/tester` | `/harness-quality-gate` |
 | skill changes | `/skill-creator` or direct edit | `/skill-audit` |
 | docs impact | `/doc-sync` | `/architect` |
 | feedback / recurrence | `/feedback-curator` | `/feedback`, `/feedback-query` |
-| final release readiness | `/harness-quality-gate` | CI/CD review pack when available |
+| CI/CD status and failure triage | `/ci-cd-gate` | `/tester`, `/review-github-actions`, `/review-security` |
+| final release readiness | `/harness-quality-gate` | `/ci-cd-gate` when PR/CI context exists |
 
 不要为了形式化而调用无关 skill。PM 的职责是选择合适强度，而不是让每个任务都跑满流程。
 
@@ -128,6 +132,33 @@ PM keeps `/reviewer` as the default code review skill and adds review packs by r
 - hot paths, queries, pagination, cache, API fan-out, large lists, bundle size or expensive render/computation: add `/review-performance`.
 
 Multiple review packs may run in parallel because they are read-only, but PM must aggregate their `Review Handoff` results before deciding whether to backflow to `/developer`.
+
+### CI/CD Gate Scheduling
+
+PM SHOULD route to `/ci-cd-gate` when:
+
+- user asks whether CI, GitHub Actions, PR checks, build, release, or deploy is ready.
+- `/tester` passes locally but remote checks are failing, pending, stale, or unknown.
+- final handoff depends on PR checks or release readiness.
+- CI failure needs classification before assigning `/developer`, `/tester`, `/review-github-actions`, or `/review-security`.
+
+`/ci-cd-gate` is read-only. Rerun workflow, push fix, post PR comment, merge, release, or deploy remain `external-side-effect` operations and require Operation Gate confirmation.
+
+### CI Setup Scheduling
+
+PM MAY assign CI workflow creation or edits to `/developer` when the slice is explicit and file ownership includes `.github/workflows/**`, `action.yml`, `.github/actions/**`, or workflow-loaded scripts.
+
+For a basic CI workflow that only runs existing tests, lint, typecheck, or build:
+
+- set `operation_risk: reversible-write`.
+- set `files_allowed` to the exact workflow/config paths.
+- set `tdd_exception_allowed: true` because this is config-only.
+- require `/developer` to identify stack commands from repo config, not invent new commands.
+- require `/review-github-actions` after the workflow edit.
+- require `/tester` to run the local commands referenced by the workflow when feasible.
+- require `/ci-cd-gate` after PR/push when remote CI evidence exists.
+
+If the workflow includes deploy, release, package publish, environment approval, OIDC, secrets, write permissions, or any external system write, PM MUST run Operation Gate before implementation and treat the action as `external-side-effect`.
 
 ### Plan Review Gate
 
@@ -225,6 +256,10 @@ PM wave 格式：
 | test failure due product behavior ambiguity | PM clarification, then `/developer` or `/tester` |
 | test failure due test expectation drift | `/tester`, then PM decision |
 | review finding | `/developer` or relevant review pack |
+| CI test/lint/typecheck/build failure | `/ci-cd-gate` classifies, then `/developer` or `/tester` |
+| CI workflow/config failure | `/ci-cd-gate`, then `/review-github-actions` and `/developer` |
+| CI secret/permission/security failure | `/ci-cd-gate`, then `/review-security` plus `/review-github-actions`, or user decision |
+| CI pending or stale | `/ci-cd-gate` returns `PENDING` / `STALE`; PM cannot claim release-ready |
 | missing docs update | `/doc-sync` |
 | skill standard failure | `/skill-creator` then `/skill-audit` |
 | repeated failure without new evidence | PM blocks and reports options |

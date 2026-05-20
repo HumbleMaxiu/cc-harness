@@ -12,6 +12,7 @@ description: 用于 /pm-orchestrator 分配明确 implementation slice 后执行
 - `/pm-orchestrator` 已分配明确的 `plan_path`、`task_id`、`step_scope` 和文件 ownership。
 - 需要实现一个小的 feature slice、bugfix slice、refactor slice 或测试修复 slice。
 - 当前任务需要先识别 repo 技术栈、测试入口和本地实现约定。
+- PM 明确授权 config/CI slice，例如创建或修改 `.github/workflows/**` 来运行现有测试、lint、typecheck 或 build。
 
 ## 何时不要使用
 
@@ -27,6 +28,7 @@ description: 用于 /pm-orchestrator 分配明确 implementation slice 后执行
 - 当前 task 引用的 spec、acceptance criteria 和 plan steps。
 - 内置实践：`references/stack-detection.md`。
 - 用户 repo 约定：`AGENTS.md`、`docs/conventions/`、`docs/memory/feedback/prevents-recurrence.md`、相关测试配置和同类实现文件。
+- CI/config slice 还要读取现有 `.github/workflows/**`、`action.yml`、`.github/actions/**`、package/tool config、lockfile 和本地验证命令。
 
 ## 执行流程
 
@@ -38,10 +40,18 @@ description: 用于 /pm-orchestrator 分配明确 implementation slice 后执行
    - `codex_inference`: 内置和 repo 都没有明确实践时，使用 Codex 对当前代码库的推断继续实现。
 4. 读取待修改文件、相邻测试和一个相似实现例子。
 5. 如果 `tdd_required: true` 或本 slice 是行为变更，使用 `/tdd` 协议执行 RED/GREEN/REFACTOR，并把 acceptance coverage 纳入 `Developer Result`。
-6. 只做最小实现；不要计划外重构、现代化语法、移动文件或新增依赖。
-7. 对 docs-only / config-only slice，如果 PM 允许 TDD exception，记录固定 `tdd_exception` 字段；必要时用 hash 或 diff 证明生产代码未被触碰。
-8. 运行最小相关验证；按 PM policy 或风险扩大到 lint、typecheck、build。
-9. 输出轻量 `Developer Result`；不要写单独交接文档文件。
+6. 如果 PM 分配的是 CI/config slice：
+   - 只创建或修改 `files_allowed` 中授权的 config，例如 `.github/workflows/ci.yml`。
+   - workflow 必须对齐 repo 已有测试、lint、typecheck、build 命令。
+   - 默认使用最小权限，例如 `permissions: contents: read`。
+   - 不要默认加入 deploy、release、package publish、environment、OIDC、secrets 或写权限 token。
+   - 如果任务需要 deploy/release/secrets/OIDC/publish，返回 `BLOCKED`，要求 PM operation gate 明确授权。
+   - 记录 `tdd_exception`，因为 CI/config slice 通常不改运行行为；同时运行本地命令验证 workflow 调用的 scripts 存在且可执行。
+   - 在 `docs_impact` 或 `scope_changes` 中建议 PM 后续调度 `/review-github-actions`、`/tester` 和 `/ci-cd-gate`。
+7. 只做最小实现；不要计划外重构、现代化语法、移动文件或新增依赖。
+8. 对 docs-only / config-only slice，如果 PM 允许 TDD exception，记录固定 `tdd_exception` 字段；必要时用 hash 或 diff 证明生产代码未被触碰。
+9. 运行最小相关验证；按 PM policy 或风险扩大到 lint、typecheck、build。
+10. 输出轻量 `Developer Result`；不要写单独交接文档文件。
 
 ## 输出格式
 
@@ -76,6 +86,7 @@ description: 用于 /pm-orchestrator 分配明确 implementation slice 后执行
 - repo 约定和计划冲突，无法安全选择。
 - TDD RED 失败原因不正确、测试入口无法推断或 GREEN 需要扩大 scope。
 - 实现需要架构决策、外部副作用、不可逆操作或新增依赖但 PM 未授权。
+- CI/config slice 需要 deploy、release、package publish、environment、OIDC、secrets、write-all permissions 或外部系统写入，但 PM 未完成 operation gate。
 
 ## 可调用 Skills
 
